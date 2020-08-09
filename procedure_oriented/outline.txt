@@ -1,0 +1,4 @@
+
+C++'s procedure_oriented may be considered as just C.
+
+Linux API  may be considered as in C, and put into LinuxProgramming.
