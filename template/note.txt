@@ -1,0 +1,18 @@
+
+
+template function
+
+template class
+
+template class 's template function
+
+
+
+模板文件不直接产生.o, 也就不产生 库。
+模板文件通常直接包含，代码编译，因此也以hpp为后缀。
+
+
+
+
+typename vs class
+https://liam.page/2018/03/16/keywords-typename-and-class-in-Cxx/

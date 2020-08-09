@@ -2,7 +2,7 @@
 
 BUILD_DIR ?= build
 .PHONY: build clean
-default: run_argv
+default: run_template_function
 
 
 build: $(BUILD_DIR)/Makefile
@@ -15,5 +15,12 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run_argv: build
-	$(BUILD_DIR)/argv
+run_template_function: build
+	$(BUILD_DIR)/template_function
+
+run_template_class: build
+	$(BUILD_DIR)/template_class
+
+run_template_class_template_function: build
+	$(BUILD_DIR)/template_class_template_function
+

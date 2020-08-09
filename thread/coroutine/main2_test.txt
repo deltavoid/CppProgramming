@@ -1,0 +1,78 @@
+
+
+i7-8550U
+
+
+N = 1e6
+
+ Performance counter stats for 'blade-bin/coroutine/main2':
+
+             38.30 msec task-clock                #    0.993 CPUs utilized          
+                 0      context-switches          #    0.000 K/sec    .git              
+                 0      cpu-migrations            #    0.000 K/sec                  
+               147      page-faults               #    0.004 M/sec                  
+        95,035,287      cycles                    #    2.481 GHz                    
+       132,444,848      instructions              #    1.39  insn per cycle         
+        21,783,755      branches                  #  568.771 M/sec                  
+         2,023,791      branch-misses             #    9.29% of all branches        
+
+       0.038571782 seconds time elapsed
+
+       0.038592000 seconds user
+       0.000000000 seconds sys
+
+N = 1e7
+
+ Performance counter stats for 'blade-bin/coroutine/main2':
+
+            324.70 msec task-clock                #    0.996 CPUs utilized          
+                34      context-switches          #    0.105 K/sec                  
+                 0      cpu-migrations            #    0.000 K/sec                  
+               148      page-faults               #    0.456 K/sec                  
+       939,726,633      cycles                    #    2.894 GHz                    
+     1,285,295,745      instructions              #    1.37  insn per cycle         
+       210,932,103      branches                  #  649.613 M/sec                  
+        20,033,274      branch-misses             #    9.50% of all branches        
+
+       0.326028195 seconds time elapsed
+
+       0.317537000 seconds user
+       0.008038000 seconds sys
+
+
+N = 1e8
+
+ Performance counter stats for 'blade-bin/coroutine/main2':
+
+          2,482.98 msec task-clock                #    1.000 CPUs utilized          
+                 7      context-switches          #    0.003 K/sec                  
+                 0      cpu-migrations            #    0.000 K/sec                  
+               150      page-faults               #    0.060 K/sec                  
+     9,158,886,739      cycles                    #    3.689 GHz                    
+    12,807,631,309      instructions              #    1.40  insn per cycle         
+     2,101,308,876      branches                  #  846.286 M/sec                  
+       200,077,360      branch-misses             #    9.52% of all branches        
+
+       2.483591267 seconds time elapsed
+
+       2.483534000 seconds user
+       0.000000000 seconds sys
+
+
+N = 1e9
+
+ Performance counter stats for 'blade-bin/coroutine/main2':
+
+         26,097.06 msec task-clock                #    1.000 CPUs utilized          
+               212      context-switches          #    0.008 K/sec                  
+                 1      cpu-migrations            #    0.000 K/sec                  
+               152      page-faults               #    0.006 K/sec                  
+    91,892,969,008      cycles                    #    3.521 GHz                    
+   128,046,365,743      instructions              #    1.39  insn per cycle         
+    21,007,809,763      branches                  #  804.988 M/sec                  
+     2,000,883,017      branch-misses             #    9.52% of all branches        
+
+      26.102794435 seconds time elapsed
+
+      26.096565000 seconds user
+       0.000000000 seconds sys

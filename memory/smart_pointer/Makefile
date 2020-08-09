@@ -2,7 +2,7 @@
 
 BUILD_DIR ?= build
 .PHONY: build clean
-default: run_argv
+#default: run_argv
 
 
 build: $(BUILD_DIR)/Makefile
@@ -15,5 +15,12 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run_argv: build
-	$(BUILD_DIR)/argv
+run_scoped_ptr: build
+	$(BUILD_DIR)/scoped_ptr
+
+run_unique_ptr1: build
+	$(BUILD_DIR)/unique_ptr1
+
+run_unique_ptr2: build
+	$(BUILD_DIR)/unique_ptr2
+

@@ -2,7 +2,7 @@
 
 BUILD_DIR ?= build
 .PHONY: build clean
-default: run_argv
+default: run_iostream_iterator
 
 
 build: $(BUILD_DIR)/Makefile
@@ -15,5 +15,8 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run_argv: build
-	$(BUILD_DIR)/argv
+run_iostream_iterator: build
+	$(BUILD_DIR)/iostream_iterator
+
+run_fstream_iterator: build
+	$(BUILD_DIR)/fstream_iterator

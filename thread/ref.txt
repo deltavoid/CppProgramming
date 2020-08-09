@@ -1,0 +1,36 @@
+
+
+threadpool
+
+http://threadpool.sourceforge.net/design/pattern.html
+
+http://threadpool.sourceforge.net/
+
+https://ce39906.github.io/2018/03/29/C-Thread-Pool-%E4%BD%BF%E7%94%A8%E8%A7%A3%E6%9E%90/
+
+https://blog.csdn.net/byxdaz/article/details/6299020
+
+
+
+folly
+
+https://github.com/facebook/folly/blob/master/folly/docs/Executors.md
+
+https://www.cnblogs.com/chenyangyao/p/folly-future.html
+
+https://gaodq.github.io/2017/08/07/facebook-wangle/
+
+
+
+c++ future
+
+https://www.cnblogs.com/haippy/p/3280643.html
+
+
+
+
+
+boost.asio, folly wangle, grpc, muduo    are all reactor or proactor.
+
+EventLoop + protobuf = grpc
+

@@ -1,0 +1,46 @@
+
+
+https://blog.csdn.net/gettogetto/article/details/53873522
+
+
+https://linux.die.net/man/3/pthread_cond_signal
+
+https://computing.llnl.gov/tutorials/pthreads/#ConditionVariables
+
+
+http://shop.oreilly.com/product/9781565921153.do
+
+
+https://computing.llnl.gov/tutorials/pthreads/
+
+
+
+
+
+
+
+
+线程：
+    能跑， 不能跑（阻塞）
+    能跑且已经在跑， 能跑但未在跑（调度）
+
+
+处理器树：
+
+    进程， 线程， 协程， 对象
+
+
+
+
+锁
+
+    __sync_fetch_and_inc, __sync_compare_and_swap
+
+    mutex, condition_variable, semaphore
+
+    concurrent_queue
+
+
+condition variable 实现 生产者 消费者
+
+    https://blog.csdn.net/chenwiehuang/article/details/55518668

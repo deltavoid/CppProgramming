@@ -1,0 +1,56 @@
+
+
+
+RAII
+
+
+
+c++ smart pointer
+
+    // raw pointer
+
+    shared_ptr
+
+    weak_ptr
+
+    unique_ptr
+
+        https://blog.csdn.net/shaosunrise/article/details/85158249
+
+        https://www.cnblogs.com/wangkeqin/p/9383658.html
+
+    scoped_ptr
+
+
+https://www.cnblogs.com/greatverve/p/smart-ptr.html
+
+
+
+
+unique_ptr
+
+    创建unique_ptr对象有两种方法：
+
+    //C++11: 
+    std::unique_ptr<Task> taskPtr(new Task(23));
+    //C++14: 
+    std::unique_ptr<Task> taskPtr = std::make_unique<Task>(34);
+
+
+    释放成员函数	作用
+    reset()	重置unique_ptr为空，delete其关联的指针。
+    release()	不delete关联指针，并返回关联指针。释放关联指针的所有权，unique_ptr为空。
+    get()	仅仅返回关联指针
+
+    std::unique_ptr<Task> taskPtr4 = std::move(taskPtr2);
+
+shared_ptr
+
+    https://blog.csdn.net/u011068702/article/details/83692838
+
+
+weak_ptr
+
+    https://www.cnblogs.com/diysoul/p/5930372.html
+
+    

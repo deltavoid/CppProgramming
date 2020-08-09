@@ -1,0 +1,46 @@
+
+
+
+
+
+boost coroutine
+
+https://theboostcpplibraries.com/boost.coroutine
+
+https://www.ituring.com.cn/article/127815
+
+https://www.boost.org/doc/libs/1_65_0/libs/coroutine/doc/html/index.html
+
+https://www.netways.de/blog/2019/04/04/modern-c-programming-coroutines-with-boost/
+
+https://devblogs.microsoft.com/cppblog/using-c-coroutines-with-boost-c-libraries/
+
+
+boost link
+
+https://qa.1r1g.com/sf/ask/1827391471/
+
+
+boost list
+
+    boost : pure header file?
+
+    boost_thread
+
+    boost_system
+
+    boost_locale
+
+    boost_coroutine
+
+    boost_context
+
+    boost_filesystem
+
+    boost_date_time
+
+    boost_iostream
+
+    boost_context
+
+    
