@@ -1,0 +1,29 @@
+
+
+argv
+
+
+// procedure_oriented
+
+    C++'s procedure_oriented is considered as C.
+
+object_based
+
+object_oriented
+
+template
+
+stl
+
+
+thread
+
+memeory
+
+// netowrk
+
+// file
+
+
+
+diverse linux api may doesn't need to bind with complex programming model at the beginning, so they are put to LinuxProgramming ad first.
