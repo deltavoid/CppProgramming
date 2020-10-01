@@ -17,3 +17,6 @@ clean:
 
 run_main: build
 	$(BUILD_DIR)/main
+
+run_main1: build
+	$(BUILD_DIR)/main1
