@@ -16,4 +16,7 @@ clean:
 
 
 run_argv: build
-	$(BUILD_DIR)/argv
+	$(BUILD_DIR)/argv hello world
+
+gdb_argv: build
+	gdb --args  env HELLO=world $(BUILD_DIR)/argv  hello world
