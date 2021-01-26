@@ -30,6 +30,22 @@ int register_event_handler(enum event_type type, event_handler_t handler)
 }
 
 
+int event_handler0(struct event* ev)
+{
+    printf("event_handler0\n");
+}
+
+int event_handler1(struct event* ev)
+{
+    printf("event_handler1\n");
+}
+
+
+const int max_events = 10;
+struct event events[max_events];
+
+
+
 int main(int argc, char** argv)
 {
     printf("args:");
@@ -37,7 +53,12 @@ int main(int argc, char** argv)
         printf("%s ", argv[i]);
     printf("\n");
 
+    register_event_handler(EVENT_TYPE0, event_handler0);
+    register_event_handler(EVENT_TYPE1, event_handler1);
 
+    // for (int i = 0; i < max_events; i++)
+
+        
     
 
     return 0;
