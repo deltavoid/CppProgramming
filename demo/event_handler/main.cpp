@@ -8,6 +8,7 @@
 enum event_type {
     EVENT_TYPE0,
     EVENT_TYPE1,
+    EVENT_CONN_TYPE,
     EVENT_TYPE_NUM
 };
 
@@ -50,6 +51,29 @@ const int max_events = 10;
 struct event events[max_events];
 
 
+class Connection {
+public:
+
+    struct conn_event {
+        uint8_t type;
+        uint8_t num;
+    };
+
+
+    static int conn_event_handler(struct event* ev)
+    {
+        struct conn_event* conn_ev = (struct conn_event*)ev;
+        printf("conn_event_handler\n");
+    }
+
+    static int register_conn_event_handler()
+    {
+        register_event_handler(EVENT_CONN_TYPE, conn_event_handler);
+    }
+
+
+};
+
 
 int main(int argc, char** argv)
 {
@@ -60,6 +84,7 @@ int main(int argc, char** argv)
 
     register_event_handler(EVENT_TYPE0, event_handler0);
     register_event_handler(EVENT_TYPE1, event_handler1);
+    Connection::register_conn_event_handler();
 
     for (int i = 0; i < max_events; i++) 
         events[i].type = i % EVENT_TYPE_NUM;
