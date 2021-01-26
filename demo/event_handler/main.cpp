@@ -29,6 +29,11 @@ int register_event_handler(enum event_type type, event_handler_t handler)
     event_handlers[type] = handler;
 }
 
+int process_event(struct event* ev)
+{
+    return event_handlers[ev->type](ev);
+}
+
 
 int event_handler0(struct event* ev)
 {
@@ -56,8 +61,7 @@ int main(int argc, char** argv)
     register_event_handler(EVENT_TYPE0, event_handler0);
     register_event_handler(EVENT_TYPE1, event_handler1);
 
-    // for (int i = 0; i < max_events; i++)
-
+    // for (int i = 0; i < max_events; i++) 
         
     
 
