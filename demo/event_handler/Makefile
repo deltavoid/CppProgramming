@@ -17,9 +17,3 @@ clean:
 
 run: build
 	$(BUILD_DIR)/main hello world
-
-run_gdb: build
-	gdb --args  env HELLO=world $(BUILD_DIR)/main  hello world
-
-run_strace: build
-	strace $(BUILD_DIR)/main
