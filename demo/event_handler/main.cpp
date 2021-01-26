@@ -75,6 +75,45 @@ public:
 };
 
 
+
+enum SlowpathEvent {
+    SLOWPATH_CONN_EVENT,
+    SLOWPATH_EVENT_NUM,
+};
+
+
+
+
+
+class SlowpathHandler {
+public:
+    
+
+    
+    static const int max_event_handlers = 8;
+    event_handler_t event_handlers[max_event_handlers];
+
+
+};
+
+class Slowpath {
+public:
+    
+    static const int max_event_handlers = 8;
+    static event_handler_t event_handlers[max_event_handlers];
+
+
+
+    int process(struct event* ev)
+    {
+        event_handlers[ev->type](ev);
+    }
+
+    
+
+};
+
+
 int main(int argc, char** argv)
 {
     printf("args:");
