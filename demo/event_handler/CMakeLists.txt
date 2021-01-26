@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(argv)
+project(main)
 
 
-add_executable(argv main.cpp)
+add_executable(main main.cpp)
