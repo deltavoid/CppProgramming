@@ -2,7 +2,7 @@
 
 BUILD_DIR ?= build
 .PHONY: build clean
-default: run_argv
+default: run
 
 
 build: $(BUILD_DIR)/Makefile
@@ -15,11 +15,11 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run_argv: build
-	$(BUILD_DIR)/argv hello world
+run: build
+	$(BUILD_DIR)/main hello world
 
-gdb_argv: build
-	gdb --args  env HELLO=world $(BUILD_DIR)/argv  hello world
+run_gdb: build
+	gdb --args  env HELLO=world $(BUILD_DIR)/main  hello world
 
 run_strace: build
-	strace $(BUILD_DIR)/argv
+	strace $(BUILD_DIR)/main
