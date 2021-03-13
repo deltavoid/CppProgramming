@@ -33,6 +33,7 @@ int main()
         std::unique_ptr<int> ptr1;
         output_null(ptr1 == nullptr, "ptr1");
     }
+    printf("\n");
 
     {
         printf("2\n");
@@ -44,12 +45,14 @@ int main()
         output_null(taskPtr3 == nullptr, "taskPtr3");
         printf("taskPtr3->id: %lld\n", taskPtr3->id);
     }
+    printf("\n");
 
     {
         printf("3\n");
         std::unique_ptr<Task> taskPtr8 = std::make_unique<Task>(8);
         output_null(taskPtr8 == nullptr, "taskPtr8");
     }
+    printf("\n");
 
     // {
     //     Task *ptr = new Task(3);
@@ -75,6 +78,7 @@ int main()
         // std::unique_ptr<Task> taskPtr7(ptr);
         // output_null(taskPtr7 == nullptr, "taskPtr7");
     }
+    printf("\n");
 
     {
         printf("5\n");
@@ -85,6 +89,7 @@ int main()
         taskPtr.reset();
         output_null(taskPtr == nullptr, "taskPtr");
     }
+    printf("\n");
 
     {
         printf("6\n");
@@ -93,6 +98,7 @@ int main()
         output_null(taskPtr6 == nullptr, "taskPtr6");
         output_null(taskPtr7 == nullptr, "taskPtr7");
     }
+    printf("\n");
 
     return 0;
 }
