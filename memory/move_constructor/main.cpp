@@ -47,7 +47,7 @@ public:
 
         printf("String::move constructor end\n");
     }
-    
+
 
     void print()
     {
@@ -73,6 +73,7 @@ int main(int argc, char** argv)
         str.print();
 
         String str1(std::move(str));
+        // String str1 = std::move(str);
 
         str1.print();
         str.print();
