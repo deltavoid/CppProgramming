@@ -33,10 +33,8 @@ public:
         printf("String::destructor end\n");
     }
 
-    // String(String& str)
-    // {
-
-    // }
+    String(const String&) = delete;
+    String& operator = (const String&) = delete;
 
     String(String&& str)
     {
@@ -49,6 +47,7 @@ public:
 
         printf("String::move constructor end\n");
     }
+    
 
     void print()
     {
