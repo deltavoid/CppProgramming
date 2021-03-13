@@ -45,7 +45,7 @@ public:
         str.buf = NULL;
 
         this->size = str.size;
-        // str.size = 0;
+        str.size = 0;
 
         printf("String::move constructor end\n");
     }
