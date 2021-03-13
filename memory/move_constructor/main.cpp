@@ -45,7 +45,7 @@ public:
         str.buf = NULL;
 
         this->size = str.size;
-        str.size = 0;
+        // str.size = 0;
 
         printf("String::move constructor end\n");
     }
@@ -53,9 +53,9 @@ public:
     void print()
     {
         if  (buf)
-            printf("%s\n", buf);
+            printf("content: %s, size: %d\n", buf, size);
         else
-            printf("string is NULL\n");
+            printf("string is NULL, size: %d\n", size);
     }
 };
 
@@ -67,13 +67,53 @@ int main(int argc, char** argv)
     //     printf("%s\n", argv[i]);
 
 
-    String str("hello");
-    str.print();
+    {
+        printf("1\n");
 
-    String str1(std::move(str));
+        String str("hello");
+        str.print();
 
-    str1.print();
-    str.print();
+        String str1(std::move(str));
+
+        str1.print();
+        str.print();
+
+    }
+    printf("\n");
+
+    {
+        printf("2\n");
+
+        String* str = new String("hello");
+        str->print();
+
+        String str1(std::move(*str));
+
+        str1.print();
+        str->print();
+
+        delete str;
+
+    }
+    printf("\n");
+
+    {
+        printf("3\n");
+
+        String* str = new String("hello");
+        str->print();
+
+        // String str1(std::move(*str));
+        String* str1 = new String(std::move(*str));
+
+        str1->print();
+        str->print();
+
+        delete str;
+        delete str1;
+
+    }
+    printf("\n");
 
     return 0;
 }
