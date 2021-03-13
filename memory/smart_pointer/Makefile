@@ -24,3 +24,9 @@ run_unique_ptr1: build
 run_unique_ptr2: build
 	$(BUILD_DIR)/unique_ptr2
 
+
+run_shared_ptr1: build
+	$(BUILD_DIR)/shared_ptr1
+
+run_shared_ptr2: build
+	$(BUILD_DIR)/shared_ptr2
