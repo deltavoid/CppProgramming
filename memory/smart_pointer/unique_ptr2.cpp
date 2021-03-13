@@ -23,7 +23,10 @@ std::unique_ptr<Task> inc(std::unique_ptr<Task> task)
 {
     task->id++;
     printf("inc\n");
-    return std::unique_ptr<Task>(new Task(task->id));
+    // return std::unique_ptr<Task>(new Task(task->id));
+    // return std::make_unique<Task>(task->id);
+    return std::move(task);
+    // return task;
 }
 
 int main()
