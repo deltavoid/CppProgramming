@@ -8,16 +8,30 @@
 
 class Student : public std::enable_shared_from_this<Student>
 {public:
-    Student() {  printf("Student::constructor\n");}
-    ~Student()  {  printf("Student::destructor\n");}
+    Student() 
+    {  
+        printf("Student::constructor\n");
+    }
+    
+    ~Student()  
+    {  
+        printf("Student::destructor\n");
+    }
 
     std::shared_ptr<Student> getStudent()
     {
         return shared_from_this();
     }
 
-    void setName(std::string name)  {  this->name = name;}
-    std::string getName()  {  return name;}
+    void setName(std::string name)  
+    {  
+        this->name = name;
+    }
+
+    std::string getName()  
+    {  
+        return name;
+    }
 
     std::string name;
 };
