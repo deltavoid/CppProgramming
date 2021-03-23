@@ -19,3 +19,5 @@ find_path(BOOST_SMART_PTR_INCLUDE_DIRS "boost/detail/atomic_count.hpp")
 add_subdirectory(scoped_ptr)
 add_subdirectory(unique_ptr)
 add_subdirectory(shared_ptr)
+add_subdirectory(weak_ptr)
+

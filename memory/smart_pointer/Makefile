@@ -36,3 +36,5 @@ run_shared_ptr2: build
 run_shared_ptr_deleter: build
 	$(BUILD_DIR)/shared_ptr/shared_ptr_deleter
 	
+run_weak_ptr: build
+	$(BUILD_DIR)/weak_ptr/weak_ptr
