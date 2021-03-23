@@ -57,6 +57,11 @@ int main()
     {
         printf("1\n");
         std::shared_ptr<int> ptr(new int(10));
+
+        unsigned long addr = (unsigned long)ptr.get();
+
+        printf("addr: %lx\n", addr);
+
     }
     printf("\n");
 
@@ -74,6 +79,7 @@ int main()
         output_count(ptr2.use_count(), "ptr2");
 
         ptr1.reset();
+        // ptr1.release(); // shared_ptr has no release
         output_count(ptr1.use_count(), "ptr1");
         output_count(ptr2.use_count(), "ptr2");
     }
