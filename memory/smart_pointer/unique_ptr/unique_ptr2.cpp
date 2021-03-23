@@ -97,8 +97,12 @@ int main()
         output_null(taskPtr == nullptr, "taskPtr");
         printf("taskPtr-> id: %lld\n", taskPtr->id);
 
-        taskPtr.reset();
+        std::unique_ptr<Task> taskPtr1(new Task(2));
+
+        taskPtr.reset(taskPtr1.release());
         output_null(taskPtr == nullptr, "taskPtr");
+        output_null(taskPtr1 == nullptr, "taskPtr1"); 
+        printf("taskPtr-> id: %lld\n", taskPtr->id);
     }
     printf("\n");
 
