@@ -43,6 +43,9 @@ int main()
         std::unique_ptr<Task> taskPtr2(new Task(2));
         output_null(taskPtr2 == nullptr, "taskPtr");
 
+        unsigned long addr = (unsigned long)taskPtr2.get();
+        printf("addr: %lx\n", addr);
+
         std::unique_ptr<Task> taskPtr3 = std::move(taskPtr2);
         output_null(taskPtr2 == nullptr, "taskPtr2");
         output_null(taskPtr3 == nullptr, "taskPtr3");
@@ -54,6 +57,11 @@ int main()
         printf("3\n");
         std::unique_ptr<Task> taskPtr8 = std::make_unique<Task>(8);
         output_null(taskPtr8 == nullptr, "taskPtr8");
+
+        Task* addr = taskPtr8.release();
+        printf("addr: %lx\n", addr);
+        delete addr;
+        // delete (void*)addr; // delete as mem, no destructor
     }
     printf("\n");
 
