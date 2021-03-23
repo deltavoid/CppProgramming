@@ -6,3 +6,46 @@ unique_ptr 使用移动构造；
 
 
 
+
+
+shared_ptr
+
+    Constructor( T* );
+
+    make_shared<T>();
+
+    拷贝构造；
+  
+
+
+    get();
+
+    reset();
+
+
+    use_count();
+
+
+    pointer func( pointer )
+
+
+
+unique_ptr
+
+    Constructor( T* );
+
+    make_unique<T>();
+
+    移动构造；
+
+
+    get();
+
+    release();
+
+    reset();
+
+
+    pointer func( pointer )
+
+
