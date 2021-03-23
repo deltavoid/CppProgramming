@@ -16,17 +16,20 @@ clean:
 
 
 run_scoped_ptr: build
-	$(BUILD_DIR)/scoped_ptr
+	$(BUILD_DIR)/scoped_ptr/scoped_ptr
 
 run_unique_ptr1: build
-	$(BUILD_DIR)/unique_ptr1
+	$(BUILD_DIR)/unique_ptr/unique_ptr1
 
 run_unique_ptr2: build
-	$(BUILD_DIR)/unique_ptr2
+	$(BUILD_DIR)/unique_ptr/unique_ptr2
 
 
 run_shared_ptr1: build
-	$(BUILD_DIR)/shared_ptr1
+	$(BUILD_DIR)/shared_ptr/shared_ptr1
 
 run_shared_ptr2: build
-	$(BUILD_DIR)/shared_ptr2
+	$(BUILD_DIR)/shared_ptr/shared_ptr2
+
+
+	
