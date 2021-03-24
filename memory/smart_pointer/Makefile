@@ -24,6 +24,9 @@ run_unique_ptr1: build
 run_unique_ptr2: build
 	$(BUILD_DIR)/unique_ptr/unique_ptr2
 
+run_unique_ptr3: build
+	$(BUILD_DIR)/unique_ptr/unique_ptr3
+
 run_unique_ptr_deleter: build
 	$(BUILD_DIR)/unique_ptr/unique_ptr_deleter
 
