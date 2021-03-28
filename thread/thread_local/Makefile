@@ -15,11 +15,11 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run_main: build
-	$(BUILD_DIR)/main
+# run_main: build
+# 	$(BUILD_DIR)/main
 
-run_main1: build
-	$(BUILD_DIR)/main1
+# run_main1: build
+# 	$(BUILD_DIR)/main1
 
 run_thread_local: build
 	$(BUILD_DIR)/thread_local
