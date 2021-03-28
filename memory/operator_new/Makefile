@@ -19,5 +19,8 @@ clean:
 run_global_new: build
 	$(BUILD_DIR)/global_new
 
+run_class_new: build
+	$(BUILD_DIR)/class_new
+
 run_placement_new: build
 	$(BUILD_DIR)/placement_new
