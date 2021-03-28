@@ -33,20 +33,43 @@ public:
         printf("String::destructor end\n");
     }
 
-    String(const String&) = delete;
-    String& operator = (const String&) = delete;
-
-    String(String&& str)
+    String(const String& str)
     {
-        printf("String::move constructor begin\n");
-        this->buf = str.buf;
-        str.buf = NULL;
+        printf("String::copy constructor begin\n");
+        size = str.size;
+        buf = new char[size];
+        strcpy(buf, str.buf);
+        buf[size] = '\0';
 
-        this->size = str.size;
-        str.size = 0;
-
-        printf("String::move constructor end\n");
+        printf("String::copy constructor end\n");        
     }
+
+    String& operator = (const String& str)
+    {
+        printf("String::copy assign operator begin\n");
+        
+        if  (&str != this)
+        {
+            this->~String();
+
+            new (this) String(str);
+        }
+
+        printf("String::copy assign operator end\n");
+        return *this;
+    }
+
+    // String(String&& str)
+    // {
+    //     printf("String::move constructor begin\n");
+    //     this->buf = str.buf;
+    //     str.buf = NULL;
+
+    //     this->size = str.size;
+    //     str.size = 0;
+
+    //     printf("String::move constructor end\n");
+    // }
 
 
     void print()
@@ -66,29 +89,28 @@ int main(int argc, char** argv)
     {
         String str("hello");
         str.print();
+        printf("\n");
 
-        String str1(std::move(str));
-        // String str1 = std::move(str);
 
-        str1.print();
+        String str1(str);
+        printf("\n");
+
+
+        String str2 = str1;
+        printf("\n");
+
+
+        String str3("world");
+        str3 = str2;
+        printf("\n");
+
+
         str.print();
-
-    }
-    printf("\n");
-
-
-    printf("2\n");
-    {
-        String* str = new String("hello");
-        str->print();
-
-        String str1(std::move(*str));
-
         str1.print();
-        str->print();
-
-        delete str;
-
+        str2.print();
+        str3.print();
+        printf("\n");
+        
     }
     printf("\n");
 
@@ -97,16 +119,21 @@ int main(int argc, char** argv)
     {
         String* str = new String("hello");
         str->print();
+        printf("\n");
+
 
         // String str1(std::move(*str));
         String* str1 = new String(std::move(*str));
+        printf("\n");
+ 
 
         str1->print();
         str->print();
+        printf("\n");
+
 
         delete str;
         delete str1;
-
     }
     printf("\n");
 
