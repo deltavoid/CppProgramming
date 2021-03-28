@@ -61,14 +61,9 @@ public:
 
 int main(int argc, char** argv)
 {
-    // printf("arg:\n");
-    // for (int i = 0; i < argc; i++)
-    //     printf("%s\n", argv[i]);
 
-
+    printf("1\n");
     {
-        printf("1\n");
-
         String str("hello");
         str.print();
 
@@ -81,9 +76,9 @@ int main(int argc, char** argv)
     }
     printf("\n");
 
-    {
-        printf("2\n");
 
+    printf("2\n");
+    {
         String* str = new String("hello");
         str->print();
 
@@ -97,9 +92,9 @@ int main(int argc, char** argv)
     }
     printf("\n");
 
-    {
-        printf("3\n");
 
+    printf("3\n");
+    {
         String* str = new String("hello");
         str->print();
 

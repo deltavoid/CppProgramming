@@ -2,7 +2,7 @@
 
 BUILD_DIR ?= build
 .PHONY: build clean
-default: run
+default: run_move_constructor
 
 
 build: $(BUILD_DIR)/Makefile
@@ -15,5 +15,8 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run: build
-	$(BUILD_DIR)/main hello world
+run_move_constructor: build
+	$(BUILD_DIR)/move_constructor
+
+run_copy_constructor: build
+	$(BUILD_DIR)/copy_constructor

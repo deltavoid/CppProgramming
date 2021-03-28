@@ -8,7 +8,9 @@ message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 message("CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
 
-add_executable(main main.cpp)
+add_executable(move_constructor move_constructor.cpp)
+
+add_executable(copy_constructor copy_constructor.cpp)
 
 
 
