@@ -48,6 +48,20 @@ public:
         printf("String::move constructor end\n");
     }
 
+    String& operator = (String&& str)
+    {
+        printf("String::move assign operator begin\n");
+        if  (&str != this)
+        {
+            this->~String();
+
+            new (this) String(std::move(str));
+        }
+
+        printf("String::move assign operator end\n");
+        return *this;
+    }
+
 
     void print()
     {
@@ -66,13 +80,23 @@ int main(int argc, char** argv)
     {
         String str("hello");
         str.print();
+        printf("\n");
 
-        String str1(std::move(str));
-        // String str1 = std::move(str);
 
-        str1.print();
+        // String str1(std::move(str));
+        String str1 = std::move(str);
+        printf("\n");
+
+
+        String str2("world");
+        str2 = std::move(str1);
+        printf("\n");
+
+
         str.print();
-
+        str1.print();
+        str2.print();
+        printf("\n");
     }
     printf("\n");
 
@@ -81,25 +105,11 @@ int main(int argc, char** argv)
     {
         String* str = new String("hello");
         str->print();
-
-        String str1(std::move(*str));
-
-        str1.print();
-        str->print();
-
-        delete str;
-
-    }
-    printf("\n");
-
-
-    printf("3\n");
-    {
-        String* str = new String("hello");
-        str->print();
+        printf("\n");
 
         // String str1(std::move(*str));
         String* str1 = new String(std::move(*str));
+        printf("\n");
 
         str1->print();
         str->print();
