@@ -10,11 +10,13 @@
 #include <unistd.h>
 
 
-int count = 0;
+// int count = 0;
 
 struct context {
 
     int cnt;
+
+    static int count;
 
     context()
     {
@@ -26,6 +28,9 @@ struct context {
         printf("context::destructor, count: %d\n", --count);
     }
 };
+
+int context::count = 0;
+
 
 
 
@@ -53,7 +58,7 @@ void worker()
 {
     struct context& ctx = get_context();
 
-    printf("ctx is %lx, count is %d\n", &ctx, count);
+    printf("ctx is %lx, count is %d\n", &ctx, context::count);
 
     sleep(1);
 }
