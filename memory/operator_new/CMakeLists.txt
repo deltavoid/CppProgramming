@@ -23,4 +23,7 @@ message("CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 add_executable(global_new global_new.cpp)
 
 
+add_executable(placement_new placement_new.cpp)
+
+
 # message("hello CMakeLists end")
