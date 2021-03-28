@@ -15,8 +15,8 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-# run_main: build
-# 	$(BUILD_DIR)/main
+run___thread: build
+	$(BUILD_DIR)/__thread
 
 # run_main1: build
 # 	$(BUILD_DIR)/main1
