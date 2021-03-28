@@ -15,9 +15,6 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run: build
-	$(BUILD_DIR)/main hello world
-
 
 run_global_new: build
 	$(BUILD_DIR)/global_new
