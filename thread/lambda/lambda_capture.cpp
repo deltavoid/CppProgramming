@@ -125,6 +125,19 @@ int main()
     }
     printf("\n");
 
+    printf("4\n");
+    {
+
+        Task task(1);
+
+        [task = std::move(task)]() mutable {
+
+            task._id = 2; // failed , task is const
+            task.print();
+        }();
+        
+    }
+    printf("\n");
 
     return 0;
 }
