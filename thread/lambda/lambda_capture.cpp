@@ -154,5 +154,37 @@ int main()
     printf("\n");
 
 
+    printf("6\n");
+    {
+        Task task(1);
+
+        [](Task& task) {
+
+            [task]() mutable{
+
+                task._id = 2;
+                task.print();
+
+            }();
+        }(task);
+    }
+    printf("\n");
+
+    printf("7\n");
+    {
+        Task task(1);
+
+        [](Task& task) {
+
+            [&task]() mutable{
+
+                task._id = 2;
+                task.print();
+
+            }();
+        }(task);
+    }
+    printf("\n");
+
     return 0;
 }
