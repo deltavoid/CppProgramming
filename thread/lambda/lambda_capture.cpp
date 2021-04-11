@@ -118,7 +118,7 @@ int main()
 
         [&task]() {
 
-            task._id = 2; // failed , task is const
+            task._id = 2;
             task.print();
         }();
         
@@ -132,12 +132,27 @@ int main()
 
         [task = std::move(task)]() mutable {
 
-            task._id = 2; // failed , task is const
+            task._id = 2;
             task.print();
         }();
         
     }
     printf("\n");
+
+    printf("5\n");
+    {
+
+        Task task(1);
+
+        [task_p = &task]() {
+
+            task_p->_id = 2;
+            task_p->print();
+        }();
+        
+    }
+    printf("\n");
+
 
     return 0;
 }
