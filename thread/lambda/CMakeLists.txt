@@ -19,8 +19,10 @@ message("CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
 
 
-add_executable(main main.cpp)
+# add_executable(main main.cpp)
 
 add_executable(lambda_capture lambda_capture.cpp)
+
+add_executable(lambda_return lambda_return.cpp)
 
 # message("hello CMakeLists end")

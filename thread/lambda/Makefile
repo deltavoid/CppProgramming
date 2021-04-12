@@ -15,8 +15,11 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run: build
-	$(BUILD_DIR)/main hello world
+# run: build
+# 	$(BUILD_DIR)/main hello world
 
 run_lambda_capture: build
-	$(BUILD_DIR)/lambda_capture hello world
+	$(BUILD_DIR)/lambda_capture
+
+run_lambda_return: build
+	$(BUILD_DIR)/lambda_return
