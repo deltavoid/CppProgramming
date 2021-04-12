@@ -16,17 +16,38 @@ int main()
 
     printf("1\n");
     {
+        int a = 1, b = 2;
 
-        int a = []() {
+        int ret = [](int a, int b) {
 
-            return 1;
+            return a > b? a : b;
 
-        }();
+        }(a, b);
 
 
-        printf("a: %d\n", a);
+        printf("ret: %d\n", ret);
     }
     printf("\n");
+
+
+    printf("2\n");
+    {
+        int a = 1, b = 2;
+
+        int ret = [](int a, int b) {
+
+            if  (a > b)
+                return a;
+            else
+                return b;
+
+        }(a, b);
+
+        printf("ret: %d\n", ret);
+    }
+    printf("\n");
+
+
 
     return 0;
 }
