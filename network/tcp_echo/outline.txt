@@ -1,0 +1,199 @@
+
+
+socket/epoll体系
+thread应用
+
+
+client.cpp: one connection per thread
+
+client_epoll_bench.cpp: one loop per thread, multi_thread,  epoll, tracer, benchmark client
+
+client_test_epollout.cpp: big data to test epollout
+
+
+
+server.cpp: one connection per thread
+
+server_epoll.cpp: one_loop_per_thread, single_thread, epoll, level_trigger, EPOLLIN, nonblocking, 
+
+server_epoll_bench.cpp: one_loop_per_thread, multi_thread, accept_on_single_thread,  epoll, level_trigger, EPOLLIN, benchmark server
+
+server_epoll_reuseport.cpp: one_loop_per_thread, multi_thread, SO_REUSEPORT, epoll, level_trigger, EPOLLIN, nonblocking,  
+
+server_epoll_handle.cpp: one_loop_per_thread, single_thread, epoll, level_trigger, EPOLLIN, nonblocking, use handle(events) as interface between eventloop and concrete object
+
+server_epoll_handle.c: one_loop_per_thread, single_thread, epoll, level_trigger, EPOLLIN, nonblocking, use handle(events) as interface between eventloop and concrete object
+
+server_poll_handle.cpp: one_loop_per_thread, single_thread, poll, POLLIN, nonblocking, use handle(events) as interface between eventloop and concrete object
+
+
+server_epollout_ref.cpp: 
+
+server_epollout.cpp: one_loop_per_thread, single_thread, epoll, level_trigger, EPOLLIN, EPOLLOUT, nonblocking, 
+
+server_epollout_handle.cpp: one_loop_per_thread, single_thread, epoll, level_trigger, EPOLLIN, EPOLLOUT, nonblocking, handle interface, echo, ring_buffer, recv_buf_native, send_buf_native
+
+server_epollout_response.cpp: one_loop_per_thread, single_thread, epoll, level_tigger, EPOLLIN, EPOLLOUT, nonblocking, handle interface, request and response, recv ring buffer, recv_buf, send_response
+
+    
+server_epoll_et_ref.cpp:
+
+server_epoll_et.cpp: one_loop_per_thread, single_thread, epoll, edge_trigger, EPOLLIN, EPOLLOUT, nonblocking, 
+
+
+
+
+epollout, level_trigger // not completed
+
+    need_send, enable_send, enable_epoll(LT, ET needn't)
+    enable_send use send's return value
+
+class Connection
+{
+    buffer;
+    enable_epollout;
+
+    write_buffer()
+    {
+        move_data_to_buffer();
+        set(need_send);
+        send_buf();
+    }
+
+    set_epollout(flag)
+    {
+        epoll_ctl(...);
+        enable_epollout = flag;
+    }
+
+    // this function has two entries, the user and epollout.
+    send_buf()
+    {
+        while ((send_len < need_send) && (tmp = ::send(...)) > 0)
+        {   send_len += tmp;
+        }
+
+        if  (send_len == need_send)
+        {   // send completed.
+            if  (enable_epollout)
+                set_epollout(false);
+            return 1;
+        }
+
+        if  (tmp < 0 && ((errno == EAGAIN || errno == EWOULDBLOCK))
+        {   // EAGAIN
+            if  (!enable_epollout)
+                set_epollout(ture);
+            return 0;
+        }
+
+        return -1;
+    }
+
+    handle_write()
+    {
+        send_buf();
+    }
+
+};
+
+
+
+epoll_out, edge_trigger
+
+    need_send, enable_send, 
+    enable_send use send's return value
+
+class Connection
+{
+    buffer;
+
+    write_buffer()
+    {
+        move_data_to_buffer();
+        set(need_send);
+        send_buf();
+    }
+
+    // this function has two entries, the user and epollout.
+    send_buf()
+    {
+        while ((send_len < need_send) && (tmp = ::send(...)) > 0)
+        {   send_len += tmp;
+        }
+
+        if  (send_len == need_send)
+        {   // send completed.
+            return 1;
+        }
+
+        if  (tmp < 0 && ((errno == EAGAIN || errno == EWOULDBLOCK))
+        {   // EAGAIN
+            return 0;
+        }
+
+        return -1;
+    }
+
+    handle_write()
+    {
+        send_buf();
+    }
+};
+
+
+
+
+
+
+epoll 的三个境界
+
+
+epoll EPOLLIN, 无限/足够buffer
+
+    LT：也可以抱住fd， 读到EAGAIN；
+        但因为是LT， 所以每次不用读完， 让epollout多次唤醒；
+        如果每次的buffer是够的， 比如每次可以处理完请求，可以不用无限buffer。
+        如果buffer满了， 此时epollout会无限唤醒， 此时有CPU损耗， 但是没有空间损耗。
+        如果希望解决epollin忙等问题， 则需要epollin流控。
+
+    ET: 直接抱住fd， 读到EAGAIN； 
+        因为buffer足够， 所以可以读到完；
+        如果buffer满了， ET不会再次提醒， 因此此时可能会丢数据；
+        所以需要流控。
+
+    
+epoll EPOLLOUT， write流控
+
+    当写缓冲区大于内核tcp缓冲区时， 需要write流控。
+
+    LT: EPOLLOUT enable 状态与缓冲区 是否非空一致。
+        缓冲区非空， enable epollout；
+        缓冲区空， disable epollout；
+        缓冲区非空 + fd可写 -> 活动；
+        活动的结果是至少有一方失效；
+
+
+    ET: EPOLLOUT提醒只标志fd可写状态。
+        有数据之后下去直接写一把；
+        写完了就是写完了；
+        没写完意味着fd不可写， 等待et产生下次epollout事件；
+
+
+epoll EPOLLIN， read流控
+    
+    当需要读的数据大于读缓冲区时， 需要read流控。
+
+    LT: EPOLLIN enable 状态与缓冲区 是否非满一致。
+        缓冲区非满， enable epollin；
+        缓冲区满，  disable epollin；
+        缓冲区非满 + fd可读 -> 活动；
+        活动的结果是至少有一方失效；
+
+
+    ET: EPOLLIN提醒只标志fd可读状态；
+        用户需要在fd可读后将fd读到不可读；
+        当缓冲区满时，需要用户自身维护状态， 并记得去读。
+
+        全ET应该需要异步事件引擎。
+ 

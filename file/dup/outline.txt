@@ -1,0 +1,18 @@
+
+
+
+同一fd
+
+    在另一个线程accept， 然后在主线程close， accept依然继续， 没有终止。
+
+
+
+一个原始fd， 一个dup_fd
+
+    在另一个线程accept dup_fd， 在主线程close, dup_fd不受影响， 
+    但这个不能说明dup的问题， 因为上一个案例依然应当可以保证fd继续使用。
+
+
+一个原始fd， 一个dup_fd
+
+    dup完之后， close原始fd， dup_fd依然可以工作， 说明dup的另一个fd在原始fd关掉之后， 依然有生命力。

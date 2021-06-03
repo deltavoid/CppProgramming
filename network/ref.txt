@@ -1,0 +1,83 @@
+
+
+udp programming
+
+
+server          client
+
+socket          socket
+
+bind
+
+recvfrom        sendto
+
+sendto          recvfrom
+
+close           close
+
+
+
+https://www.cnblogs.com/skyfsm/p/6287787.html
+
+
+
+ipv6
+
+https://blog.csdn.net/hepeng597/article/details/7803277
+
+
+ipv6 tcp connect invalid argument
+
+https://blog.csdn.net/liufuchun111/article/details/82349206
+
+https://blog.csdn.net/qq_34870631/article/details/80585632
+
+https://www.jianshu.com/p/389a8870a51d
+
+
+gethostbyname 
+
+https://www.cnblogs.com/cxz2009/archive/2010/11/19/1881611.html
+
+
+struct sockaddr;
+struct sockaddr_in;
+struct sockaddr_in6;
+
+
+
+getsockname 
+http://www.samirchen.com/get-client-server-ip-port/
+
+
+
+
+
+epoll
+
+
+
+https://github.com/yedf/handy/blob/master/raw-examples/epoll.cc
+
+
+https://github.com/yedf/handy/blob/master/raw-examples/epoll-et.cc
+
+
+
+网络编程中的SO_REUSEADDR和SO_REUSEPORT参数详解
+https://zhuanlan.zhihu.com/p/35367402
+
+
+什么是惊群，如何有效避免惊群?
+https://www.zhihu.com/question/22756773
+
+accept 与 epoll 惊群
+https://pureage.info/2015/12/22/thundering-herd.html
+
+
+select、poll、epoll之间的区别总结[整理]
+https://www.cnblogs.com/anker/p/3265058.html
+
+select: https://www.cnblogs.com/Anker/archive/2013/08/14/3258674.html
+poll: https://www.cnblogs.com/Anker/archive/2013/08/15/3261006.html
+epoll: https://www.cnblogs.com/Anker/archive/2013/08/17/3263780.html
