@@ -40,5 +40,5 @@ kernel_module
 
 
 
-every domain has both c level api and c++ level api and even kernel implementation in kernel module.
+every domain has both C level api and C++ level API and even kernel implementation in kernel module.
 
