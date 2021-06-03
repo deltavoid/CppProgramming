@@ -6,15 +6,12 @@ kernel, C, C++ Programming
 
 
 
+example
+
+demo
 
 
-
-argv
-
-
-// procedure_oriented
-
-    C++'s procedure_oriented is considered as C.
+procedure_oriented
 
 object_based
 
@@ -25,14 +22,23 @@ template
 stl
 
 
+process
+
 thread
 
 memeory
 
-// netowrk
 
-// file
+file
+
+netowrk
 
 
 
-diverse linux api may doesn't need to bind with complex programming model at the beginning, so they are put to LinuxProgramming ad first.
+kernel_module
+
+
+
+
+every domain has both c level api and c++ level api and even kernel implementation in kernel module.
+
