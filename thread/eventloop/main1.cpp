@@ -54,16 +54,14 @@ int main(int argc, char **argv)
     int thread_num = 1;
     if (argc > 1)
         if (sscanf(argv[1], "%d", &thread_num) < 0)
-        {
-            perror("bad thread_num");
+        {   perror("bad thread_num");
             return -1;
         }
 
     int sleep_time = 10;
     if (argc > 2)
         if (sscanf(argv[2], "%d", &sleep_time) < 0)
-        {
-            perror("bad sleep_time");
+        {   perror("bad sleep_time");
             return -1;
         }
 

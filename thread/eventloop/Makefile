@@ -21,7 +21,7 @@ run_main: build
 	$(BUILD_DIR)/main
 
 run_main1: build
-	$(BUILD_DIR)/main1
+	$(BUILD_DIR)/main1 2 2 
 
 ldd: build
 	ldd $(BUILD_DIR)/main
