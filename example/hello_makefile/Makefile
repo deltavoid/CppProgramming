@@ -15,5 +15,7 @@ run: build
 run_strace: build
 	strace ./main
 
+ldd: build
+	ldd ./main
 
 
