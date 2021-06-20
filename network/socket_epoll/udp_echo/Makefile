@@ -15,6 +15,9 @@ run_client_connect: client_connect
 server: server.cpp
 	g++ -o $@ $^ 
 
+server_msg: server_msg.cpp
+	g++ -o $@ $^
+
 client: client.cpp
 	g++ -o $@ $^
 
