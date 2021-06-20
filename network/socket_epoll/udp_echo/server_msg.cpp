@@ -19,6 +19,24 @@ struct sockaddr_storage ;
 
 int get_local_address_by_hdr(struct msghdr* hdr, struct sockaddr_storage* local_addr)
 {
+    if  (hdr->msg_controllen > 0)
+    {
+        for (cmsghdr *cmsg = CMSG_FIRSTHDR(hdr); cmsg != nullptr; cmsg = CMSG_NXTHDR(hdr, cmsg))
+        {
+            if (cmsg->cmsg_type == IP_PKTINFO)
+            {
+                in_pktinfo *info = reinterpret_cast<in_pktinfo *>(CMSG_DATA(cmsg));
+
+                char route_ip_buf[128], dst_ip_buf[128];
+                inet_ntop(AF_INET, &info->ipi_addr, dst_ip_buf, sizeof(dst_ip_buf));
+                inet_ntop(AF_INET, &info->ipi_spec_dst, route_ip_buf, sizeof(route_ip_buf));
+
+                printf("route ip: %s, dst ip: %s, ifindex: %d\n", 
+                        route_ip_buf, dst_ip_buf, info->ipi_ifindex);
+            }
+        }
+
+    }
 
     return 0;
 }
@@ -82,6 +100,10 @@ void* udp_echo(void* arg)
     int fd = *(int*)arg;
     char buf[buf_size];
 
+
+
+
+
     // struct sockaddr_in client_addr;
     // socklen_t socklen = sizeof(struct sockaddr_in);
 
@@ -130,7 +152,10 @@ int main(int argc, char** argv)
     // short port = port_;
 
     int fd = -1;
-    if  ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)  perror("socket error");
+    if  ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)  
+    {   perror("socket error");
+        return 1;
+    }
 
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(sockaddr_in));
@@ -138,7 +163,17 @@ int main(int argc, char** argv)
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons((short)port_);
 
-    if  (bind(fd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) == -1)  perror("bind error");
+    if  (bind(fd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) == -1)  
+    {   perror("bind error");
+        return 1;
+    }
+
+    const int on = 1;
+    if  (setsockopt(fd, IPPROTO_IP, IP_PKTINFO, &on, sizeof(on)) < 0)
+    {   perror("setsockopt");
+        return 1;
+    }
+
 
     udp_echo(&fd);
 
