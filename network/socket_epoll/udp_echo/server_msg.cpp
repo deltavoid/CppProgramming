@@ -17,30 +17,26 @@ const int buf_size = 4096;
 struct sockaddr_storage ;
 
 
-int display_local_address_by_hdr(struct msghdr* hdr)
+int get_local_address_by_hdr(struct msghdr* hdr, struct sockaddr_storage* local_addr)
 {
 
     return 0;
-
 }
-
-
-
-
 
 
 int read_packet(int fd, char* buf, int size,
         struct sockaddr_storage* local_addr,
         struct sockaddr_storage* remote_addr)
 {
+    if  (local_addr == NULL || remote_addr == NULL)
+        return -1;
+    
     const int cmsg_buf_len = 128;
     char cbuf[cmsg_buf_len];
 
     struct iovec iov = {buf, (size_t)size};
-    // struct sockaddr_storage raw_address;
     struct msghdr hdr;
 
-    // hdr.msg_name = &raw_address;
     hdr.msg_name = remote_addr;
     hdr.msg_namelen = sizeof(sockaddr_storage);
     hdr.msg_iov = &iov;
@@ -56,27 +52,20 @@ int read_packet(int fd, char* buf, int size,
     printf("recvmsg return %d\n", bytes_read);
 
     
-    if (bytes_read < 0 && errno != 0)
-    {
-        if (errno != EAGAIN)
-        {
-            // LOG(ERROR) << "Error reading " << strerror(errno);
-            perror("Error reading");
+    if  (bytes_read < 0 && errno != 0)
+    {   if  (errno != EAGAIN)
+        {   perror("Error reading");
         }
         return -1;
     }
 
     if (hdr.msg_flags & MSG_CTRUNC)
     {
-        // QUIC_BUG << "Incorrectly set control length: " << hdr.msg_controllen
-        //          << ", expected " << QUIC_ARRAYSIZE(cbuf);
-        
         printf("Incorrectly set control length: %d , expected: %d\n", sizeof(cbuf));
-
         return -1;
     }
 
-    if  (display_local_address_by_hdr(&hdr) < 0)
+    if  (get_local_address_by_hdr(&hdr, local_addr) < 0)
     {
         printf("display local address error");
         return -1;
@@ -93,14 +82,12 @@ void* udp_echo(void* arg)
     int fd = *(int*)arg;
     char buf[buf_size];
 
-    struct sockaddr_in client_addr;
-    socklen_t socklen = sizeof(struct sockaddr_in);
+    // struct sockaddr_in client_addr;
+    // socklen_t socklen = sizeof(struct sockaddr_in);
 
     while (true)
     {
         struct sockaddr_storage local_addr, remote_addr;
-
-        
         // int recv_len = recvfrom(fd, buf, buf_size, 0, (struct sockaddr*)&client_addr, &socklen);
         // if  (recv_len <= 0)  break;
         int recv_len = read_packet(fd, buf, buf_size, &local_addr, &remote_addr);
@@ -108,8 +95,7 @@ void* udp_echo(void* arg)
         printf("server recv %d bytes \n", recv_len);
 
         if  (remote_addr.ss_family != AF_INET)   
-        {
-            printf("remote addr is not AF_INET, expect: %d, actual: %d, \n", AF_INET, remote_addr.ss_family);
+        {   printf("remote addr is not AF_INET, expect: %d, actual: %d, \n", AF_INET, remote_addr.ss_family);
             break;
         }
         struct sockaddr_in* remote_addr_in =(struct sockaddr_in*)&remote_addr;
@@ -120,7 +106,7 @@ void* udp_echo(void* arg)
         
         int send_len = sendto(fd, buf, recv_len, 0, (struct sockaddr*)&remote_addr, sizeof(struct sockaddr)); 
         printf("server echo %d bytes to %s:%d\n",
-                send_len, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+                send_len, inet_ntoa(remote_addr_in->sin_addr), ntohs(remote_addr_in->sin_port));
         printf("\n");
     }
 
