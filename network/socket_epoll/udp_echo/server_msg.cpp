@@ -14,7 +14,7 @@ const int buf_size = 4096;
 
 
 
-struct sockaddr_storage ;
+struct sockaddr_storage;
 
 
 int get_local_address_by_hdr(struct msghdr* hdr, struct sockaddr_storage* local_addr)
@@ -33,9 +33,14 @@ int get_local_address_by_hdr(struct msghdr* hdr, struct sockaddr_storage* local_
 
                 printf("route ip: %s, dst ip: %s, ifindex: %d\n", 
                         route_ip_buf, dst_ip_buf, info->ipi_ifindex);
+
+                struct sockaddr_in* local_addr_in = (struct sockaddr_in*)local_addr;
+                local_addr_in->sin_family = AF_INET;
+                local_addr_in->sin_addr = info->ipi_addr;
+                local_addr_in->sin_port = 0;
+                bzero(local_addr_in->sin_zero, sizeof(local_addr_in->sin_zero));
             }
         }
-
     }
 
     return 0;
@@ -123,7 +128,16 @@ void* udp_echo(void* arg)
         struct sockaddr_in* remote_addr_in =(struct sockaddr_in*)&remote_addr;
         printf("server recv %d bytes from %s:%d\n", 
                 recv_len, inet_ntoa(remote_addr_in->sin_addr), ntohs(remote_addr_in->sin_port));
-        
+
+        if  (local_addr.ss_family != AF_INET)
+        {   printf("local addr is not AF_INET\n");
+            break;
+        }   
+        struct sockaddr_in* local_addr_in = (struct sockaddr_in*)&local_addr;
+        printf("server recv %d bytes at %s\n", recv_len,
+                inet_ntoa(local_addr_in->sin_addr));  
+
+ 
 
         
         int send_len = sendto(fd, buf, recv_len, 0, (struct sockaddr*)&remote_addr, sizeof(struct sockaddr)); 
