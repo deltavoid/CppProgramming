@@ -10,11 +10,7 @@
 #include <errno.h>
 
 const int buf_size = 4096;
-// const short port = 8192;
 
-
-
-struct sockaddr_storage;
 
 
 int get_local_address_by_hdr(struct msghdr* hdr, struct sockaddr_storage* local_addr)
@@ -90,11 +86,9 @@ int read_packet(int fd, char* buf, int size,
 
     if  (get_local_address_by_hdr(&hdr, local_addr) < 0)
     {
-        printf("display local address error");
+        printf("get local address error");
         return -1;
     }
-
-
 
 
     return bytes_read;
@@ -106,17 +100,9 @@ void* udp_echo(void* arg)
     char buf[buf_size];
 
 
-
-
-
-    // struct sockaddr_in client_addr;
-    // socklen_t socklen = sizeof(struct sockaddr_in);
-
     while (true)
     {
         struct sockaddr_storage local_addr, remote_addr;
-        // int recv_len = recvfrom(fd, buf, buf_size, 0, (struct sockaddr*)&client_addr, &socklen);
-        // if  (recv_len <= 0)  break;
         int recv_len = read_packet(fd, buf, buf_size, &local_addr, &remote_addr);
         if  (recv_len <= 0)  break;
         printf("server recv %d bytes \n", recv_len);
@@ -135,11 +121,9 @@ void* udp_echo(void* arg)
         }   
         struct sockaddr_in* local_addr_in = (struct sockaddr_in*)&local_addr;
         printf("server recv %d bytes at %s\n", recv_len,
-                inet_ntoa(local_addr_in->sin_addr));  
+                inet_ntoa(local_addr_in->sin_addr));
 
  
-
-        
         int send_len = sendto(fd, buf, recv_len, 0, (struct sockaddr*)&remote_addr, sizeof(struct sockaddr)); 
         printf("server echo %d bytes to %s:%d\n",
                 send_len, inet_ntoa(remote_addr_in->sin_addr), ntohs(remote_addr_in->sin_port));
