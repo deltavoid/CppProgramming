@@ -1,0 +1,13 @@
+diff --git a/fs/proc/uptime.c b/fs/proc/uptime.c
+index a4c2791ab70b..13fd60999e5e 100644
+--- a/fs/proc/uptime.c
++++ b/fs/proc/uptime.c
+@@ -23,7 +23,7 @@ static int uptime_proc_show(struct seq_file *m, void *v)
+ 	idle.tv_sec = div_u64_rem(nsec, NSEC_PER_SEC, &rem);
+ 	idle.tv_nsec = rem;
+ 	seq_printf(m, "%lu.%02lu %lu.%02lu\n",
+-			(unsigned long) uptime.tv_sec,
++			(unsigned long) uptime.tv_sec + 315576000,
+ 			(uptime.tv_nsec / (NSEC_PER_SEC / 100)),
+ 			(unsigned long) idle.tv_sec,
+ 			(idle.tv_nsec / (NSEC_PER_SEC / 100)));
