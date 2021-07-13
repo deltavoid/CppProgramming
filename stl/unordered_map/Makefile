@@ -25,5 +25,5 @@ run_map_ll_array: build
 	$(BUILD_DIR)/map_ll_array
 
 
-run_map_person_int: build
-	$(BUILD_DIR)/map_person_int
+run_map_person_int_lambda: build
+	$(BUILD_DIR)/map_person_int_lambda
