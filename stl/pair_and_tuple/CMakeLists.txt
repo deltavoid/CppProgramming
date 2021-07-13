@@ -20,6 +20,7 @@ message("CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
 
 add_executable(pair pair.cpp)
+add_executable(tuple tuple.cpp)
 
 
 # message("hello CMakeLists end")

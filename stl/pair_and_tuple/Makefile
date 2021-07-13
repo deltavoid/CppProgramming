@@ -17,8 +17,11 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run: build
+run_pair: build
 	$(BUILD_DIR)/pair
+
+run_tuple: build
+	$(BUILD_DIR)/tuple
 
 # ldd: build
 # 	ldd $(BUILD_DIR)/main
