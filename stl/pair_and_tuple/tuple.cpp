@@ -19,6 +19,10 @@ int main()
             std::get<0>(tuple1), std::get<1>(tuple1), std::get<2>(tuple1).c_str());
 
 
+    auto tuple2 = std::make_tuple(2, 2.0f, std::string("world"));
+    printf("tuple2.e0: %d, tuple2.e1: %f, tuple2.e2: %s\n",
+            std::get<0>(tuple2), std::get<1>(tuple2), std::get<2>(tuple2).c_str());
+
 
     return 0;
 }
