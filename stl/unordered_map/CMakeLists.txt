@@ -3,6 +3,6 @@ cmake_minimum_required(VERSION 3.5)
 project(unordered_map)
 
 
-add_executable(main main.cpp)
-add_executable(main1 main1.cpp)
-add_executable(main2 main2.cpp)
+add_executable(map_ll_ll map_ll_ll.cpp)
+add_executable(map_ll_pair map_ll_pair.cpp)
+add_executable(map_ll_array map_ll_array.cpp)

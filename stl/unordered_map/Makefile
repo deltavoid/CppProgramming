@@ -15,11 +15,11 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 
-run_main: build
-	$(BUILD_DIR)/main --hello world
+run_map_ll_ll: build
+	$(BUILD_DIR)/map_ll_ll
 
-run_main1: build
-	$(BUILD_DIR)/main1 --hello world
+run_map_ll_pair: build
+	$(BUILD_DIR)/map_ll_pair
 
-run_main2: build
-	$(BUILD_DIR)/main2 --hello world
+run_map_ll_array: build
+	$(BUILD_DIR)/map_ll_array
