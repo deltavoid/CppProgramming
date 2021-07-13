@@ -27,3 +27,6 @@ run_map_ll_array: build
 
 run_map_person_int_lambda: build
 	$(BUILD_DIR)/map_person_int_lambda
+
+run_map_person_int_function_struct: build
+	$(BUILD_DIR)/map_person_int_function_struct
