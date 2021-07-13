@@ -30,3 +30,8 @@ run_map_person_int_lambda: build
 
 run_map_person_int_function_struct: build
 	$(BUILD_DIR)/map_person_int_function_struct
+
+
+run_map_pair_uint64: build
+	$(BUILD_DIR)/map_pair_uint64
+	
