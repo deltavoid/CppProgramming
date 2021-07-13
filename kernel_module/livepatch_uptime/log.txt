@@ -1,0 +1,33 @@
+
+
+# diff -u linux-source-4.19/fs/proc/uptime.c ./uptime.c > uptime.patch
+
+# diff -u /data00/zhangqianyu/WorkSpace/linux/linux-image-bsk/fs/proc/uptime.c /data00/zhangqianyu/WorkSpace/linux/livepatch-uptime/uptime.c > uptime.patch
+
+
+diff at git
+
+
+
+# kpatch-build -s linux-source-4.19 -v /usr/lib/debug/lib/modules/$(uname -r)/vmlinux uptime.patch
+
+
+kpatch-build -s /data00/zhangqianyu/WorkSpace/linux/linux-image-bsk -v /usr/lib/debug/lib/modules/$(uname -r)/vmlinux uptime.patch
+
+
+
+
+
+
+cat /proc/uptime && uptime -p
+
+
+kpatch load livepatch-uptime.ko
+
+
+cat /proc/uptime && uptime -p 
+
+
+kpatch unload livepatch-uptime.ko
+
+
