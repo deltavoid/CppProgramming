@@ -35,3 +35,5 @@ run_map_person_int_function_struct: build
 run_map_pair_uint64: build
 	$(BUILD_DIR)/map_pair_uint64
 	
+run_map_uint64_shared_ptr: build
+	$(BUILD_DIR)/map_uint64_shared_ptr
