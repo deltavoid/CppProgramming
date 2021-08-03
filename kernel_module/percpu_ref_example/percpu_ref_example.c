@@ -88,6 +88,9 @@ static void __exit percpu_ref_example_exit(void)
     pr_info("percpu_ref_example_exit begin\n");
 
 
+    percpu_ref_exit(&cnt);
+
+
     pr_info("percpu_ref_example_exit end\n");
     pr_debug("-------------------------------------------------\n");
 }
