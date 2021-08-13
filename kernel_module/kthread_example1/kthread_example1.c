@@ -63,30 +63,30 @@ struct task_struct* example_thread;
 
 // module init ----------------------------------------------------------
 
-static int __init kthread_example_init(void)
+static int __init kthread_example1_init(void)
 {
-    pr_info("kthread_example_init begin\n");
+    pr_info("kthread_example1_init begin\n");
 
-    example_thread = kthread_run(example_thread_run, NULL, "kthread_example");
+    example_thread = kthread_run(example_thread_run, NULL, "kthread_example1");
     if  (!example_thread)
         return -1;
 
-    pr_info("kthread_example_init end\n");
+    pr_info("kthread_example1_init end\n");
     return 0;
 }
 
-static void __exit kthread_example_exit(void)
+static void __exit kthread_example1_exit(void)
 {
-    pr_info("kthread_example_exit begin\n");
+    pr_info("kthread_example1_exit begin\n");
 
     kthread_stop(example_thread);
 
 
-    pr_info("kthread_example_exit end\n");
+    pr_info("kthread_example1_exit end\n");
     pr_debug("-------------------------------------------------\n");
 }
 
 
-module_init(kthread_example_init);
-module_exit(kthread_example_exit);
+module_init(kthread_example1_init);
+module_exit(kthread_example1_exit);
 MODULE_LICENSE("GPL");
