@@ -7,7 +7,10 @@
 #include <linux/kernel.h>
 #include <linux/version.h>
 
+#include <linux/semaphore.h>
 
+
+struct semaphore sem;
 
 
 // module init ----------------------------------------------------------
@@ -15,6 +18,17 @@
 static int __init sem_use_init(void)
 {
     pr_info("sem_use_init begin\n");
+
+    sema_init(&sem, 0);
+
+    up(&sem);
+
+    down(&sem);
+
+    up(&sem);
+
+    while (down_interruptible(&sem) < 0)
+        pr_debug("Interrupted during semaphore wait\n");
 
 
     pr_info("sem_use_init end\n");
