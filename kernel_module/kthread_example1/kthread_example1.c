@@ -26,6 +26,7 @@ static int example_thread_ctx_init(struct example_thread_ctx* ctx)
 {
     ctx->finished = 0;
     // init_waitqueue_head(&ctx->wq_head);
+    return 0;
 }
 
 
@@ -60,7 +61,7 @@ static int example_thread_run(void *arg)
     pr_debug("example_thread: 1\n");
 
 
-    for (i = 0; i < 100 && !kthread_should_stop(); i++)
+    for (i = 0; i < 10 && !kthread_should_stop(); i++)
     {
         pr_debug("example_thread: 2, i: %d\n", i);
 
@@ -68,16 +69,19 @@ static int example_thread_run(void *arg)
     }
 
 
-
-
-    
-
     ctx->finished = 1;
 
     pr_debug("example_thread: 3\n");
     wait_for_kthread_stop();
 
     pr_debug("example_thread: 4\n");
+    for (i = 0; i < 10; i++)
+    {
+        pr_debug("example_thread: 4.1, i: %d\n", i);
+        msleep(1000);
+    }
+    
+    pr_debug("example_thread: 5\n");
 	return 0;
 }
 
