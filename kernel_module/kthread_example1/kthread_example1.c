@@ -14,6 +14,21 @@
 
 
 
+struct example_thread_ctx {
+
+
+    int finished;
+    struct wait_queue_head wq_head;
+
+};
+
+static int example_thread_ctx_init(struct example_thread_ctx* ctx)
+{
+    ctx->finished = 0;
+    // init_waitqueue_head(&ctx->wq_head);
+}
+
+
 /*
  * Prevent the kthread exits directly, and make sure when kthread_stop()
  * is called to stop a kthread, it is still alive. If a kthread might be
@@ -34,9 +49,13 @@ static inline void wait_for_kthread_stop(void)
 }
 
 
+
+
+
 static int example_thread_run(void *arg)
 {
     int i;
+    struct example_thread_ctx* ctx = (struct example_thread_ctx*)arg;
 
     pr_debug("example_thread: 1\n");
 
@@ -49,6 +68,12 @@ static int example_thread_run(void *arg)
     }
 
 
+
+
+    
+
+    ctx->finished = 1;
+
     pr_debug("example_thread: 3\n");
     wait_for_kthread_stop();
 
@@ -59,6 +84,7 @@ static int example_thread_run(void *arg)
 
 
 struct task_struct* example_thread;
+struct example_thread_ctx example_thread_ctx;
 
 
 // module init ----------------------------------------------------------
@@ -67,9 +93,17 @@ static int __init kthread_example1_init(void)
 {
     pr_info("kthread_example1_init begin\n");
 
-    example_thread = kthread_run(example_thread_run, NULL, "kthread_example1");
+    example_thread_ctx_init(&example_thread_ctx);
+
+    example_thread = kthread_run(example_thread_run, &example_thread_ctx, "kthread_example1");
     if  (!example_thread)
         return -1;
+
+    while (example_thread_ctx.finished == 0)
+    {
+        cond_resched();
+        cpu_relax();
+    }
 
     pr_info("kthread_example1_init end\n");
     return 0;

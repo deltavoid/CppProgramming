@@ -53,6 +53,9 @@ static int example_thread_run(void *arg)
     wait_for_kthread_stop();
 
     pr_debug("example_thread: 4\n");
+    msleep(10000);
+
+    pr_debug("example_thread: 5\n");
 	return 0;
 }
 
