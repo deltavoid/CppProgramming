@@ -1,6 +1,6 @@
 
 
-MODULE := hello
+MODULE := kthread_example2
 obj-m += $(MODULE).o
 CFLAGS_$(MODULE).o := -DDEBUG
 KERNDIR	:= /lib/modules/$(shell uname -r)/build

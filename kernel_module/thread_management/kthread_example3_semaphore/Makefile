@@ -1,6 +1,6 @@
 
 
-MODULE := hello
+MODULE := kthread_example3
 obj-m += $(MODULE).o
 CFLAGS_$(MODULE).o := -DDEBUG
 KERNDIR	:= /lib/modules/$(shell uname -r)/build
@@ -14,7 +14,7 @@ $(MODULE).ko: $(MODULE).c
 	$(MAKE) -C $(KERNDIR) M=$(CURDIR) modules
 
 clean:
-	rm -rf *.ko *.o  *.mod *.mod.o *.mod.c *.order *.symvers .$(MODULE).*.cmd .tmp_versions
+	rm -f *.ko *.o  *.mod *.mod.o *.mod.c *.order *.symvers .$(MODULE).*.cmd
 
 insmod: rmmod build
 	sudo insmod $(MODULE).ko
