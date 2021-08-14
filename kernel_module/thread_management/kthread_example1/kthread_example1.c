@@ -69,7 +69,8 @@ static int example_thread_run(void *arg)
     }
 
 
-    ctx->finished = 1;
+    // ctx->finished = 1;
+    smp_store_release(&ctx->finished, 1);
 
     pr_debug("example_thread: 3\n");
     wait_for_kthread_stop();
@@ -103,7 +104,8 @@ static int __init kthread_example1_init(void)
     if  (!example_thread)
         return -1;
 
-    while (example_thread_ctx.finished == 0)
+    // while (example_thread_ctx.finished == 0)
+    while (smp_load_acquire(&example_thread_ctx.finished) == 0)
     {
         cond_resched();
         cpu_relax();
