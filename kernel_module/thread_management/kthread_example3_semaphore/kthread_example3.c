@@ -100,24 +100,31 @@ static int example_thread_run(void *arg)
 }
 
 
-
-struct task_struct* example_thread;
-struct example_thread_ctx example_thread_ctx;
+#define NR_THREADS 4
+struct task_struct* example_threads[NR_THREADS];
+struct example_thread_ctx example_thread_ctxs[NR_THREADS];
 
 
 // module init ----------------------------------------------------------
 
 static int __init kthread_example1_init(void)
 {
+    int i;
     pr_info("kthread_example1_init begin\n");
 
     sema_init(&sem_exit, 0);
 
-    example_thread_ctx_init(&example_thread_ctx, &sem_exit);
 
-    example_thread = kthread_run(example_thread_run, &example_thread_ctx, "kthread_example1");
-    if  (!example_thread)
-        return -1;
+    for (i = 0; i < NR_THREADS; i++)
+        example_thread_ctx_init(&example_thread_ctxs[i], &sem_exit);
+
+    for (i = 0; i < NR_THREADS; i++)
+    {
+        example_threads[i] = kthread_run(example_thread_run, &example_thread_ctxs[i], "kthread_example");
+        if  (!example_threads[i])
+            return -1;
+    }
+    
 
     // while (example_thread_ctx.finished == 0)
     // while (smp_load_acquire(&example_thread_ctx.finished) == 0)
@@ -125,9 +132,14 @@ static int __init kthread_example1_init(void)
     //     cond_resched();
     //     cpu_relax();
     // }
-    while (down_interruptible(&sem_exit) < 0)
-        pr_debug("Interrupted during semaphore wait\n");
-        
+
+    for (i = 0; i < NR_THREADS; i++)
+    {
+        while (down_interruptible(&sem_exit) < 0)
+            pr_debug("Interrupted during semaphore wait\n");
+    }
+    
+
 
     pr_info("kthread_example1_init end\n");
     return 0;
@@ -135,9 +147,13 @@ static int __init kthread_example1_init(void)
 
 static void __exit kthread_example1_exit(void)
 {
+    int i;
     pr_info("kthread_example1_exit begin\n");
 
-    kthread_stop(example_thread);
+    for (i = 0; i < NR_THREADS; i++)
+    {   kthread_stop(example_threads[i]);
+    }
+    
 
 
     pr_info("kthread_example1_exit end\n");
