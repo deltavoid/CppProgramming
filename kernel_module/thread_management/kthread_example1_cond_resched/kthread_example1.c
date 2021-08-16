@@ -18,7 +18,7 @@ struct example_thread_ctx {
 
 
     int finished;
-    struct wait_queue_head wq_head;
+    // struct wait_queue_head wq_head;
 
 };
 
