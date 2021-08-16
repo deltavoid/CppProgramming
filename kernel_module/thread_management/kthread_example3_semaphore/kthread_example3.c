@@ -10,6 +10,11 @@
 #include <linux/sched.h>
 #include <linux/delay.h>
 #include <linux/kthread.h>
+#include <linux/semaphore.h>
+
+
+
+struct semaphore sem_exit;
 
 
 
@@ -17,15 +22,18 @@
 struct example_thread_ctx {
 
 
-    int finished;
-    struct wait_queue_head wq_head;
+    // int finished;
+    // struct wait_queue_head wq_head;
+
+    struct semaphore* sem_exit_p;
 
 };
 
-static int example_thread_ctx_init(struct example_thread_ctx* ctx)
+static int example_thread_ctx_init(struct example_thread_ctx* ctx, struct semaphore* sem_exit_p)
 {
-    ctx->finished = 0;
+    // ctx->finished = 0;
     // init_waitqueue_head(&ctx->wq_head);
+    ctx->sem_exit_p = sem_exit_p;
     return 0;
 }
 
@@ -70,7 +78,12 @@ static int example_thread_run(void *arg)
 
 
     // ctx->finished = 1;
-    smp_store_release(&ctx->finished, 1);
+    // smp_store_release(&ctx->finished, 1);
+
+    up(ctx->sem_exit_p);
+
+
+
 
     pr_debug("example_thread: 3\n");
     wait_for_kthread_stop();
@@ -98,18 +111,23 @@ static int __init kthread_example1_init(void)
 {
     pr_info("kthread_example1_init begin\n");
 
-    example_thread_ctx_init(&example_thread_ctx);
+    sema_init(&sem_exit, 0);
+
+    example_thread_ctx_init(&example_thread_ctx, &sem_exit);
 
     example_thread = kthread_run(example_thread_run, &example_thread_ctx, "kthread_example1");
     if  (!example_thread)
         return -1;
 
     // while (example_thread_ctx.finished == 0)
-    while (smp_load_acquire(&example_thread_ctx.finished) == 0)
-    {
-        cond_resched();
-        cpu_relax();
-    }
+    // while (smp_load_acquire(&example_thread_ctx.finished) == 0)
+    // {
+    //     cond_resched();
+    //     cpu_relax();
+    // }
+    while (down_interruptible(&sem_exit) < 0)
+        pr_debug("Interrupted during semaphore wait\n");
+        
 
     pr_info("kthread_example1_init end\n");
     return 0;
