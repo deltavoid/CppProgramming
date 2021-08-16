@@ -25,7 +25,7 @@ struct example_thread_ctx {
 static int example_thread_ctx_init(struct example_thread_ctx* ctx)
 {
     ctx->finished = 0;
-    // init_waitqueue_head(&ctx->wq_head);
+    init_waitqueue_head(&ctx->wq_head);
     return 0;
 }
 
@@ -69,8 +69,14 @@ static int example_thread_run(void *arg)
     }
 
 
-    // ctx->finished = 1;
-    smp_store_release(&ctx->finished, 1);
+    // smp_store_release(&ctx->finished, 1);
+    ctx->finished = 1;
+    wake_up(&ctx->wq_head);
+
+
+
+
+
 
     pr_debug("example_thread: 3\n");
     wait_for_kthread_stop();
@@ -105,11 +111,13 @@ static int __init kthread_example1_init(void)
         return -1;
 
     // while (example_thread_ctx.finished == 0)
-    while (smp_load_acquire(&example_thread_ctx.finished) == 0)
-    {
-        cond_resched();
-        cpu_relax();
-    }
+    // while (smp_load_acquire(&example_thread_ctx.finished) == 0)
+    // {
+    //     cond_resched();
+    //     cpu_relax();
+    // }
+    wait_event(example_thread_ctx.wq_head, example_thread_ctx.finished == 1);
+
 
     pr_info("kthread_example1_init end\n");
     return 0;
