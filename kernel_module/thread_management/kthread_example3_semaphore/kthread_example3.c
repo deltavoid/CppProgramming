@@ -126,12 +126,6 @@ static int __init kthread_example1_init(void)
     }
     
 
-    // while (example_thread_ctx.finished == 0)
-    // while (smp_load_acquire(&example_thread_ctx.finished) == 0)
-    // {
-    //     cond_resched();
-    //     cpu_relax();
-    // }
 
     for (i = 0; i < NR_THREADS; i++)
     {
