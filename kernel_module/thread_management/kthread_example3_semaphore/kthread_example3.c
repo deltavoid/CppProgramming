@@ -77,12 +77,8 @@ static int example_thread_run(void *arg)
     }
 
 
-    // ctx->finished = 1;
-    // smp_store_release(&ctx->finished, 1);
 
     up(ctx->sem_exit_p);
-
-
 
 
     pr_debug("example_thread: 3\n");

@@ -69,12 +69,8 @@ static int example_thread_run(void *arg)
     }
 
 
-    // smp_store_release(&ctx->finished, 1);
     ctx->finished = 1;
     wake_up(&ctx->wq_head);
-
-
-
 
 
 
@@ -110,12 +106,8 @@ static int __init kthread_example1_init(void)
     if  (!example_thread)
         return -1;
 
-    // while (example_thread_ctx.finished == 0)
-    // while (smp_load_acquire(&example_thread_ctx.finished) == 0)
-    // {
-    //     cond_resched();
-    //     cpu_relax();
-    // }
+
+
     wait_event(example_thread_ctx.wq_head, example_thread_ctx.finished == 1);
 
 
