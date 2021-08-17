@@ -48,16 +48,18 @@ PWD			:= $(shell pwd)
 KERNEL_HEAD		:= $(shell uname -r)
 KERNEL_DIR		:= /lib/modules/$(KERNEL_HEAD)/build
 
-all:
+build:
 	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) modules
 
 clean:
 	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean
 
-install:
+
+insmod: rmmod build
 	sudo insmod $(MODULE_NAME).ko
 
-remove:
-	sudo rmmod $(MODULE_NAME)
+rmmod:
+	-sudo rmmod $(MODULE_NAME)
+
 
 endif
