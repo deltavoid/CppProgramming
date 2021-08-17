@@ -14,7 +14,7 @@
 
 
 
-struct semaphore sem_exit;
+static struct semaphore sem_exit;
 
 
 
@@ -97,8 +97,8 @@ static int example_thread_run(void *arg)
 
 
 #define NR_THREADS 4
-struct task_struct* example_threads[NR_THREADS];
-struct example_thread_ctx example_thread_ctxs[NR_THREADS];
+static struct task_struct* example_threads[NR_THREADS];
+static struct example_thread_ctx example_thread_ctxs[NR_THREADS];
 
 
 // module init ----------------------------------------------------------

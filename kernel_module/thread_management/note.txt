@@ -1,0 +1,29 @@
+
+
+
+
+内核线程状态
+
+
+
+cpu, tid, pid
+
+硬中断上下文， 软中断上下文， 线程上下文， preempt_count
+
+
+断点（函数）， 变量（参数）， 堆栈， 
+
+
+struct task_struct*, struct mm_strcut*, struct file_struct*,
+
+
+
+
+
+用户态线程状态
+
+
+tid, pid
+
+断点（函数， 类名）， 变量（this指针）， 堆栈
+
