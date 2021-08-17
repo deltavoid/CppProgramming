@@ -36,6 +36,7 @@ obj-m			:= $(MODULE_NAME).o
 # $(MODULE_NAME)-m	+= kprobe.o trace.o
 # ldflags-y		+= -r -T $(KBUILD_EXTMOD)/kprobe.lds
 # ccflags-y		+= -I$(KBUILD_EXTMOD)/include
+ccflags-y		+= -DDEBUG
 
 # name-fix   = $(squote)$(quote)$(subst $(comma),_,$(subst -,_,$1))$(quote)$(squote)
 # ccflags-y += -DCONFIG_MODULE_NAME=$(call name-fix,$(MODULE_NAME))
