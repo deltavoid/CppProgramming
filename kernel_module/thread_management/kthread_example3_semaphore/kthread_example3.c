@@ -21,18 +21,12 @@ static struct semaphore sem_exit;
 
 struct example_thread_ctx {
 
-
-    // int finished;
-    // struct wait_queue_head wq_head;
-
     struct semaphore* sem_exit_p;
 
 };
 
 static int example_thread_ctx_init(struct example_thread_ctx* ctx, struct semaphore* sem_exit_p)
 {
-    // ctx->finished = 0;
-    // init_waitqueue_head(&ctx->wq_head);
     ctx->sem_exit_p = sem_exit_p;
     return 0;
 }
