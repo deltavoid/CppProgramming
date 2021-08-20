@@ -17,13 +17,20 @@
 
 static void preempt_count_display(void)
 {
-    unsigned preempt_cnt = preempt_count();
-    // if  (preempt_cnt)
-    pr_debug("preempt_count: 0x%08x\n", preempt_cnt);
+    pr_debug("preempt_count: 0x%08x\n", preempt_count());
     pr_debug("test_preempt_need_resched: %d\n", test_preempt_need_resched());
+    
+    pr_debug("hardirq_count: %ld\n", hardirq_count());
+    pr_debug("softirq_count: %ld\n", softirq_count());
+    pr_debug("irq_count: %ld\n", irq_count());
+    pr_debug("in_irq: %ld\n", in_irq());
+    pr_debug("in_serving_softirq: %ld\n", in_serving_softirq());
+    pr_debug("in_nmi: %ld\n", in_nmi());
+    pr_debug("in_task: %d\n", in_task());
+
 }
 
-static void current_display(void)
+static void thread_display(void)
 {
     struct thread_info* thread_p = current_thread_info();
     struct task_struct* task_p = current;
@@ -36,12 +43,18 @@ static void current_display(void)
             smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
 
     pr_debug("thread flags: %lx\n", thread_p->flags);
-    pr_debug("thread status: %lx\n", thread_p->status);
+    pr_debug("thread status: %x\n", thread_p->status);
 
-    pr_debug("task flags: %lx\n", task_p->flags);
+    pr_debug("task flags: %x\n", task_p->flags);
     pr_debug("task state: %lx\n", task_p->state);
 
 
+}
+
+static void current_display(void)
+{
+    thread_display();
+    preempt_count_display();
 }
 
 // kprobe -----------------------------------------------------------
