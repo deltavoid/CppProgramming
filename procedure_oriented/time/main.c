@@ -35,5 +35,8 @@ int main()
     printf("msecs: %lld\n", get_msecs());
 
 
+    // another approach, gettimeofday
+
+
     return 0;
 }
