@@ -35,18 +35,18 @@ static void thread_display(void)
     struct thread_info* thread_p = current_thread_info();
     struct task_struct* task_p = current;
 
-    pr_debug("thread_p: %px, task_p: %px\n", thread_p, task_p);
+    pr_debug("thread_p: 0x%px, task_p: 0x%px\n", thread_p, task_p);
     
     
     // comm should use get_task_comm
     pr_debug("cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
             smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
 
-    pr_debug("thread flags: %lx\n", thread_p->flags);
-    pr_debug("thread status: %x\n", thread_p->status);
+    pr_debug("thread flags: 0x%lx\n", thread_p->flags);
+    pr_debug("thread status: 0x%x\n", thread_p->status);
 
-    pr_debug("task flags: %x\n", task_p->flags);
-    pr_debug("task state: %lx\n", task_p->state);
+    pr_debug("task flags: 0x%x\n", task_p->flags);
+    pr_debug("task state: 0x%lx\n", task_p->state);
 
 
 }
@@ -203,12 +203,12 @@ static int __init preempt_count_display_init(void)
     // }
     // pr_info("Planted kprobe at %p\n", kp.addr);
 
-    // current_display();
+    current_display();
 
-    // preempt_count_display();
-    // preempt_count_test();
+    preempt_count_display();
+    preempt_count_test();
     
-    dump_stack_test();
+    // dump_stack_test();
 
     return 0;
 }
