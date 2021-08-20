@@ -64,6 +64,7 @@ static int example_thread_run(void *arg)
     struct example_thread_ctx* ctx = (struct example_thread_ctx*)arg;
 
     pr_debug("example_thread: 1, id: %d\n", ctx->id);
+    ctx->start_jiffies = jiffies;
 
 
     for (i = 0; i < 3 && !kthread_should_stop(); i++)
@@ -74,6 +75,7 @@ static int example_thread_run(void *arg)
     }
 
 
+    ctx->end_jiffies = jiffies;
 
     up(ctx->sem_exit_p);
 
@@ -139,6 +141,12 @@ static void __exit kthread_example1_exit(void)
 
     for (i = 0; i < NR_THREADS; i++)
     {   kthread_stop(example_threads[i]);
+    }
+
+    for (i = 0; i < NR_THREADS; i++)
+    {
+        unsigned long duration_jiffies = example_thread_ctxs[i].end_jiffies - example_thread_ctxs[i].start_jiffies;
+        pr_info("thread %d, duration second: %lu\n", i, duration_jiffies / HZ);
     }
     
 
