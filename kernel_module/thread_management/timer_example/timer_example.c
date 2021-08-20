@@ -75,6 +75,8 @@ static void timer_example_exit(struct timer_example* data)
     if  (timer_pending(&data->timer))
     {   pr_debug("timer_example_exit, del_timer\n");
         del_timer(&data->timer);
+
+        // del_timer_sync(&data->timer); // can not be used in atomic context
     }
 }
 
