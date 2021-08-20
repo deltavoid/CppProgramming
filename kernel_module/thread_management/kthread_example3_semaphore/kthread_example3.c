@@ -9,6 +9,7 @@
 
 #include <linux/sched.h>
 #include <linux/delay.h>
+#include <linux/jiffies.h>
 #include <linux/kthread.h>
 #include <linux/semaphore.h>
 
@@ -20,13 +21,15 @@ static struct semaphore sem_exit;
 
 
 struct example_thread_ctx {
-
+    int id;
     struct semaphore* sem_exit_p;
 
+    unsigned long start_jiffies, end_jiffies;
 };
 
-static int example_thread_ctx_init(struct example_thread_ctx* ctx, struct semaphore* sem_exit_p)
+static int example_thread_ctx_init(struct example_thread_ctx* ctx, int id, struct semaphore* sem_exit_p)
 {
+    ctx->id = id;
     ctx->sem_exit_p = sem_exit_p;
     return 0;
 }
@@ -60,10 +63,10 @@ static int example_thread_run(void *arg)
     int i;
     struct example_thread_ctx* ctx = (struct example_thread_ctx*)arg;
 
-    pr_debug("example_thread: 1\n");
+    pr_debug("example_thread: 1, id: %d\n", ctx->id);
 
 
-    for (i = 0; i < 10 && !kthread_should_stop(); i++)
+    for (i = 0; i < 3 && !kthread_should_stop(); i++)
     {
         pr_debug("example_thread: 2, i: %d\n", i);
 
@@ -79,7 +82,7 @@ static int example_thread_run(void *arg)
     wait_for_kthread_stop();
 
     pr_debug("example_thread: 4\n");
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < 3; i++)
     {
         pr_debug("example_thread: 4.1, i: %d\n", i);
         msleep(1000);
@@ -106,7 +109,7 @@ static int __init kthread_example1_init(void)
 
 
     for (i = 0; i < NR_THREADS; i++)
-        example_thread_ctx_init(&example_thread_ctxs[i], &sem_exit);
+        example_thread_ctx_init(&example_thread_ctxs[i], i, &sem_exit);
 
     for (i = 0; i < NR_THREADS; i++)
     {
