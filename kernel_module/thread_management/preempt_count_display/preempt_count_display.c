@@ -23,6 +23,7 @@ static void preempt_count_display(void)
     pr_debug("hardirq_count: %ld\n", hardirq_count());
     pr_debug("softirq_count: %ld\n", softirq_count());
     pr_debug("irq_count: %ld\n", irq_count());
+    
     pr_debug("in_irq: %ld\n", in_irq());
     pr_debug("in_serving_softirq: %ld\n", in_serving_softirq());
     pr_debug("in_nmi: %ld\n", in_nmi());
@@ -53,9 +54,17 @@ static void thread_display(void)
 
 static void current_display(void)
 {
+    pr_debug("current_display: 1\n");
     thread_display();
+
+    pr_debug("current_display: 2\n");
     preempt_count_display();
+
+    pr_debug("current_display: 3\n");
+    pr_debug("\n");
 }
+
+
 
 // kprobe -----------------------------------------------------------
 
@@ -73,7 +82,7 @@ static struct kprobe kp = {
 /* for any context, information need to know
  * cpu, tid, pid, command name
  * preempt_count: thread context, irq context, hard_irq, soft_irq, preempt_disable, 
- * need_resched
+ *     need_resched
  * lock
  */
 
@@ -88,7 +97,8 @@ static int handler_pre(struct kprobe *p, struct pt_regs *regs)
         pr_debug("%s cnt: %ld --------------------------------------------------------------\n", 
                 p->symbol_name, cnt);
         // pr_debug("cnt: %ld\n", cnt);
-        preempt_count_display();
+        // preempt_count_display();
+        current_display();
         
         dump_stack();
     }
@@ -115,11 +125,12 @@ static int handler_fault(struct kprobe *p, struct pt_regs *regs, int trapnr)
 spinlock_t example_lock;
 static void preempt_count_test(void)
 {
-    pr_debug("module_init\n");
+    pr_debug("\n");
+    pr_debug("preempt_count_test\n");
     preempt_count_display();
 
 
-
+    pr_debug("\n");
     spin_lock(&example_lock);
 
     pr_debug("spin_lock\n");
@@ -128,6 +139,7 @@ static void preempt_count_test(void)
     spin_unlock(&example_lock);
 
 
+    pr_debug("\n");
     local_bh_disable();
 
     pr_debug("local_bh_disable\n");
@@ -135,6 +147,8 @@ static void preempt_count_test(void)
 
     local_bh_enable();
 
+
+    pr_debug("\n");
     local_bh_disable();
     local_bh_disable();
 
@@ -144,6 +158,7 @@ static void preempt_count_test(void)
     local_bh_enable();
     local_bh_enable();
 
+    pr_debug("\n");
     local_bh_disable();
     local_bh_disable();
     local_bh_disable();
@@ -155,6 +170,7 @@ static void preempt_count_test(void)
     local_bh_enable();
     local_bh_enable();
 
+    pr_debug("\n");
     spin_lock_bh(&example_lock);
 
     pr_debug("spin_lock_bh\n");
@@ -163,6 +179,7 @@ static void preempt_count_test(void)
     spin_unlock_bh(&example_lock);
 
 
+    pr_debug("\n");
     preempt_disable();
 
     pr_debug("preempt_disable\n");
