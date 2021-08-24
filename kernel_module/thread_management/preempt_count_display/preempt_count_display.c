@@ -92,7 +92,7 @@ static unsigned long cnt = 0;
 /* kprobe pre_handler: called just before the probed instruction is executed */
 static int handler_pre(struct kprobe *p, struct pt_regs *regs)
 {
-    if  (++cnt % 10 == 0)
+    if  (++cnt % 100 == 0)
     {
         pr_debug("%s cnt: %ld --------------------------------------------------------------\n", 
                 p->symbol_name, cnt);
@@ -207,18 +207,18 @@ static void dump_stack_test(void)
 
 static int __init preempt_count_display_init(void)
 {
-    // int ret;
-    // kp.pre_handler = handler_pre;
-    // // kp.post_handler = handler_post;
-    // kp.post_handler = NULL;
-    // kp.fault_handler = handler_fault;
+    int ret;
+    kp.pre_handler = handler_pre;
+    // kp.post_handler = handler_post;
+    kp.post_handler = NULL;
+    kp.fault_handler = handler_fault;
 
-    // ret = register_kprobe(&kp);
-    // if (ret < 0) {
-    //     pr_err("register_kprobe failed, returned %d\n", ret);
-    //     return ret;
-    // }
-    // pr_info("Planted kprobe at %p\n", kp.addr);
+    ret = register_kprobe(&kp);
+    if (ret < 0) {
+        pr_err("register_kprobe failed, returned %d\n", ret);
+        return ret;
+    }
+    pr_info("Planted kprobe at %p\n", kp.addr);
 
     current_display();
 
@@ -232,12 +232,12 @@ static int __init preempt_count_display_init(void)
 
 static void __exit preempt_count_display_exit(void)
 {
-    // unregister_kprobe(&kp);
+    unregister_kprobe(&kp);
 
-    // preempt_count_display();
+    preempt_count_display();
 
 
-    // pr_info("kprobe at %p unregistered\n", kp.addr);
+    pr_info("kprobe at %p unregistered\n", kp.addr);
     pr_debug("----------------------------------------------\n");
 }
 

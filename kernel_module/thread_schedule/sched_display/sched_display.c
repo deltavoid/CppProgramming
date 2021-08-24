@@ -15,15 +15,27 @@
 
 // preempt_count display ------------------------------------------
 
-static void preempt_count_display(void)
-{
-    struct task_struct* task_p = current;
 
+static void task_struct_display(const char* prefix, struct task_struct* task_p)
+{
     preempt_disable();
     // comm should use get_task_comm
-    pr_debug("cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
-            smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
+    pr_debug("%s cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
+            prefix, smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
     preempt_enable();
+}
+
+static void current_display(void)
+{
+    // struct task_struct* task_p = current;
+
+    // preempt_disable();
+    // // comm should use get_task_comm
+    // pr_debug("cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
+    //         smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
+    // preempt_enable();
+
+    task_struct_display("current:", current);
 
     pr_debug("preempt_count: 0x%08x, test_preempt_need_resched: %d\n", preempt_count(), test_preempt_need_resched());
     // pr_debug("test_preempt_need_resched: %d\n", test_preempt_need_resched());
@@ -43,7 +55,10 @@ static void probe_sched_wakeup(void *priv, struct task_struct *p)
     if  (++*count % 1000 == 0)
     {
         pr_debug("probe_sched_wakeup: wakeup %s\n", p->comm);
-        preempt_count_display();
+        // preempt_count_display();
+        current_display();
+
+        pr_debug("\n");
     }
 }
 
@@ -58,7 +73,10 @@ static void probe_sched_switch(void *priv, bool preempt,
     if  (++*count % 1000 == 0)
     {
         pr_debug("probe_sched_switch: prev: %s, next: %s\n", prev->comm, next->comm);
-        preempt_count_display();
+        // preempt_count_display();
+        current_display();
+
+        pr_debug("\n");
     }
 
 }
@@ -73,7 +91,10 @@ static void probe_sched_migrate_task(void *priv, struct task_struct *p, int cpu)
     if  (++*count % 10 == 0)
     {
         pr_debug("probe_sched_migrate: task: %s, cpu: %d\n", p->comm, cpu);
-        preempt_count_display();
+        // preempt_count_display();
+        current_display();
+
+        pr_debug("\n");
     }
 }
 
