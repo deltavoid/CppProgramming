@@ -18,24 +18,24 @@
 
 static void task_struct_display(const char* prefix, struct task_struct* task_p)
 {
-    preempt_disable();
+    // preempt_disable();
     // comm should use get_task_comm
-    pr_debug("%s cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
-            prefix, smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
-    preempt_enable();
+    pr_debug("%s task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
+            prefix, task_p->pid, task_p->tgid, task_p->comm);
+    // preempt_enable();
 }
 
 static void current_display(void)
 {
-    // struct task_struct* task_p = current;
+    struct task_struct* task_p = current;
 
-    // preempt_disable();
-    // // comm should use get_task_comm
-    // pr_debug("cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
-    //         smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
-    // preempt_enable();
+    preempt_disable();
+    // comm should use get_task_comm
+    pr_debug("current: cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
+            smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
+    preempt_enable();
 
-    task_struct_display("current:", current);
+    // task_struct_display("current:", current);
 
     pr_debug("preempt_count: 0x%08x, test_preempt_need_resched: %d\n", preempt_count(), test_preempt_need_resched());
     // pr_debug("test_preempt_need_resched: %d\n", test_preempt_need_resched());
@@ -57,6 +57,8 @@ static void probe_sched_wakeup(void *priv, struct task_struct *p)
         pr_debug("probe_sched_wakeup: wakeup %s\n", p->comm);
         // preempt_count_display();
         current_display();
+
+        task_struct_display("target: ", p);
 
         pr_debug("\n");
     }
