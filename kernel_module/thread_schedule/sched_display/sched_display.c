@@ -54,7 +54,7 @@ static void probe_sched_wakeup(void *priv, struct task_struct *p)
     
     if  (++*count % 1000 == 0)
     {
-        pr_debug("probe_sched_wakeup: wakeup %s\n", p->comm);
+        pr_debug("probe_sched_wakeup: \n");
         // preempt_count_display();
         current_display();
 
@@ -74,9 +74,12 @@ static void probe_sched_switch(void *priv, bool preempt,
     
     if  (++*count % 1000 == 0)
     {
-        pr_debug("probe_sched_switch: prev: %s, next: %s\n", prev->comm, next->comm);
+        pr_debug("probe_sched_switch: preempt: %d\n", preempt);
         // preempt_count_display();
         current_display();
+
+        task_struct_display("prev: ", prev);
+        task_struct_display("next: ", next);
 
         pr_debug("\n");
     }
