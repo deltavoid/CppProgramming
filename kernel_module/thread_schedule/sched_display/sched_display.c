@@ -95,9 +95,11 @@ static void probe_sched_migrate_task(void *priv, struct task_struct *p, int cpu)
     
     if  (++*count % 10 == 0)
     {
-        pr_debug("probe_sched_migrate: task: %s, cpu: %d\n", p->comm, cpu);
+        pr_debug("probe_sched_migrate: target cpu: %d\n", cpu);
         // preempt_count_display();
         current_display();
+
+        task_struct_display("p: ", p);
 
         pr_debug("\n");
     }
