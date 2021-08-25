@@ -153,6 +153,21 @@ static void trace_sched_stat_iowait_probe(void* priv,
 
 }
 
+static void trace_sched_stat_blocked_probe(void* priv,
+        struct task_struct *tsk, u64 delay)
+{
+    if  (smp_processor_id() == CPU_ID)
+    {
+        pr_debug("trace_sched_stat_blocked_probe: cpu_id: %d, delay: %llu\n", smp_processor_id(), delay);
+
+        task_struct_display("task: ", tsk);
+
+        pr_debug("\n");
+    }
+
+}
+
+
 static void trace_sched_stat_runtime_probe(void* priv,
         struct task_struct *tsk, u64 runtime, u64 vruntime)
 {
@@ -280,6 +295,11 @@ static struct tracepoint_probe_context sched_probes = {
             .probe = trace_sched_stat_iowait_probe,
             .priv = NULL,
         },
+        {
+            .name = "sched_stat_blocked",
+            .probe = trace_sched_stat_blocked_probe,
+            .priv = NULL,
+        },
         // {
         //     .name = "sched_stat_runtime",
         //     .probe = trace_sched_stat_runtime_probe,
@@ -287,7 +307,7 @@ static struct tracepoint_probe_context sched_probes = {
         // },
 
     },
-    .init_num = 3
+    .init_num = 4
 };
 
 
