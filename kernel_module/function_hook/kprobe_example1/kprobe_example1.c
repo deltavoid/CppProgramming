@@ -81,36 +81,100 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 
 
 /* For each probe you need to allocate a kprobe structure */
-static struct kprobe kp = {
-    .symbol_name	= symbol,
-    .pre_handler = kprobe_symbol_pre_handler,
-    .post_handler = kprobe_symbol_post_handler,
-    .fault_handler = kprobe_generic_fault_handler,
+// static struct kprobe kp = {
+//     .symbol_name	= symbol,
+//     .pre_handler = kprobe_symbol_pre_handler,
+//     .post_handler = kprobe_symbol_post_handler,
+//     .fault_handler = kprobe_generic_fault_handler,
+// };
+
+#define kprobe_num 1
+
+static struct kprobe kprobes[kprobe_num] = {
+
+    {
+        .symbol_name	= symbol,
+        .pre_handler = kprobe_symbol_pre_handler,
+        .post_handler = kprobe_symbol_post_handler,
+        .fault_handler = kprobe_generic_fault_handler,
+    },
 };
 
-static int __init kprobe_init(void)
-{
-    int ret;
-    // kp.pre_handler = handler_pre;
-    // // kp.post_handler = handler_post;
-    // kp.post_handler = NULL;
-    // kp.fault_handler = handler_fault;
 
-    ret = register_kprobe(&kp);
-    if (ret < 0) {
-        pr_err("register_kprobe failed, returned %d\n", ret);
-        return ret;
+static int kprobes_init(struct kprobe* kps, int num)
+{
+    int i, j;
+    int ret;
+
+    for (i = 0; i < num; i++)
+    {
+        ret = register_kprobe(&kps[i]);
+        if  (ret < 0)
+        {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
+                    i, kps[i].symbol_name);
+            goto kprobes_init_failed;
+        }
     }
-    pr_info("Planted kprobe at %p\n", kp.addr);
+
+    return 0;
+
+kprobes_init_failed:
+    for (j = i - 1; j >= 0; j--)
+        unregister_kprobe(&kps[j]);
+
+    return ret;
+}
+
+
+
+static void kprobes_exit(struct kprobe* kps, int num)
+{
+    int i;
+
+    for (i = num - 1; i >= 0; i--)
+        unregister_kprobe(&kps[i]);
+}
+
+
+
+
+
+
+static int __init kprobe_example_init(void)
+{
+    // int ret;
+
+
+    // ret = register_kprobe(&kp);
+    // if (ret < 0) {
+    //     pr_err("register_kprobe failed, returned %d\n", ret);
+    //     return ret;
+    // }
+    // pr_info("Planted kprobe at %p\n", kp.addr);
+
+    pr_debug("kprobe_exmaple_init: 1\n");
+
+    if  (kprobes_init(kprobes, kprobe_num) < 0)
+        return -1;
+
+
+    pr_debug("kprobe_exmaple_init: 2\n");
     return 0;
 }
 
-static void __exit kprobe_exit(void)
+static void __exit kprobe_example_exit(void)
 {
-    unregister_kprobe(&kp);
-    pr_info("kprobe at %p unregistered\n", kp.addr);
+    // unregister_kprobe(&kp);
+    // pr_info("kprobe at %p unregistered\n", kp.addr);
+
+    pr_debug("kprobe_exmaple_exit: 1\n");
+
+    kprobes_exit(kprobes, kprobe_num);
+
+
+    pr_debug("kprobe_exmaple_exit: 2\n");
 }
 
-module_init(kprobe_init)
-module_exit(kprobe_exit)
+module_init(kprobe_example_init)
+module_exit(kprobe_example_exit)
 MODULE_LICENSE("GPL");
