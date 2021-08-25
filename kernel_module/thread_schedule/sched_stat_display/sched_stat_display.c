@@ -77,9 +77,9 @@ static void probe_sched_switch(void *priv, bool preempt,
     // if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
     if  (smp_processor_id() == CPU_ID)
     {
-        pr_debug("probe_sched_switch: preempt: %d\n", preempt);
+        pr_debug("probe_sched_switch: cpu_id: %d, preempt: %d\n", smp_processor_id(), preempt);
         // preempt_count_display();
-        current_display();
+        // current_display();
 
         task_struct_display("prev: ", prev);
         task_struct_display("next: ", next);
