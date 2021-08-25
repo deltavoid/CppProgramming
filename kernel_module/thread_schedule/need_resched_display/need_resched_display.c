@@ -187,7 +187,7 @@ static void trace_sched_stat_runtime_probe(void* priv,
 // --------------------------------------------------------------
 
 
-static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe_resched_curr_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     // x86_64 function call convention
     unsigned long args[6] = {
@@ -199,15 +199,19 @@ static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
         regs->r9,
     };
 
-    pr_debug("kprobe_symbol_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
-            "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-            "preempt_count: 0x%x\n",
-            p->symbol_name, (unsigned long)p->addr,
-            args[0], args[1], args[2], args[3], args[4], args[5],
-            preempt_count());
+    if  (smp_processor_id() == CPU_ID)
+    {
+        pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
+                "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+                "preempt_count: 0x%x\n",
+                p->symbol_name, (unsigned long)p->addr,
+                args[0], args[1], args[2], args[3], args[4], args[5],
+                preempt_count());
 
-    /* A dump_stack() here will give a stack backtrace */
-    // dump_stack();
+        /* A dump_stack() here will give a stack backtrace */
+        // dump_stack();
+
+    }
 
     return 0;
 }
@@ -393,10 +397,9 @@ static struct tracepoint_probe_context sched_probes = {
 #define kprobe_num 1
 
 static struct kprobe kprobes[kprobe_num] = {
-
     {
-        .symbol_name = "tcp_v4_syn_recv_sock",
-        .pre_handler = kprobe_symbol_pre_handler,
+        .symbol_name = "resched_curr",
+        .pre_handler = kprobe_resched_curr_pre_handler,
         .fault_handler = kprobe_generic_fault_handler,
     },
 };
