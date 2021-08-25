@@ -139,6 +139,20 @@ static void trace_sched_stat_sleep_probe(void* priv,
 
 }
 
+static void trace_sched_stat_iowait_probe(void* priv,
+        struct task_struct *tsk, u64 delay)
+{
+    if  (smp_processor_id() == CPU_ID)
+    {
+        pr_debug("trace_sched_stat_iowait_probe: cpu_id: %d, delay: %llu\n", smp_processor_id(), delay);
+
+        task_struct_display("task: ", tsk);
+
+        pr_debug("\n");
+    }
+
+}
+
 static void trace_sched_stat_runtime_probe(void* priv,
         struct task_struct *tsk, u64 runtime, u64 vruntime)
 {
@@ -241,11 +255,11 @@ static struct tracepoint_probe_context sched_probes = {
         //     .probe = probe_sched_wakeup,
         //     .priv = NULL,
         // },
-        {
-            .name = "sched_switch",
-            .probe = trace_sched_switch_probe,
-            .priv = NULL,
-        },
+        // {
+        //     .name = "sched_switch",
+        //     .probe = trace_sched_switch_probe,
+        //     .priv = NULL,
+        // },
         // {
         //     .name = "sched_migrate_task",
         //     .probe = probe_sched_migrate_task,
@@ -262,13 +276,18 @@ static struct tracepoint_probe_context sched_probes = {
             .priv = NULL,
         },
         {
-            .name = "sched_stat_runtime",
-            .probe = trace_sched_stat_runtime_probe,
+            .name = "sched_stat_iowait",
+            .probe = trace_sched_stat_iowait_probe,
             .priv = NULL,
         },
+        // {
+        //     .name = "sched_stat_runtime",
+        //     .probe = trace_sched_stat_runtime_probe,
+        //     .priv = NULL,
+        // },
 
     },
-    .init_num = 4
+    .init_num = 3
 };
 
 
