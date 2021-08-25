@@ -46,10 +46,6 @@
 static char symbol[MAX_SYMBOL_LEN] = "_do_fork";
 module_param_string(symbol, symbol, sizeof(symbol), 0644);
 
-/* For each probe you need to allocate a kprobe structure */
-static struct kprobe kp = {
-    .symbol_name	= symbol,
-};
 
 /* kprobe pre_handler: called just before the probed instruction is executed */
 static int handler_pre(struct kprobe *p, struct pt_regs *regs)
@@ -122,13 +118,22 @@ static int handler_fault(struct kprobe *p, struct pt_regs *regs, int trapnr)
     return 0;
 }
 
+
+/* For each probe you need to allocate a kprobe structure */
+static struct kprobe kp = {
+    .symbol_name	= symbol,
+    .pre_handler = handler_pre,
+    // .post_handler = handler_post,
+    .fault_handler = handler_fault,
+};
+
 static int __init kprobe_init(void)
 {
     int ret;
-    kp.pre_handler = handler_pre;
-    // kp.post_handler = handler_post;
-    kp.post_handler = NULL;
-    kp.fault_handler = handler_fault;
+    // kp.pre_handler = handler_pre;
+    // // kp.post_handler = handler_post;
+    // kp.post_handler = NULL;
+    // kp.fault_handler = handler_fault;
 
     ret = register_kprobe(&kp);
     if (ret < 0) {
