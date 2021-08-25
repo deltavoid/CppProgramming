@@ -48,14 +48,19 @@ static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
         regs->r9,
     };
 
-    // unsigned preempt_cnt = preempt_count();
-    // if  (preempt_cnt)
-    //     pr_debug("preempt_count: %x\n", preempt_cnt);
+
 
     pr_debug("symbol name: %s, symbol addr: %lx, "
-            "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu",
+            "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+            "preempt_count: %d",
             p->symbol_name, (unsigned long)p->addr,
-            args[0], args[1], args[2], args[3], args[4], args[5]);
+            args[0], args[1], args[2], args[3], args[4], args[5],
+            preempt_count());
+
+
+    // unsigned preempt_cnt = preempt_count();
+    // if  (preempt_cnt)
+    //     pr_debug("preempt_count: %x\n", preempt_cnt);    
 
     /* A dump_stack() here will give a stack backtrace */
     return 0;
