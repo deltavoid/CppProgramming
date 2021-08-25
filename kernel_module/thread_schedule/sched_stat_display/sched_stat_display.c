@@ -67,17 +67,17 @@ static void current_display(void)
 // }
 
 
-u64 __percpu * probe_sched_switch_count;
+// u64 __percpu * probe_sched_switch_count;
 
-static void trace_sched_switch_probe(void *priv, bool preempt,
-        struct task_struct *prev, struct task_struct *next)
+static void trace_sched_switch_probe(void *priv, 
+        bool preempt, struct task_struct *prev, struct task_struct *next)
 {
-    u64* count = this_cpu_ptr(probe_sched_switch_count);
+    // u64* count = this_cpu_ptr(probe_sched_switch_count);
     
     // if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
     if  (smp_processor_id() == CPU_ID)
     {
-        pr_debug("probe_sched_switch: cpu_id: %d, preempt: %d\n", smp_processor_id(), preempt);
+        pr_debug("trace_sched_switch_probe: cpu_id: %d, preempt: %d\n", smp_processor_id(), preempt);
         // preempt_count_display();
         // current_display();
 
@@ -110,6 +110,19 @@ static void trace_sched_switch_probe(void *priv, bool preempt,
 // }
 
 
+static void trace_sched_stat_sleep_probe(void* priv,
+        struct task_struct *tsk, u64 delay)
+{
+    if  (smp_processor_id() == CPU_ID)
+    {
+        pr_debug("trace_sched_stat_sleep_probe: cpu_id: %d, delay: %llu\n", smp_processor_id(), delay);
+
+        task_struct_display("task: ", tsk);
+
+        pr_debug("\n");
+    }
+
+}
 
 // tracepoint_probe_context ----------------------------------------
 
@@ -198,16 +211,22 @@ static struct tracepoint_probe_context sched_probes = {
         //     .probe = probe_sched_wakeup,
         //     .priv = NULL,
         // },
-        {
-            .name = "sched_switch",
-            .probe = trace_sched_switch_probe,
-            .priv = NULL,
-        },
+        // {
+        //     .name = "sched_switch",
+        //     .probe = trace_sched_switch_probe,
+        //     .priv = NULL,
+        // },
         // {
         //     .name = "sched_migrate_task",
         //     .probe = probe_sched_migrate_task,
         //     .priv = NULL,
         // },
+        {
+            .name = "sched_stat_sleep",
+            .probe = trace_sched_stat_sleep_probe,
+            .priv = NULL,
+        },
+
     },
     .init_num = 1
 };
@@ -219,7 +238,7 @@ static int __init tracepoint_init(void)
     pr_debug("tracepoint_init begin\n");
 
     // probe_sched_wakeup_count = alloc_percpu(u64);
-    probe_sched_switch_count = alloc_percpu(u64);
+    // probe_sched_switch_count = alloc_percpu(u64);
     // probe_sched_migrate_count = alloc_percpu(u64);
 
     if  (tracepoint_probe_context_find_tracepoints(&sched_probes) < 0)
@@ -244,7 +263,7 @@ static void __exit tracepoint_exit(void)
     tracepoint_probe_context_unregister_probes(&sched_probes);
 
     // free_percpu(probe_sched_wakeup_count);
-    free_percpu(probe_sched_switch_count);
+    // free_percpu(probe_sched_switch_count);
     // free_percpu(probe_sched_migrate_count);
 
     pr_debug("tracepoint_exit end\n");
