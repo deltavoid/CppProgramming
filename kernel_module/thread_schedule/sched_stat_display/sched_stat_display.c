@@ -47,29 +47,29 @@ static void current_display(void)
 
 #define CPU_ID 0
 
-u64 __percpu * probe_sched_wakeup_count;
+// u64 __percpu * probe_sched_wakeup_count;
 
-static void probe_sched_wakeup(void *priv, struct task_struct *p)
-{
-    u64* count = this_cpu_ptr(probe_sched_wakeup_count);
+// static void probe_sched_wakeup(void *priv, struct task_struct *p)
+// {
+//     u64* count = this_cpu_ptr(probe_sched_wakeup_count);
     
-    // if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
-    if  (smp_processor_id() == CPU_ID)
-    {
-        pr_debug("probe_sched_wakeup: \n");
-        // preempt_count_display();
-        current_display();
+//     // if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
+//     if  (smp_processor_id() == CPU_ID)
+//     {
+//         pr_debug("probe_sched_wakeup: \n");
+//         // preempt_count_display();
+//         current_display();
 
-        task_struct_display("target: ", p);
+//         task_struct_display("target: ", p);
 
-        pr_debug("\n");
-    }
-}
+//         pr_debug("\n");
+//     }
+// }
 
 
 u64 __percpu * probe_sched_switch_count;
 
-static void probe_sched_switch(void *priv, bool preempt,
+static void trace_sched_switch_probe(void *priv, bool preempt,
         struct task_struct *prev, struct task_struct *next)
 {
     u64* count = this_cpu_ptr(probe_sched_switch_count);
@@ -90,24 +90,24 @@ static void probe_sched_switch(void *priv, bool preempt,
 }
 
 
-u64 __percpu * probe_sched_migrate_count;
+// u64 __percpu * probe_sched_migrate_count;
 
-static void probe_sched_migrate_task(void *priv, struct task_struct *p, int cpu)
-{
-    u64* count = this_cpu_ptr(probe_sched_migrate_count);
+// static void probe_sched_migrate_task(void *priv, struct task_struct *p, int cpu)
+// {
+//     u64* count = this_cpu_ptr(probe_sched_migrate_count);
     
-    // if  (smp_processor_id() == CPU_ID && ++*count % 10 == 0)
-    if  (smp_processor_id() == CPU_ID)
-    {
-        pr_debug("probe_sched_migrate: target cpu: %d\n", cpu);
-        // preempt_count_display();
-        current_display();
+//     // if  (smp_processor_id() == CPU_ID && ++*count % 10 == 0)
+//     if  (smp_processor_id() == CPU_ID)
+//     {
+//         pr_debug("probe_sched_migrate: target cpu: %d\n", cpu);
+//         // preempt_count_display();
+//         current_display();
 
-        task_struct_display("p: ", p);
+//         task_struct_display("p: ", p);
 
-        pr_debug("\n");
-    }
-}
+//         pr_debug("\n");
+//     }
+// }
 
 
 
@@ -200,7 +200,7 @@ static struct tracepoint_probe_context sched_probes = {
         // },
         {
             .name = "sched_switch",
-            .probe = probe_sched_switch,
+            .probe = trace_sched_switch_probe,
             .priv = NULL,
         },
         // {
@@ -218,9 +218,9 @@ static int __init tracepoint_init(void)
 {
     pr_debug("tracepoint_init begin\n");
 
-    probe_sched_wakeup_count = alloc_percpu(u64);
+    // probe_sched_wakeup_count = alloc_percpu(u64);
     probe_sched_switch_count = alloc_percpu(u64);
-    probe_sched_migrate_count = alloc_percpu(u64);
+    // probe_sched_migrate_count = alloc_percpu(u64);
 
     if  (tracepoint_probe_context_find_tracepoints(&sched_probes) < 0)
     {   pr_warn("find tracepoints failed\n");
@@ -243,9 +243,9 @@ static void __exit tracepoint_exit(void)
 
     tracepoint_probe_context_unregister_probes(&sched_probes);
 
-    free_percpu(probe_sched_wakeup_count);
+    // free_percpu(probe_sched_wakeup_count);
     free_percpu(probe_sched_switch_count);
-    free_percpu(probe_sched_migrate_count);
+    // free_percpu(probe_sched_migrate_count);
 
     pr_debug("tracepoint_exit end\n");
     pr_debug("------------------------------------------------------------------\n");
