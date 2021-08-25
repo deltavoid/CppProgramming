@@ -33,12 +33,9 @@ static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
             args[0], args[1], args[2], args[3], args[4], args[5],
             preempt_count());
 
-    // unsigned preempt_cnt = preempt_count();
-    // if  (preempt_cnt)
-    //     pr_debug("preempt_count: %x\n", preempt_cnt);    
-
     /* A dump_stack() here will give a stack backtrace */
     // dump_stack();
+
     return 0;
 }
 
@@ -80,26 +77,8 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 }
 
 
-/* For each probe you need to allocate a kprobe structure */
-// static struct kprobe kp = {
-//     .symbol_name	= symbol,
-//     .pre_handler = kprobe_symbol_pre_handler,
-//     .post_handler = kprobe_symbol_post_handler,
-//     .fault_handler = kprobe_generic_fault_handler,
-// };
 
-#define kprobe_num 1
-
-static struct kprobe kprobes[kprobe_num] = {
-
-    {
-        .symbol_name	= symbol,
-        .pre_handler = kprobe_symbol_pre_handler,
-        .post_handler = kprobe_symbol_post_handler,
-        .fault_handler = kprobe_generic_fault_handler,
-    },
-};
-
+// ---------------------------------------------------------------------------------------
 
 static int kprobes_init(struct kprobe* kps, int num)
 {
@@ -125,8 +104,6 @@ kprobes_init_failed:
     return ret;
 }
 
-
-
 static void kprobes_exit(struct kprobe* kps, int num)
 {
     int i;
@@ -137,21 +114,24 @@ static void kprobes_exit(struct kprobe* kps, int num)
 
 
 
+// -----------------------------------------------------------------------
+
+#define kprobe_num 1
+
+static struct kprobe kprobes[kprobe_num] = {
+
+    {
+        .symbol_name	= symbol,
+        .pre_handler = kprobe_symbol_pre_handler,
+        .post_handler = kprobe_symbol_post_handler,
+        .fault_handler = kprobe_generic_fault_handler,
+    },
+};
 
 
 
 static int __init kprobe_example_init(void)
 {
-    // int ret;
-
-
-    // ret = register_kprobe(&kp);
-    // if (ret < 0) {
-    //     pr_err("register_kprobe failed, returned %d\n", ret);
-    //     return ret;
-    // }
-    // pr_info("Planted kprobe at %p\n", kp.addr);
-
     pr_debug("kprobe_exmaple_init: 1\n");
 
     if  (kprobes_init(kprobes, kprobe_num) < 0)
@@ -164,9 +144,6 @@ static int __init kprobe_example_init(void)
 
 static void __exit kprobe_example_exit(void)
 {
-    // unregister_kprobe(&kp);
-    // pr_info("kprobe at %p unregistered\n", kp.addr);
-
     pr_debug("kprobe_exmaple_exit: 1\n");
 
     kprobes_exit(kprobes, kprobe_num);
@@ -174,6 +151,7 @@ static void __exit kprobe_example_exit(void)
 
     pr_debug("kprobe_exmaple_exit: 2\n");
 }
+
 
 module_init(kprobe_example_init)
 module_exit(kprobe_example_exit)
