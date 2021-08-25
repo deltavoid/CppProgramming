@@ -392,14 +392,14 @@ static struct tracepoint_probe_context sched_probes = {
             .probe = trace_sched_stat_blocked_probe,
             .priv = NULL,
         },
-        // {
-        //     .name = "sched_stat_runtime",
-        //     .probe = trace_sched_stat_runtime_probe,
-        //     .priv = NULL,
-        // },
+        {
+            .name = "sched_stat_runtime",
+            .probe = trace_sched_stat_runtime_probe,
+            .priv = NULL,
+        },
 
     },
-    .init_num = 5
+    .init_num = 6
 };
 
 
