@@ -33,8 +33,8 @@ static void current_display(void)
 
     preempt_disable();
     // comm should use get_task_comm
-    pr_debug("current: cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
-            smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
+    pr_debug("current:  task tid/pid: %d, pid/tgid: %d, comm: %s, cpu_id: %d\n", 
+            task_p->pid, task_p->tgid, task_p->comm, smp_processor_id());
     preempt_enable();
 
     // task_struct_display("current:", current);
@@ -206,12 +206,14 @@ static int kprobe_resched_curr_pre_handler(struct kprobe *p, struct pt_regs *reg
 
     if  (smp_processor_id() == CPU_ID)
     {
-        pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
-                "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-                "preempt_count: 0x%x\n",
-                p->symbol_name, (unsigned long)p->addr,
-                args[0], args[1], args[2], args[3], args[4], args[5],
-                preempt_count());
+        // pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
+        //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+        //         "preempt_count: 0x%x\n",
+        //         p->symbol_name, (unsigned long)p->addr,
+        //         args[0], args[1], args[2], args[3], args[4], args[5],
+        //         preempt_count());
+
+        pr_debug("kprobe_resched_curr_pre_handler:\n");
 
         /* A dump_stack() here will give a stack backtrace */
         // dump_stack();
@@ -360,11 +362,11 @@ static struct tracepoint_probe_context sched_probes = {
         //     .probe = probe_sched_wakeup,
         //     .priv = NULL,
         // },
-        // {
-        //     .name = "sched_switch",
-        //     .probe = trace_sched_switch_probe,
-        //     .priv = NULL,
-        // },
+        {
+            .name = "sched_switch",
+            .probe = trace_sched_switch_probe,
+            .priv = NULL,
+        },
         // {
         //     .name = "sched_migrate_task",
         //     .probe = probe_sched_migrate_task,
@@ -397,7 +399,7 @@ static struct tracepoint_probe_context sched_probes = {
         // },
 
     },
-    .init_num = 4
+    .init_num = 5
 };
 
 
