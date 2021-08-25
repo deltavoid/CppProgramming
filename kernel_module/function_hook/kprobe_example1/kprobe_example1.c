@@ -78,7 +78,7 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 
 
 
-// ---------------------------------------------------------------------------------------
+// kprobes_init --------------------------------------------------------------------------------
 
 static int kprobes_init(struct kprobe* kps, int num)
 {
