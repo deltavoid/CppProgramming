@@ -163,7 +163,7 @@ struct tracepoint_probe_entry {
     void* priv;
 };
 
-#define TRACEPOINT_PROBE_CONTEXT_MAX_NUM 8
+#define TRACEPOINT_PROBE_CONTEXT_MAX_NUM 32
 
 struct tracepoint_probe_context {
     struct tracepoint_probe_entry entries[TRACEPOINT_PROBE_CONTEXT_MAX_NUM];
@@ -241,11 +241,11 @@ static struct tracepoint_probe_context sched_probes = {
         //     .probe = probe_sched_wakeup,
         //     .priv = NULL,
         // },
-        // {
-        //     .name = "sched_switch",
-        //     .probe = trace_sched_switch_probe,
-        //     .priv = NULL,
-        // },
+        {
+            .name = "sched_switch",
+            .probe = trace_sched_switch_probe,
+            .priv = NULL,
+        },
         // {
         //     .name = "sched_migrate_task",
         //     .probe = probe_sched_migrate_task,
@@ -268,7 +268,7 @@ static struct tracepoint_probe_context sched_probes = {
         },
 
     },
-    .init_num = 3
+    .init_num = 4
 };
 
 
