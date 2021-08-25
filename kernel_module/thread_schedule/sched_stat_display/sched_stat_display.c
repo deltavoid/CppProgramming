@@ -110,6 +110,21 @@ static void trace_sched_switch_probe(void *priv,
 // }
 
 
+static void trace_sched_stat_wait_probe(void* priv,
+        struct task_struct *tsk, u64 delay)
+{
+    if  (smp_processor_id() == CPU_ID)
+    {
+        pr_debug("trace_sched_stat_wait_probe: cpu_id: %d, delay: %llu\n", smp_processor_id(), delay);
+
+        task_struct_display("task: ", tsk);
+
+        pr_debug("\n");
+    }
+
+}
+
+
 static void trace_sched_stat_sleep_probe(void* priv,
         struct task_struct *tsk, u64 delay)
 {
@@ -222,13 +237,18 @@ static struct tracepoint_probe_context sched_probes = {
         //     .priv = NULL,
         // },
         {
+            .name = "sched_stat_wait",
+            .probe = trace_sched_stat_wait_probe,
+            .priv = NULL,
+        },
+        {
             .name = "sched_stat_sleep",
             .probe = trace_sched_stat_sleep_probe,
             .priv = NULL,
         },
 
     },
-    .init_num = 1
+    .init_num = 2
 };
 
 
