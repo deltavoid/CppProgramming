@@ -139,6 +139,21 @@ static void trace_sched_stat_sleep_probe(void* priv,
 
 }
 
+static void trace_sched_stat_runtime_probe(void* priv,
+        struct task_struct *tsk, u64 runtime, u64 vruntime)
+{
+    if  (smp_processor_id() == CPU_ID)
+    {
+        pr_debug("trace_sched_stat_runtime_probe: cpu_id: %d, runtime: %llu, vruntime: %llu\n", 
+                smp_processor_id(), runtime, vruntime);
+
+        task_struct_display("task: ", tsk);
+
+        pr_debug("\n");
+    }
+
+}
+
 // tracepoint_probe_context ----------------------------------------
 
 struct tracepoint_probe_entry {
@@ -246,9 +261,14 @@ static struct tracepoint_probe_context sched_probes = {
             .probe = trace_sched_stat_sleep_probe,
             .priv = NULL,
         },
+        {
+            .name = "sched_stat_runtime",
+            .probe = trace_sched_stat_runtime_probe,
+            .priv = NULL,
+        },
 
     },
-    .init_num = 2
+    .init_num = 3
 };
 
 
