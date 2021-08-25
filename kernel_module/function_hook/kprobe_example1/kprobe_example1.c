@@ -63,6 +63,7 @@ static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
     //     pr_debug("preempt_count: %x\n", preempt_cnt);    
 
     /* A dump_stack() here will give a stack backtrace */
+    // dump_stack();
     return 0;
 }
 
