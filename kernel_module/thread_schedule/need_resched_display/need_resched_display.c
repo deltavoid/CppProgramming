@@ -14,6 +14,7 @@
 
 
 
+
 // preempt_count display ------------------------------------------
 
 
@@ -199,6 +200,10 @@ static int kprobe_resched_curr_pre_handler(struct kprobe *p, struct pt_regs *reg
         regs->r9,
     };
 
+    // struct rq *rq = (struct rq*)arg0;
+    // int cpu = cpu_of(rq);
+    // struct task_struct *curr = rq->curr;
+
     if  (smp_processor_id() == CPU_ID)
     {
         pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
@@ -211,6 +216,9 @@ static int kprobe_resched_curr_pre_handler(struct kprobe *p, struct pt_regs *reg
         /* A dump_stack() here will give a stack backtrace */
         // dump_stack();
 
+        current_display();
+        
+        pr_debug("\n");
     }
 
     return 0;
