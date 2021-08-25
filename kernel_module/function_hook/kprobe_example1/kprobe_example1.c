@@ -64,28 +64,7 @@ static void kprobe_symbol_post_handler(struct kprobe *p, struct pt_regs *regs,
             preempt_count());
 
 }
-// {
-// #ifdef CONFIG_X86
-//     pr_info("<%s> post_handler: p->addr = 0x%p, flags = 0x%lx\n",
-//         p->symbol_name, p->addr, regs->flags);
-// #endif
-// #ifdef CONFIG_PPC
-//     pr_info("<%s> post_handler: p->addr = 0x%p, msr = 0x%lx\n",
-//         p->symbol_name, p->addr, regs->msr);
-// #endif
-// #ifdef CONFIG_MIPS
-//     pr_info("<%s> post_handler: p->addr = 0x%p, status = 0x%lx\n",
-//         p->symbol_name, p->addr, regs->cp0_status);
-// #endif
-// #ifdef CONFIG_ARM64
-//     pr_info("<%s> post_handler: p->addr = 0x%p, pstate = 0x%lx\n",
-//         p->symbol_name, p->addr, (long)regs->pstate);
-// #endif
-// #ifdef CONFIG_S390
-//     pr_info("<%s> pre_handler: p->addr, 0x%p, flags = 0x%lx\n",
-//         p->symbol_name, p->addr, regs->flags);
-// #endif
-// }
+
 
 /*
  * fault_handler: this is called if an exception is generated for any
