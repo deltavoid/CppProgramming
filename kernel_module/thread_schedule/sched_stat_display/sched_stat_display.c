@@ -53,7 +53,8 @@ static void probe_sched_wakeup(void *priv, struct task_struct *p)
 {
     u64* count = this_cpu_ptr(probe_sched_wakeup_count);
     
-    if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
+    // if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
+    if  (smp_processor_id() == CPU_ID)
     {
         pr_debug("probe_sched_wakeup: \n");
         // preempt_count_display();
@@ -73,7 +74,8 @@ static void probe_sched_switch(void *priv, bool preempt,
 {
     u64* count = this_cpu_ptr(probe_sched_switch_count);
     
-    if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
+    // if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
+    if  (smp_processor_id() == CPU_ID)
     {
         pr_debug("probe_sched_switch: preempt: %d\n", preempt);
         // preempt_count_display();
@@ -94,7 +96,8 @@ static void probe_sched_migrate_task(void *priv, struct task_struct *p, int cpu)
 {
     u64* count = this_cpu_ptr(probe_sched_migrate_count);
     
-    if  (smp_processor_id() == CPU_ID && ++*count % 10 == 0)
+    // if  (smp_processor_id() == CPU_ID && ++*count % 10 == 0)
+    if  (smp_processor_id() == CPU_ID)
     {
         pr_debug("probe_sched_migrate: target cpu: %d\n", cpu);
         // preempt_count_display();
@@ -190,23 +193,23 @@ static void tracepoint_probe_context_unregister_probes(struct tracepoint_probe_c
 
 static struct tracepoint_probe_context sched_probes = {
     .entries = {
-        {
-            .name = "sched_wakeup",
-            .probe = probe_sched_wakeup,
-            .priv = NULL,
-        },
+        // {
+        //     .name = "sched_wakeup",
+        //     .probe = probe_sched_wakeup,
+        //     .priv = NULL,
+        // },
         {
             .name = "sched_switch",
             .probe = probe_sched_switch,
             .priv = NULL,
         },
-        {
-            .name = "sched_migrate_task",
-            .probe = probe_sched_migrate_task,
-            .priv = NULL,
-        },
+        // {
+        //     .name = "sched_migrate_task",
+        //     .probe = probe_sched_migrate_task,
+        //     .priv = NULL,
+        // },
     },
-    .init_num = 3
+    .init_num = 1
 };
 
 
