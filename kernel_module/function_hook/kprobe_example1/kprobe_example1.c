@@ -50,9 +50,9 @@ static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
 
 
 
-    pr_debug("symbol name: %s, symbol addr: %lx, "
+    pr_debug("symbol name: %s, symbol addr: 0x%lx, "
             "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-            "preempt_count: %d",
+            "preempt_count: 0x%x",
             p->symbol_name, (unsigned long)p->addr,
             args[0], args[1], args[2], args[3], args[4], args[5],
             preempt_count());
