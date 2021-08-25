@@ -16,28 +16,6 @@ module_param_string(symbol, symbol, sizeof(symbol), 0644);
 /* kprobe pre_handler: called just before the probed instruction is executed */
 static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
-// #ifdef CONFIG_X86
-//     pr_info("<%s> pre_handler: p->addr = 0x%p, ip = %lx, flags = 0x%lx\n",
-//         p->symbol_name, p->addr, regs->ip, regs->flags);
-// #endif
-// #ifdef CONFIG_PPC
-//     pr_info("<%s> pre_handler: p->addr = 0x%p, nip = 0x%lx, msr = 0x%lx\n",
-//         p->symbol_name, p->addr, regs->nip, regs->msr);
-// #endif
-// #ifdef CONFIG_MIPS
-//     pr_info("<%s> pre_handler: p->addr = 0x%p, epc = 0x%lx, status = 0x%lx\n",
-//         p->symbol_name, p->addr, regs->cp0_epc, regs->cp0_status);
-// #endif
-// #ifdef CONFIG_ARM64
-//     pr_info("<%s> pre_handler: p->addr = 0x%p, pc = 0x%lx,"
-//             " pstate = 0x%lx\n",
-//         p->symbol_name, p->addr, (long)regs->pc, (long)regs->pstate);
-// #endif
-// #ifdef CONFIG_S390
-//     pr_info("<%s> pre_handler: p->addr, 0x%p, ip = 0x%lx, flags = 0x%lx\n",
-//         p->symbol_name, p->addr, regs->psw.addr, regs->flags);
-// #endif
-
     // x86_64 function call convention
     unsigned long args[6] = {
         regs->di,
@@ -48,15 +26,12 @@ static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
         regs->r9,
     };
 
-
-
-    pr_debug("symbol name: %s, symbol addr: 0x%lx, "
+    pr_debug("kprobe_symbol_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
             "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-            "preempt_count: 0x%x",
+            "preempt_count: 0x%x\n",
             p->symbol_name, (unsigned long)p->addr,
             args[0], args[1], args[2], args[3], args[4], args[5],
             preempt_count());
-
 
     // unsigned preempt_cnt = preempt_count();
     // if  (preempt_cnt)
@@ -67,9 +42,28 @@ static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
-// /* kprobe post_handler: called after the probed instruction is executed */
-// static void kprobe_symbol_post_handler(struct kprobe *p, struct pt_regs *regs,
-//                 unsigned long flags)
+/* kprobe post_handler: called after the probed instruction is executed */
+static void kprobe_symbol_post_handler(struct kprobe *p, struct pt_regs *regs,
+                unsigned long flags)
+{
+    // x86_64 function call convention
+    unsigned long args[6] = {
+        regs->di,
+        regs->si,
+        regs->dx,
+        regs->cx,
+        regs->r8,
+        regs->r9,
+    };
+
+    pr_debug("kprobe_symbol_post_handler: symbol name: %s, symbol addr: 0x%lx, flags: 0x%lx "
+            "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+            "preempt_count: 0x%x\n",
+            p->symbol_name, (unsigned long)p->addr, flags,
+            args[0], args[1], args[2], args[3], args[4], args[5],
+            preempt_count());
+
+}
 // {
 // #ifdef CONFIG_X86
 //     pr_info("<%s> post_handler: p->addr = 0x%p, flags = 0x%lx\n",
@@ -100,7 +94,8 @@ static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
  */
 static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, int trapnr)
 {
-    pr_info("fault_handler: p->addr = 0x%p, trap #%dn", p->addr, trapnr);
+    pr_info("kprobe_generic_fault_handler: symbol name: %s, p->addr = 0x%p, trap #%dn", 
+            p->symbol_name, p->addr, trapnr);
     /* Return 0 because we don't handle the fault. */
     return 0;
 }
@@ -110,7 +105,7 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 static struct kprobe kp = {
     .symbol_name	= symbol,
     .pre_handler = kprobe_symbol_pre_handler,
-    // .post_handler = kprobe_symbol_post_handler,
+    .post_handler = kprobe_symbol_post_handler,
     .fault_handler = kprobe_generic_fault_handler,
 };
 
