@@ -20,9 +20,10 @@
 
 static void task_struct_display(const char* prefix, struct task_struct* task_p)
 {
-
     pr_debug("%s task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
             prefix, task_p->pid, task_p->tgid, task_p->comm);
+    pr_debug("    task state: %ld, task flag: 0x%08x\n",
+            task_p->state, task_p->flags);
 }
 
 static void current_display(void)
