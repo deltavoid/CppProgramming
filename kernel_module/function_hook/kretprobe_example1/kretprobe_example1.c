@@ -23,78 +23,13 @@ struct my_data {
 
 
 
-
-
-// /* kprobe pre_handler: called just before the probed instruction is executed */
-// static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
-// {
-//     // x86_64 function call convention
-//     unsigned long args[6] = {
-//         regs->di,
-//         regs->si,
-//         regs->dx,
-//         regs->cx,
-//         regs->r8,
-//         regs->r9,
-//     };
-
-//     pr_debug("kprobe_symbol_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
-//             "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-//             "preempt_count: 0x%x\n",
-//             p->symbol_name, (unsigned long)p->addr,
-//             args[0], args[1], args[2], args[3], args[4], args[5],
-//             preempt_count());
-
-//     /* A dump_stack() here will give a stack backtrace */
-//     // dump_stack();
-
-//     return 0;
-// }
-
-// /* kprobe post_handler: called after the probed instruction is executed */
-// static void kprobe_symbol_post_handler(struct kprobe *p, struct pt_regs *regs,
-//                 unsigned long flags)
-// {
-//     // x86_64 function call convention
-//     unsigned long args[6] = {
-//         regs->di,
-//         regs->si,
-//         regs->dx,
-//         regs->cx,
-//         regs->r8,
-//         regs->r9,
-//     };
-
-//     pr_debug("kprobe_symbol_post_handler: symbol name: %s, symbol addr: 0x%lx, flags: 0x%lx "
-//             "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-//             "preempt_count: 0x%x\n",
-//             p->symbol_name, (unsigned long)p->addr, flags,
-//             args[0], args[1], args[2], args[3], args[4], args[5],
-//             preempt_count());
-
-// }
-
-
-// /*
-//  * fault_handler: this is called if an exception is generated for any
-//  * instruction within the pre- or post-handler, or when Kprobes
-//  * single-steps the probed instruction.
-//  */
-// static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, int trapnr)
-// {
-//     pr_info("kprobe_generic_fault_handler: symbol name: %s, p->addr = 0x%p, trap #%dn", 
-//             p->symbol_name, p->addr, trapnr);
-//     /* Return 0 because we don't handle the fault. */
-//     return 0;
-// }
-
 /* Here we use the entry_hanlder to timestamp function entry */
 static int kretprobe_symbol_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	struct my_data *data;
 
-	if (!current->mm)
-		return 1;	/* Skip kernel threads */
+	// if (!current->mm)
+	// 	return 1;	/* Skip kernel threads */
 
 	data = (struct my_data *)ri->data;
 	data->entry_stamp = ktime_get();
