@@ -511,12 +511,12 @@ static struct tracepoint_probe_context sched_probes = {
         // },
 
     },
-    .init_num = 1
+    .init_num = 0
 };
 
 
 
-#define kprobe_num 2
+#define kprobe_num 0
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -576,10 +576,18 @@ static int __init need_resched_display_init(void)
         goto kprobes_init_failed;
     }
 
+    ret = kretprobes_init(kretprobes, kretprobe_num);
+    if  (ret < 0)
+    {   pr_warn("need_resched_display_init: kretprobes_init failed\n");
+        goto kretprobes_init_failed;
+    }
+
 
     pr_debug("need_resched_display_init end\n");
     return 0;
 
+kretprobes_init_failed:
+    kprobes_exit(kprobes, kprobe_num);
 kprobes_init_failed:
     tracepoint_probe_context_unregister_probes(&sched_probes);
 
@@ -590,6 +598,8 @@ kprobes_init_failed:
 static void __exit need_resched_display_exit(void)
 {
     pr_debug("need_resched_display_exit begin\n");
+
+    kretprobes_exit(kretprobes, kretprobe_num);
 
     kprobes_exit(kprobes, kprobe_num);
 
