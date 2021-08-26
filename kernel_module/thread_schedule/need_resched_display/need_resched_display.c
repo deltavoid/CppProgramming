@@ -277,37 +277,62 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 
 
 
-struct my_data {
-	ktime_t entry_stamp;
-};
+// struct my_data {
+// 	ktime_t entry_stamp;
+// };
 
 
 
-static int kretprobe_symbol_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-	struct my_data *data;
+// static int kretprobe_resched_curr_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+// {
+// 	struct my_data *data;
 
-	// if (!current->mm)
-	// 	return 1;	/* Skip kernel threads */
+// 	// if (!current->mm)
+// 	// 	return 1;	/* Skip kernel threads */
 
-	data = (struct my_data *)ri->data;
-	data->entry_stamp = ktime_get();
-	return 0;
-}
+// 	data = (struct my_data *)ri->data;
+// 	data->entry_stamp = ktime_get();
+// 	return 0;
+// }
 
 
-static int kretprobe_symbol_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+static int kretprobe_resched_curr_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	unsigned long retval = regs_return_value(regs);
-	struct my_data *data = (struct my_data *)ri->data;
-	s64 delta;
-	ktime_t now;
+	// struct my_data *data = (struct my_data *)ri->data;
+	// s64 delta;
+	// ktime_t now;
 
-	now = ktime_get();
-	delta = ktime_to_ns(ktime_sub(now, data->entry_stamp));
-	pr_info("%s returned %lu and took %lld ns to execute\n",
-			"tcp_v4_syn_recv_sock", retval, (long long)delta);
-	return 0;
+	// now = ktime_get();
+	// delta = ktime_to_ns(ktime_sub(now, data->entry_stamp));
+	// pr_info("%s returned %lu and took %lld ns to execute\n",
+	// 		"tcp_v4_syn_recv_sock", retval, (long long)delta);
+	
+    
+    
+    
+    
+    if  (smp_processor_id() == CPU_ID)
+    {
+        // pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
+        //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+        //         "preempt_count: 0x%x\n",
+        //         p->symbol_name, (unsigned long)p->addr,
+        //         args[0], args[1], args[2], args[3], args[4], args[5],
+        //         preempt_count());
+
+        pr_debug("kretprobe_resched_curr_ret_handler:\n");
+
+        /* A dump_stack() here will give a stack backtrace */
+        // dump_stack();
+
+        current_display();
+        
+        pr_debug("\n");
+    }
+    
+    
+    return 0;
 }
 
 
@@ -537,11 +562,11 @@ static struct kretprobe kretprobes[kretprobe_num] = {
 
     {
         .kp = {
-            .symbol_name = "tcp_v4_syn_recv_sock",
+            .symbol_name = "resched_curr",
         },
-	    .handler = kretprobe_symbol_ret_handler,
-	    .entry_handler = kretprobe_symbol_entry_handler,
-	    .data_size = sizeof(struct my_data),
+	    .handler = kretprobe_resched_curr_ret_handler,
+	    // .entry_handler = kretprobe_symbol_entry_handler,
+	    // .data_size = sizeof(struct my_data),
 	    .maxactive = 64,
     },
 
