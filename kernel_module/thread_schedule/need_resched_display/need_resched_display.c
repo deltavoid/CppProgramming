@@ -276,6 +276,42 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 }
 
 
+
+struct my_data {
+	ktime_t entry_stamp;
+};
+
+
+
+static int kretprobe_symbol_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	struct my_data *data;
+
+	// if (!current->mm)
+	// 	return 1;	/* Skip kernel threads */
+
+	data = (struct my_data *)ri->data;
+	data->entry_stamp = ktime_get();
+	return 0;
+}
+
+
+static int kretprobe_symbol_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	unsigned long retval = regs_return_value(regs);
+	struct my_data *data = (struct my_data *)ri->data;
+	s64 delta;
+	ktime_t now;
+
+	now = ktime_get();
+	delta = ktime_to_ns(ktime_sub(now, data->entry_stamp));
+	pr_info("%s returned %lu and took %lld ns to execute\n",
+			"tcp_v4_syn_recv_sock", retval, (long long)delta);
+	return 0;
+}
+
+
+
 // tracepoint_probe_context ----------------------------------------
 
 struct tracepoint_probe_entry {
@@ -391,6 +427,44 @@ static void kprobes_exit(struct kprobe* kps, int num)
 
 
 
+
+// kretprobes_init --------------------------------------------------------------------------------
+
+static int kretprobes_init(struct kretprobe* kps, int num)
+{
+    int i, j;
+    int ret;
+
+    for (i = 0; i < num; i++)
+    {
+        ret = register_kretprobe(&kps[i]);
+        if  (ret < 0)
+        {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
+                    i, kps[i].kp.symbol_name);
+            goto kretprobes_init_failed;
+        }
+    }
+
+    return 0;
+
+kretprobes_init_failed:
+    for (j = i - 1; j >= 0; j--)
+        unregister_kretprobe(&kps[j]);
+
+    return ret;
+}
+
+static void kretprobes_exit(struct kretprobe* kps, int num)
+{
+    int i;
+
+    for (i = num - 1; i >= 0; i--)
+        unregister_kretprobe(&kps[i]);
+}
+
+
+
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
@@ -457,7 +531,21 @@ static struct kprobe kprobes[kprobe_num] = {
     },
 };
 
+#define kretprobe_num 1
 
+static struct kretprobe kretprobes[kretprobe_num] = {
+
+    {
+        .kp = {
+            .symbol_name = "tcp_v4_syn_recv_sock",
+        },
+	    .handler = kretprobe_symbol_ret_handler,
+	    .entry_handler = kretprobe_symbol_entry_handler,
+	    .data_size = sizeof(struct my_data),
+	    .maxactive = 64,
+    },
+
+};
 
 
 
