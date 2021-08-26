@@ -536,19 +536,19 @@ static struct tracepoint_probe_context sched_probes = {
         // },
 
     },
-    .init_num = 0
+    .init_num = 1
 };
 
 
 
-#define kprobe_num 0
+#define kprobe_num 1
 
 static struct kprobe kprobes[kprobe_num] = {
-    {
-        .symbol_name = "resched_curr",
-        .pre_handler = kprobe_resched_curr_pre_handler,
-        .fault_handler = kprobe_generic_fault_handler,
-    },
+    // {
+    //     .symbol_name = "resched_curr",
+    //     .pre_handler = kprobe_resched_curr_pre_handler,
+    //     .fault_handler = kprobe_generic_fault_handler,
+    // },
     {
         .symbol_name = "__schedule",
         .pre_handler = kprobe___schedule_pre_handler,
