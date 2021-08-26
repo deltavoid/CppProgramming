@@ -27,15 +27,15 @@ static void task_struct_display(const char* prefix, struct task_struct* task_p)
 
 static void current_display(void)
 {
-    struct task_struct* task_p = current;
+    // struct task_struct* task_p = current;
 
-    preempt_disable();
-    // comm should use get_task_comm
-    pr_debug("current:  task tid/pid: %d, pid/tgid: %d, comm: %s, cpu_id: %d\n", 
-            task_p->pid, task_p->tgid, task_p->comm, smp_processor_id());
-    preempt_enable();
+    // preempt_disable();
+    // // comm should use get_task_comm
+    // pr_debug("current:  task tid/pid: %d, pid/tgid: %d, comm: %s, cpu_id: %d\n", 
+    //         task_p->pid, task_p->tgid, task_p->comm, smp_processor_id());
+    // preempt_enable();
 
-    // task_struct_display("current:", current);
+    task_struct_display("current:", current);
 
     pr_debug("preempt_count: 0x%08x, test_preempt_need_resched: %d\n", preempt_count(), test_preempt_need_resched());
     // pr_debug("test_preempt_need_resched: %d\n", test_preempt_need_resched());
@@ -95,7 +95,7 @@ static int kprobe_resched_curr_pre_handler(struct kprobe *p, struct pt_regs *reg
 
     if  (smp_processor_id() == CPU_ID)
     {
-        pr_debug("kprobe_resched_curr_pre_handler:\n");
+        pr_debug("kprobe_resched_curr_pre_handler: cpu_id: %d\n", smp_processor_id());
 
         current_display();
         
@@ -123,7 +123,8 @@ static int kprobe___schedule_pre_handler(struct kprobe *p, struct pt_regs *regs)
 
     if  (smp_processor_id() == CPU_ID)
     {
-        pr_debug("kprobe___schedule_pre_handler: preempt: %d\n", preempt);
+        pr_debug("kprobe___schedule_pre_handler: cpu_id: %d, preempt: %d\n", 
+                smp_processor_id(), preempt);
 
         current_display();
         
@@ -150,7 +151,7 @@ static int kretprobe_resched_curr_ret_handler(struct kretprobe_instance *ri, str
     
     if  (smp_processor_id() == CPU_ID)
     {
-        pr_debug("kretprobe_resched_curr_ret_handler:\n");
+        pr_debug("kretprobe_resched_curr_ret_handler: cpu_id: %d\n", smp_processor_id());
 
         current_display();
         
