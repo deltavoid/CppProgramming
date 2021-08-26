@@ -51,7 +51,7 @@ static void current_display(void)
 
 // u64 __percpu * probe_sched_switch_count;
 
-static void trace_sched_switch_probe(void *priv, 
+static void trace_sched_switch_handler(void *priv, 
         bool preempt, struct task_struct *prev, struct task_struct *next)
 {
     // u64* count = this_cpu_ptr(probe_sched_switch_count);
@@ -59,7 +59,7 @@ static void trace_sched_switch_probe(void *priv,
     // if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
     if  (smp_processor_id() == CPU_ID)
     {
-        pr_debug("trace_sched_switch_probe: cpu_id: %d, preempt: %d\n", smp_processor_id(), preempt);
+        pr_debug("trace_sched_switch_handler: cpu_id: %d, preempt: %d\n", smp_processor_id(), preempt);
         // preempt_count_display();
         // current_display();
 
@@ -72,12 +72,12 @@ static void trace_sched_switch_probe(void *priv,
 }
 
 
-static void trace_sched_stat_runtime_probe(void* priv,
+static void trace_sched_stat_runtime_handler(void* priv,
         struct task_struct *tsk, u64 runtime, u64 vruntime)
 {
     if  (smp_processor_id() == CPU_ID)
     {
-        pr_debug("trace_sched_stat_runtime_probe: cpu_id: %d, runtime: %llu, vruntime: %llu\n", 
+        pr_debug("trace_sched_stat_runtime_handler: cpu_id: %d, runtime: %llu, vruntime: %llu\n", 
                 smp_processor_id(), runtime, vruntime);
 
         task_struct_display("task: ", tsk);
@@ -323,13 +323,13 @@ static struct tracepoint_probe_context sched_probes = {
 
         {
             .name = "sched_switch",
-            .probe = trace_sched_switch_probe,
+            .probe = trace_sched_switch_handler,
             .priv = NULL,
         },
 
         // {
         //     .name = "sched_stat_runtime",
-        //     .probe = trace_sched_stat_runtime_probe,
+        //     .probe = trace_sched_stat_runtime_handler,
         //     .priv = NULL,
         // },
 
