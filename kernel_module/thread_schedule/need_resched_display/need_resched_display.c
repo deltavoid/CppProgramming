@@ -20,11 +20,9 @@
 
 static void task_struct_display(const char* prefix, struct task_struct* task_p)
 {
-    // preempt_disable();
-    // comm should use get_task_comm
+
     pr_debug("%s task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
             prefix, task_p->pid, task_p->tgid, task_p->comm);
-    // preempt_enable();
 }
 
 static void current_display(void)
@@ -49,24 +47,6 @@ static void current_display(void)
 
 #define CPU_ID 0
 
-// u64 __percpu * probe_sched_wakeup_count;
-
-// static void probe_sched_wakeup(void *priv, struct task_struct *p)
-// {
-//     u64* count = this_cpu_ptr(probe_sched_wakeup_count);
-    
-//     // if  (smp_processor_id() == CPU_ID && ++*count % 1000 == 0)
-//     if  (smp_processor_id() == CPU_ID)
-//     {
-//         pr_debug("probe_sched_wakeup: \n");
-//         // preempt_count_display();
-//         current_display();
-
-//         task_struct_display("target: ", p);
-
-//         pr_debug("\n");
-//     }
-// }
 
 
 // u64 __percpu * probe_sched_switch_count;
@@ -85,84 +65,6 @@ static void trace_sched_switch_probe(void *priv,
 
         task_struct_display("prev: ", prev);
         task_struct_display("next: ", next);
-
-        pr_debug("\n");
-    }
-
-}
-
-
-// u64 __percpu * probe_sched_migrate_count;
-
-// static void probe_sched_migrate_task(void *priv, struct task_struct *p, int cpu)
-// {
-//     u64* count = this_cpu_ptr(probe_sched_migrate_count);
-    
-//     // if  (smp_processor_id() == CPU_ID && ++*count % 10 == 0)
-//     if  (smp_processor_id() == CPU_ID)
-//     {
-//         pr_debug("probe_sched_migrate: target cpu: %d\n", cpu);
-//         // preempt_count_display();
-//         current_display();
-
-//         task_struct_display("p: ", p);
-
-//         pr_debug("\n");
-//     }
-// }
-
-
-static void trace_sched_stat_wait_probe(void* priv,
-        struct task_struct *tsk, u64 delay)
-{
-    if  (smp_processor_id() == CPU_ID)
-    {
-        pr_debug("trace_sched_stat_wait_probe: cpu_id: %d, delay: %llu\n", smp_processor_id(), delay);
-
-        task_struct_display("task: ", tsk);
-
-        pr_debug("\n");
-    }
-
-}
-
-
-static void trace_sched_stat_sleep_probe(void* priv,
-        struct task_struct *tsk, u64 delay)
-{
-    if  (smp_processor_id() == CPU_ID)
-    {
-        pr_debug("trace_sched_stat_sleep_probe: cpu_id: %d, delay: %llu\n", smp_processor_id(), delay);
-
-        task_struct_display("task: ", tsk);
-
-        pr_debug("\n");
-    }
-
-}
-
-static void trace_sched_stat_iowait_probe(void* priv,
-        struct task_struct *tsk, u64 delay)
-{
-    if  (smp_processor_id() == CPU_ID)
-    {
-        pr_debug("trace_sched_stat_iowait_probe: cpu_id: %d, delay: %llu\n", smp_processor_id(), delay);
-
-        task_struct_display("task: ", tsk);
-
-        pr_debug("\n");
-    }
-
-}
-
-static void trace_sched_stat_blocked_probe(void* priv,
-        struct task_struct *tsk, u64 delay)
-{
-    if  (smp_processor_id() == CPU_ID)
-    {
-        pr_debug("trace_sched_stat_blocked_probe: cpu_id: %d, delay: %llu\n", smp_processor_id(), delay);
-
-        task_struct_display("task: ", tsk);
 
         pr_debug("\n");
     }
@@ -190,33 +92,10 @@ static void trace_sched_stat_runtime_probe(void* priv,
 
 static int kprobe_resched_curr_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
-    // x86_64 function call convention
-    unsigned long args[6] = {
-        regs->di,
-        regs->si,
-        regs->dx,
-        regs->cx,
-        regs->r8,
-        regs->r9,
-    };
-
-    // struct rq *rq = (struct rq*)arg0;
-    // int cpu = cpu_of(rq);
-    // struct task_struct *curr = rq->curr;
 
     if  (smp_processor_id() == CPU_ID)
     {
-        // pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
-        //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-        //         "preempt_count: 0x%x\n",
-        //         p->symbol_name, (unsigned long)p->addr,
-        //         args[0], args[1], args[2], args[3], args[4], args[5],
-        //         preempt_count());
-
         pr_debug("kprobe_resched_curr_pre_handler:\n");
-
-        /* A dump_stack() here will give a stack backtrace */
-        // dump_stack();
 
         current_display();
         
@@ -239,24 +118,12 @@ static int kprobe___schedule_pre_handler(struct kprobe *p, struct pt_regs *regs)
         regs->r9,
     };
 
-    // struct rq *rq = (struct rq*)arg0;
-    // int cpu = cpu_of(rq);
-    // struct task_struct *curr = rq->curr;
+
     bool preempt = args[0];
 
     if  (smp_processor_id() == CPU_ID)
     {
-        // pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
-        //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-        //         "preempt_count: 0x%x\n",
-        //         p->symbol_name, (unsigned long)p->addr,
-        //         args[0], args[1], args[2], args[3], args[4], args[5],
-        //         preempt_count());
-
         pr_debug("kprobe___schedule_pre_handler: preempt: %d\n", preempt);
-
-        /* A dump_stack() here will give a stack backtrace */
-        // dump_stack();
 
         current_display();
         
@@ -277,54 +144,13 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 
 
 
-// struct my_data {
-// 	ktime_t entry_stamp;
-// };
-
-
-
-// static int kretprobe_resched_curr_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-// 	struct my_data *data;
-
-// 	// if (!current->mm)
-// 	// 	return 1;	/* Skip kernel threads */
-
-// 	data = (struct my_data *)ri->data;
-// 	data->entry_stamp = ktime_get();
-// 	return 0;
-// }
-
-
 static int kretprobe_resched_curr_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
 	unsigned long retval = regs_return_value(regs);
-	// struct my_data *data = (struct my_data *)ri->data;
-	// s64 delta;
-	// ktime_t now;
-
-	// now = ktime_get();
-	// delta = ktime_to_ns(ktime_sub(now, data->entry_stamp));
-	// pr_info("%s returned %lu and took %lld ns to execute\n",
-	// 		"tcp_v4_syn_recv_sock", retval, (long long)delta);
-	
-    
-    
-    
     
     if  (smp_processor_id() == CPU_ID)
     {
-        // pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
-        //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-        //         "preempt_count: 0x%x\n",
-        //         p->symbol_name, (unsigned long)p->addr,
-        //         args[0], args[1], args[2], args[3], args[4], args[5],
-        //         preempt_count());
-
         pr_debug("kretprobe_resched_curr_ret_handler:\n");
-
-        /* A dump_stack() here will give a stack backtrace */
-        // dump_stack();
 
         current_display();
         
@@ -494,41 +320,13 @@ static void kretprobes_exit(struct kretprobe* kps, int num)
 
 static struct tracepoint_probe_context sched_probes = {
     .entries = {
-        // {
-        //     .name = "sched_wakeup",
-        //     .probe = probe_sched_wakeup,
-        //     .priv = NULL,
-        // },
+
         {
             .name = "sched_switch",
             .probe = trace_sched_switch_probe,
             .priv = NULL,
         },
-        // {
-        //     .name = "sched_migrate_task",
-        //     .probe = probe_sched_migrate_task,
-        //     .priv = NULL,
-        // },
-        // {
-        //     .name = "sched_stat_wait",
-        //     .probe = trace_sched_stat_wait_probe,
-        //     .priv = NULL,
-        // },
-        // {
-        //     .name = "sched_stat_sleep",
-        //     .probe = trace_sched_stat_sleep_probe,
-        //     .priv = NULL,
-        // },
-        // {
-        //     .name = "sched_stat_iowait",
-        //     .probe = trace_sched_stat_iowait_probe,
-        //     .priv = NULL,
-        // },
-        // {
-        //     .name = "sched_stat_blocked",
-        //     .probe = trace_sched_stat_blocked_probe,
-        //     .priv = NULL,
-        // },
+
         // {
         //     .name = "sched_stat_runtime",
         //     .probe = trace_sched_stat_runtime_probe,
@@ -559,14 +357,11 @@ static struct kprobe kprobes[kprobe_num] = {
 #define kretprobe_num 1
 
 static struct kretprobe kretprobes[kretprobe_num] = {
-
     {
         .kp = {
             .symbol_name = "resched_curr",
         },
 	    .handler = kretprobe_resched_curr_ret_handler,
-	    // .entry_handler = kretprobe_symbol_entry_handler,
-	    // .data_size = sizeof(struct my_data),
 	    .maxactive = 64,
     },
 
@@ -579,9 +374,7 @@ static int __init need_resched_display_init(void)
     int ret;
     pr_debug("need_resched_display_init begin\n");
 
-    // probe_sched_wakeup_count = alloc_percpu(u64);
     // probe_sched_switch_count = alloc_percpu(u64);
-    // probe_sched_migrate_count = alloc_percpu(u64);
 
     ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
     if  (ret < 0)
@@ -630,9 +423,7 @@ static void __exit need_resched_display_exit(void)
 
     tracepoint_probe_context_unregister_probes(&sched_probes);
 
-    // free_percpu(probe_sched_wakeup_count);
     // free_percpu(probe_sched_switch_count);
-    // free_percpu(probe_sched_migrate_count);
 
     pr_debug("need_resched_display_exit end\n");
     pr_debug("------------------------------------------------------------------\n");
