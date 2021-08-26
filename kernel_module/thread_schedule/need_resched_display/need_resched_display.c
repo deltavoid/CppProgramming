@@ -372,34 +372,34 @@ static struct tracepoint_probe_context sched_probes = {
         //     .probe = probe_sched_migrate_task,
         //     .priv = NULL,
         // },
-        {
-            .name = "sched_stat_wait",
-            .probe = trace_sched_stat_wait_probe,
-            .priv = NULL,
-        },
-        {
-            .name = "sched_stat_sleep",
-            .probe = trace_sched_stat_sleep_probe,
-            .priv = NULL,
-        },
-        {
-            .name = "sched_stat_iowait",
-            .probe = trace_sched_stat_iowait_probe,
-            .priv = NULL,
-        },
-        {
-            .name = "sched_stat_blocked",
-            .probe = trace_sched_stat_blocked_probe,
-            .priv = NULL,
-        },
-        {
-            .name = "sched_stat_runtime",
-            .probe = trace_sched_stat_runtime_probe,
-            .priv = NULL,
-        },
+        // {
+        //     .name = "sched_stat_wait",
+        //     .probe = trace_sched_stat_wait_probe,
+        //     .priv = NULL,
+        // },
+        // {
+        //     .name = "sched_stat_sleep",
+        //     .probe = trace_sched_stat_sleep_probe,
+        //     .priv = NULL,
+        // },
+        // {
+        //     .name = "sched_stat_iowait",
+        //     .probe = trace_sched_stat_iowait_probe,
+        //     .priv = NULL,
+        // },
+        // {
+        //     .name = "sched_stat_blocked",
+        //     .probe = trace_sched_stat_blocked_probe,
+        //     .priv = NULL,
+        // },
+        // {
+        //     .name = "sched_stat_runtime",
+        //     .probe = trace_sched_stat_runtime_probe,
+        //     .priv = NULL,
+        // },
 
     },
-    .init_num = 6
+    .init_num = 1
 };
 
 
