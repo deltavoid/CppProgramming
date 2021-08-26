@@ -227,6 +227,44 @@ static int kprobe_resched_curr_pre_handler(struct kprobe *p, struct pt_regs *reg
 }
 
 
+static int kprobe___schedule_pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    // x86_64 function call convention
+    unsigned long args[6] = {
+        regs->di,
+        regs->si,
+        regs->dx,
+        regs->cx,
+        regs->r8,
+        regs->r9,
+    };
+
+    // struct rq *rq = (struct rq*)arg0;
+    // int cpu = cpu_of(rq);
+    // struct task_struct *curr = rq->curr;
+    bool preempt = args[0];
+
+    if  (smp_processor_id() == CPU_ID)
+    {
+        // pr_debug("kprobe_resched_curr_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
+        //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+        //         "preempt_count: 0x%x\n",
+        //         p->symbol_name, (unsigned long)p->addr,
+        //         args[0], args[1], args[2], args[3], args[4], args[5],
+        //         preempt_count());
+
+        pr_debug("kprobe___schedule_pre_handler: preempt: %d\n", preempt);
+
+        /* A dump_stack() here will give a stack backtrace */
+        // dump_stack();
+
+        current_display();
+        
+        pr_debug("\n");
+    }
+
+    return 0;
+}
 
 
 static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, int trapnr)
@@ -404,12 +442,17 @@ static struct tracepoint_probe_context sched_probes = {
 
 
 
-#define kprobe_num 1
+#define kprobe_num 2
 
 static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name = "resched_curr",
         .pre_handler = kprobe_resched_curr_pre_handler,
+        .fault_handler = kprobe_generic_fault_handler,
+    },
+    {
+        .symbol_name = "__schedule",
+        .pre_handler = kprobe___schedule_pre_handler,
         .fault_handler = kprobe_generic_fault_handler,
     },
 };
