@@ -69,13 +69,13 @@ static int kretprobes_init(struct kretprobe* kps, int num)
         if  (ret < 0)
         {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
                     i, kps[i].kp.symbol_name);
-            goto kprobes_init_failed;
+            goto kretprobes_init_failed;
         }
     }
 
     return 0;
 
-kprobes_init_failed:
+kretprobes_init_failed:
     for (j = i - 1; j >= 0; j--)
         unregister_kretprobe(&kps[j]);
 
