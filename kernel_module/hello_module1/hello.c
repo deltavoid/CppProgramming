@@ -12,25 +12,25 @@
 
 // module init ----------------------------------------------------------
 
-static int __init hello_init(void)
+static int __init _module_init(void)
 {
     pr_info("%s_init begin\n", KBUILD_MODNAME);
 
 
-    pr_info("hello_init end\n");
+    pr_info("%s_init end\n", KBUILD_MODNAME);
     return 0;
 }
 
-static void __exit hello_exit(void)
+static void __exit _module_exit(void)
 {
-    pr_info("hello_exit begin\n");
+    pr_info("%s_exit begin\n", KBUILD_MODNAME);
 
 
-    pr_info("hello_exit end\n");
+    pr_info("%s_exit end\n", KBUILD_MODNAME);
     pr_debug("-------------------------------------------------\n");
 }
 
 
-module_init(hello_init);
-module_exit(hello_exit);
+module_init(_module_init);
+module_exit(_module_exit);
 MODULE_LICENSE("GPL");
