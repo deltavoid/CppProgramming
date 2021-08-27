@@ -11,7 +11,7 @@
 #include <linux/tracepoint.h>
 #include <trace/events/sched.h>
 
-
+#include "hook_func_lib.h"
 
 
 
@@ -148,7 +148,6 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 
 static int kretprobe_resched_curr_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-	unsigned long retval = regs_return_value(regs);
     
     if  (smp_processor_id() == CPU_ID)
     {
@@ -165,155 +164,155 @@ static int kretprobe_resched_curr_ret_handler(struct kretprobe_instance *ri, str
 
 
 
-// tracepoint_probe_context ----------------------------------------
+// // tracepoint_probe_context ----------------------------------------
 
-struct tracepoint_probe_entry {
-    char* name;
-    struct tracepoint *tp;
-    void* probe;
-    void* priv;
-};
+// struct tracepoint_probe_entry {
+//     char* name;
+//     struct tracepoint *tp;
+//     void* probe;
+//     void* priv;
+// };
 
-#define TRACEPOINT_PROBE_CONTEXT_MAX_NUM 32
+// #define TRACEPOINT_PROBE_CONTEXT_MAX_NUM 32
 
-struct tracepoint_probe_context {
-    struct tracepoint_probe_entry entries[TRACEPOINT_PROBE_CONTEXT_MAX_NUM];
-    int init_num;
-    int found_num;
-};
+// struct tracepoint_probe_context {
+//     struct tracepoint_probe_entry entries[TRACEPOINT_PROBE_CONTEXT_MAX_NUM];
+//     int init_num;
+//     int found_num;
+// };
 
-static void tracepoint_lookup(struct tracepoint *tp, void *priv)
-{
-    int i;
-    struct tracepoint_probe_context* ctx = priv;
+// static void tracepoint_lookup(struct tracepoint *tp, void *priv)
+// {
+//     int i;
+//     struct tracepoint_probe_context* ctx = priv;
 
-    if  (ctx->found_num == ctx->init_num)
-        return;
+//     if  (ctx->found_num == ctx->init_num)
+//         return;
 
-    for (i = 0; i < ctx->init_num; i++)
-    {   struct tracepoint_probe_entry* entry = &ctx->entries[i];
+//     for (i = 0; i < ctx->init_num; i++)
+//     {   struct tracepoint_probe_entry* entry = &ctx->entries[i];
 
-        if  (entry->tp || strcmp(tp->name, entry->name))
-            continue;
-        entry->tp = tp;
-        ctx->found_num++;
-    }
-}
+//         if  (entry->tp || strcmp(tp->name, entry->name))
+//             continue;
+//         entry->tp = tp;
+//         ctx->found_num++;
+//     }
+// }
 
-static int tracepoint_probe_context_find_tracepoints(struct tracepoint_probe_context* ctx)
-{
-    int i;
-    for (i = 0; i < ctx->init_num; i++)
-        ctx->entries[i].tp = NULL;
-    ctx->found_num = 0;
-
-
-    for_each_kernel_tracepoint(tracepoint_lookup, ctx);
-
-    if  (ctx->found_num != ctx->init_num)
-        return -1;
-    return 0;
-}
-
-static int tracepoint_probe_context_register_probes(struct tracepoint_probe_context* ctx)
-{
-    int i;
-
-    for (i = 0; i < ctx->init_num; i++)
-    {   struct tracepoint_probe_entry* entry = &ctx->entries[i];
-        int ret = tracepoint_probe_register(entry->tp, entry->probe, entry->priv);
-        if  (ret)
-            pr_warn("trace_%s probe failed\n", entry->name);
-
-    }
-
-    return 0;
-}
-
-static void tracepoint_probe_context_unregister_probes(struct tracepoint_probe_context* ctx)
-{
-    int i;
-
-    for (i = 0; i < ctx->init_num; i++)
-    {   struct tracepoint_probe_entry* entry = &ctx->entries[i];
-        tracepoint_probe_unregister(entry->tp, entry->probe, entry->priv);
-    }
-
-    tracepoint_synchronize_unregister();
-}
+// static int tracepoint_probe_context_find_tracepoints(struct tracepoint_probe_context* ctx)
+// {
+//     int i;
+//     for (i = 0; i < ctx->init_num; i++)
+//         ctx->entries[i].tp = NULL;
+//     ctx->found_num = 0;
 
 
+//     for_each_kernel_tracepoint(tracepoint_lookup, ctx);
 
-// kprobes_init --------------------------------------------------------------------------------
+//     if  (ctx->found_num != ctx->init_num)
+//         return -1;
+//     return 0;
+// }
 
-static int kprobes_init(struct kprobe* kps, int num)
-{
-    int i, j;
-    int ret;
+// static int tracepoint_probe_context_register_probes(struct tracepoint_probe_context* ctx)
+// {
+//     int i;
 
-    for (i = 0; i < num; i++)
-    {
-        ret = register_kprobe(&kps[i]);
-        if  (ret < 0)
-        {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
-                    i, kps[i].symbol_name);
-            goto kprobes_init_failed;
-        }
-    }
+//     for (i = 0; i < ctx->init_num; i++)
+//     {   struct tracepoint_probe_entry* entry = &ctx->entries[i];
+//         int ret = tracepoint_probe_register(entry->tp, entry->probe, entry->priv);
+//         if  (ret)
+//             pr_warn("trace_%s probe failed\n", entry->name);
 
-    return 0;
+//     }
 
-kprobes_init_failed:
-    for (j = i - 1; j >= 0; j--)
-        unregister_kprobe(&kps[j]);
+//     return 0;
+// }
 
-    return ret;
-}
+// static void tracepoint_probe_context_unregister_probes(struct tracepoint_probe_context* ctx)
+// {
+//     int i;
 
-static void kprobes_exit(struct kprobe* kps, int num)
-{
-    int i;
+//     for (i = 0; i < ctx->init_num; i++)
+//     {   struct tracepoint_probe_entry* entry = &ctx->entries[i];
+//         tracepoint_probe_unregister(entry->tp, entry->probe, entry->priv);
+//     }
 
-    for (i = num - 1; i >= 0; i--)
-        unregister_kprobe(&kps[i]);
-}
+//     tracepoint_synchronize_unregister();
+// }
 
 
 
+// // kprobes_init --------------------------------------------------------------------------------
 
-// kretprobes_init --------------------------------------------------------------------------------
+// static int kprobes_init(struct kprobe* kps, int num)
+// {
+//     int i, j;
+//     int ret;
 
-static int kretprobes_init(struct kretprobe* kps, int num)
-{
-    int i, j;
-    int ret;
+//     for (i = 0; i < num; i++)
+//     {
+//         ret = register_kprobe(&kps[i]);
+//         if  (ret < 0)
+//         {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
+//                     i, kps[i].symbol_name);
+//             goto kprobes_init_failed;
+//         }
+//     }
 
-    for (i = 0; i < num; i++)
-    {
-        ret = register_kretprobe(&kps[i]);
-        if  (ret < 0)
-        {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
-                    i, kps[i].kp.symbol_name);
-            goto kretprobes_init_failed;
-        }
-    }
+//     return 0;
 
-    return 0;
+// kprobes_init_failed:
+//     for (j = i - 1; j >= 0; j--)
+//         unregister_kprobe(&kps[j]);
 
-kretprobes_init_failed:
-    for (j = i - 1; j >= 0; j--)
-        unregister_kretprobe(&kps[j]);
+//     return ret;
+// }
 
-    return ret;
-}
+// static void kprobes_exit(struct kprobe* kps, int num)
+// {
+//     int i;
 
-static void kretprobes_exit(struct kretprobe* kps, int num)
-{
-    int i;
+//     for (i = num - 1; i >= 0; i--)
+//         unregister_kprobe(&kps[i]);
+// }
 
-    for (i = num - 1; i >= 0; i--)
-        unregister_kretprobe(&kps[i]);
-}
+
+
+
+// // kretprobes_init --------------------------------------------------------------------------------
+
+// static int kretprobes_init(struct kretprobe* kps, int num)
+// {
+//     int i, j;
+//     int ret;
+
+//     for (i = 0; i < num; i++)
+//     {
+//         ret = register_kretprobe(&kps[i]);
+//         if  (ret < 0)
+//         {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
+//                     i, kps[i].kp.symbol_name);
+//             goto kretprobes_init_failed;
+//         }
+//     }
+
+//     return 0;
+
+// kretprobes_init_failed:
+//     for (j = i - 1; j >= 0; j--)
+//         unregister_kretprobe(&kps[j]);
+
+//     return ret;
+// }
+
+// static void kretprobes_exit(struct kretprobe* kps, int num)
+// {
+//     int i;
+
+//     for (i = num - 1; i >= 0; i--)
+//         unregister_kretprobe(&kps[i]);
+// }
 
 
 
