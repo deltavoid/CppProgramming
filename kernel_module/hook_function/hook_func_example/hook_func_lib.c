@@ -65,3 +65,42 @@ void tracepoint_probe_context_unregister_probes(struct tracepoint_probe_context*
 
     tracepoint_synchronize_unregister();
 }
+
+
+
+
+
+
+// kprobes_init --------------------------------------------------------------------------------
+
+int kprobes_init(struct kprobe* kps, int num)
+{
+    int i, j;
+    int ret;
+
+    for (i = 0; i < num; i++)
+    {
+        ret = register_kprobe(&kps[i]);
+        if  (ret < 0)
+        {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
+                    i, kps[i].symbol_name);
+            goto kprobes_init_failed;
+        }
+    }
+
+    return 0;
+
+kprobes_init_failed:
+    for (j = i - 1; j >= 0; j--)
+        unregister_kprobe(&kps[j]);
+
+    return ret;
+}
+
+void kprobes_exit(struct kprobe* kps, int num)
+{
+    int i;
+
+    for (i = num - 1; i >= 0; i--)
+        unregister_kprobe(&kps[i]);
+}

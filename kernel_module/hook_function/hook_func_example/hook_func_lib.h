@@ -2,6 +2,7 @@
 #define HOOK_FUNC_LIB_H
 
 #include <linux/tracepoint.h>
+#include <linux/kprobes.h>
 
 
 
@@ -25,6 +26,11 @@ struct tracepoint_probe_context {
 extern int tracepoint_probe_context_find_tracepoints(struct tracepoint_probe_context* ctx);
 extern int tracepoint_probe_context_register_probes(struct tracepoint_probe_context* ctx);
 extern void tracepoint_probe_context_unregister_probes(struct tracepoint_probe_context* ctx);
+
+
+
+extern int kprobes_init(struct kprobe* kps, int num);
+extern void kprobes_exit(struct kprobe* kps, int num);
 
 
 #endif // HOOK_FUNC_LIB_H

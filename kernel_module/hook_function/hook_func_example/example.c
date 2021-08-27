@@ -51,6 +51,71 @@ static void probe_local_timer_entry(int id)
 
 
 
+static const char symbol[] = "tcp_v4_syn_recv_sock";
+
+static int kprobe_symbol_pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    // x86_64 function call convention
+    unsigned long args[6] = {
+        regs->di,
+        regs->si,
+        regs->dx,
+        regs->cx,
+        regs->r8,
+        regs->r9,
+    };
+
+    pr_debug("kprobe_symbol_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
+            "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+            "preempt_count: 0x%x\n",
+            p->symbol_name, (unsigned long)p->addr,
+            args[0], args[1], args[2], args[3], args[4], args[5],
+            preempt_count());
+
+    /* A dump_stack() here will give a stack backtrace */
+    // dump_stack();
+
+    return 0;
+}
+
+
+
+static void kprobe_symbol_post_handler(struct kprobe *p, struct pt_regs *regs,
+                unsigned long flags)
+{
+    // x86_64 function call convention
+    unsigned long args[6] = {
+        regs->di,
+        regs->si,
+        regs->dx,
+        regs->cx,
+        regs->r8,
+        regs->r9,
+    };
+
+    pr_debug("kprobe_symbol_post_handler: symbol name: %s, symbol addr: 0x%lx, flags: 0x%lx "
+            "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+            "preempt_count: 0x%x\n",
+            p->symbol_name, (unsigned long)p->addr, flags,
+            args[0], args[1], args[2], args[3], args[4], args[5],
+            preempt_count());
+
+}
+
+
+
+static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, int trapnr)
+{
+    pr_info("kprobe_generic_fault_handler: symbol name: %s, p->addr = 0x%p, trap #%dn", 
+            p->symbol_name, p->addr, trapnr);
+    /* Return 0 because we don't handle the fault. */
+    return 0;
+}
+
+
+
+
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
@@ -62,8 +127,23 @@ static struct tracepoint_probe_context sched_probes = {
             .priv = NULL,
         },
     },
-    .init_num = 1
+    .init_num = 0
 };
+
+
+#define kprobe_num 1
+
+static struct kprobe kprobes[kprobe_num] = {
+
+    {
+        .symbol_name	= symbol,
+        .pre_handler = kprobe_symbol_pre_handler,
+        .post_handler = kprobe_symbol_post_handler,
+        .fault_handler = kprobe_generic_fault_handler,
+    },
+};
+
+
 
 
 
@@ -83,6 +163,9 @@ static int __init tracepoint_init(void)
         return -1;
     }
 
+    if  (kprobes_init(kprobes, kprobe_num) < 0)
+        return -1;
+
 
     pr_debug("tracepoint_init end\n");
     return 0;
@@ -94,6 +177,8 @@ static void __exit tracepoint_exit(void)
 
     tracepoint_probe_context_unregister_probes(&sched_probes);
 
+    kprobes_exit(kprobes, kprobe_num);
+    
     // free_percpu(probe_sched_wakeup_count);
 
     pr_debug("tracepoint_exit end\n");
