@@ -1,0 +1,30 @@
+#ifndef HOOK_FUNC_LIB_H
+#define HOOK_FUNC_LIB_H
+
+#include <linux/tracepoint.h>
+
+
+
+
+struct tracepoint_probe_entry {
+    char* name;
+    struct tracepoint *tp;
+    void* probe;
+    void* priv;
+};
+
+#define TRACEPOINT_PROBE_CONTEXT_MAX_NUM 8
+
+struct tracepoint_probe_context {
+    struct tracepoint_probe_entry entries[TRACEPOINT_PROBE_CONTEXT_MAX_NUM];
+    int init_num;
+    int found_num;
+};
+
+
+extern int tracepoint_probe_context_find_tracepoints(struct tracepoint_probe_context* ctx);
+extern int tracepoint_probe_context_register_probes(struct tracepoint_probe_context* ctx);
+extern void tracepoint_probe_context_unregister_probes(struct tracepoint_probe_context* ctx);
+
+
+#endif // HOOK_FUNC_LIB_H
