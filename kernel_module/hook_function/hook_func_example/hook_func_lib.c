@@ -104,3 +104,39 @@ void kprobes_exit(struct kprobe* kps, int num)
     for (i = num - 1; i >= 0; i--)
         unregister_kprobe(&kps[i]);
 }
+
+
+
+// kretprobes_init --------------------------------------------------------------------------------
+
+int kretprobes_init(struct kretprobe* kps, int num)
+{
+    int i, j;
+    int ret;
+
+    for (i = 0; i < num; i++)
+    {
+        ret = register_kretprobe(&kps[i]);
+        if  (ret < 0)
+        {   pr_warn("kprobes_init: register_kprobe failed, i: %d, symbol name: %s\n",
+                    i, kps[i].kp.symbol_name);
+            goto kretprobes_init_failed;
+        }
+    }
+
+    return 0;
+
+kretprobes_init_failed:
+    for (j = i - 1; j >= 0; j--)
+        unregister_kretprobe(&kps[j]);
+
+    return ret;
+}
+
+void kretprobes_exit(struct kretprobe* kps, int num)
+{
+    int i;
+
+    for (i = num - 1; i >= 0; i--)
+        unregister_kretprobe(&kps[i]);
+}

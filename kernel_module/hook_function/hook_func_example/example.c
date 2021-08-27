@@ -114,6 +114,38 @@ static int kprobe_generic_fault_handler(struct kprobe *p, struct pt_regs *regs, 
 
 
 
+struct my_data {
+	ktime_t entry_stamp;
+};
+
+static int kretprobe_symbol_entry_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	struct my_data *data;
+
+	// if (!current->mm)
+	// 	return 1;	/* Skip kernel threads */
+
+	data = (struct my_data *)ri->data;
+	data->entry_stamp = ktime_get();
+	return 0;
+}
+
+
+
+static int kretprobe_symbol_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+	unsigned long retval = regs_return_value(regs);
+	struct my_data *data = (struct my_data *)ri->data;
+	s64 delta;
+	ktime_t now;
+
+	now = ktime_get();
+	delta = ktime_to_ns(ktime_sub(now, data->entry_stamp));
+	pr_info("%s returned %lu and took %lld ns to execute\n",
+			symbol, retval, (long long)delta);
+	return 0;
+}
+
 
 
 // module init -----------------------------------------------------
@@ -145,13 +177,27 @@ static struct kprobe kprobes[kprobe_num] = {
 
 
 
+#define kretprobe_num 1
+
+static struct kretprobe kretprobes[kretprobe_num] = {
+    {
+        .kp = {
+            .symbol_name = symbol,
+        },
+	    .handler = kretprobe_symbol_ret_handler,
+	    .entry_handler = kretprobe_symbol_entry_handler,
+	    .data_size = sizeof(struct my_data),
+	    .maxactive = 64,
+    },
+};
+
+
 
 
 static int __init tracepoint_init(void)
 {
     pr_debug("tracepoint_init begin\n");
 
-    // probe_sched_wakeup_count = alloc_percpu(u64);
 
     if  (tracepoint_probe_context_find_tracepoints(&sched_probes) < 0)
     {   pr_warn("find tracepoints failed\n");
@@ -166,6 +212,9 @@ static int __init tracepoint_init(void)
     if  (kprobes_init(kprobes, kprobe_num) < 0)
         return -1;
 
+    
+    if  (kretprobes_init(kretprobes, kretprobe_num) < 0)
+        return -1;
 
     pr_debug("tracepoint_init end\n");
     return 0;
@@ -178,8 +227,9 @@ static void __exit tracepoint_exit(void)
     tracepoint_probe_context_unregister_probes(&sched_probes);
 
     kprobes_exit(kprobes, kprobe_num);
+
+    kretprobes_exit(kretprobes, kretprobe_num);
     
-    // free_percpu(probe_sched_wakeup_count);
 
     pr_debug("tracepoint_exit end\n");
     pr_debug("------------------------------------------------------------------\n");

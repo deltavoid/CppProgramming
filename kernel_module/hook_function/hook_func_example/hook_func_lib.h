@@ -28,9 +28,12 @@ extern int tracepoint_probe_context_register_probes(struct tracepoint_probe_cont
 extern void tracepoint_probe_context_unregister_probes(struct tracepoint_probe_context* ctx);
 
 
-
 extern int kprobes_init(struct kprobe* kps, int num);
 extern void kprobes_exit(struct kprobe* kps, int num);
+
+
+extern int kretprobes_init(struct kretprobe* kps, int num);
+extern void kretprobes_exit(struct kretprobe* kps, int num);
 
 
 #endif // HOOK_FUNC_LIB_H
