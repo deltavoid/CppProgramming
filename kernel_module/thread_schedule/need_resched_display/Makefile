@@ -1,23 +1,47 @@
 
 
-MODULE := need_resched_display
-obj-m += $(MODULE).o
-CFLAGS_$(MODULE).o := -DDEBUG
-KERNDIR	:= /lib/modules/$(shell uname -r)/build
+# MODULE := hello
+# obj-m += $(MODULE).o
+# CFLAGS_$(MODULE).o := -DDEBUG
+# KERNDIR	:= /lib/modules/$(shell uname -r)/build
 
 
-.PHONY: insmod rmmod build clean
-default: insmod
 
-build: $(MODULE).ko
-$(MODULE).ko: $(MODULE).c
-	$(MAKE) -C $(KERNDIR) M=$(CURDIR) modules
+
+MODULE_NAME		:= need_resched_display
+
+
+# ifneq ($(KERNELRELEASE),)
+ifneq ($(KBUILD_EXTMOD),)
+obj-m			:= $(MODULE_NAME).o
+$(MODULE_NAME)-m	:= need_resched_display_main.o hook_func_lib.o
+# $(MODULE_NAME)-m	+= kprobe.o trace.o
+# ldflags-y		+= -r -T $(KBUILD_EXTMOD)/kprobe.lds
+# ccflags-y		+= -I$(KBUILD_EXTMOD)/include
+ccflags-y		+= -DDEBUG
+
+# name-fix   = $(squote)$(quote)$(subst $(comma),_,$(subst -,_,$1))$(quote)$(squote)
+# ccflags-y += -DCONFIG_MODULE_NAME=$(call name-fix,$(MODULE_NAME))
+
+KBUILD_MODPOST_WARN=1
+
+else
+PWD			:= $(shell pwd)
+KERNEL_HEAD		:= $(shell uname -r)
+KERNEL_DIR		:= /lib/modules/$(KERNEL_HEAD)/build
+
+build:
+	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) modules
 
 clean:
-	rm -f *.ko *.o  *.mod *.mod.o *.mod.c *.order *.symvers .$(MODULE).*.cmd
+	$(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean
+
 
 insmod: rmmod build
-	sudo insmod $(MODULE).ko 
+	sudo insmod $(MODULE_NAME).ko
 
 rmmod:
-	-sudo rmmod $(MODULE)
+	-sudo rmmod $(MODULE_NAME)
+
+
+endif
