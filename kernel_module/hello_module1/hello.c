@@ -14,7 +14,7 @@
 
 static int __init hello_init(void)
 {
-    pr_info("hello_init begin\n");
+    pr_info("%s_init begin\n", KBUILD_MODNAME);
 
 
     pr_info("hello_init end\n");
