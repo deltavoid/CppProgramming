@@ -34,7 +34,7 @@ static void preempt_count_display(void)
 
 
 
-static void probe_local_timer_entry(int id)
+static void trace_local_timer_entry_handler(int id)
 {
     if  (smp_processor_id() == 0)
     {
@@ -155,7 +155,7 @@ static struct tracepoint_probe_context sched_probes = {
 
         {
             .name = "local_timer_entry",
-            .probe = probe_local_timer_entry,
+            .probe = trace_local_timer_entry_handler,
             .priv = NULL,
         },
     },
