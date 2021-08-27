@@ -14,7 +14,7 @@ MODULE_NAME		:= hook_func_example
 # ifneq ($(KERNELRELEASE),)
 ifneq ($(KBUILD_EXTMOD),)
 obj-m			:= $(MODULE_NAME).o
-# $(MODULE_NAME)-m	:= init.o
+$(MODULE_NAME)-m	:= example.o hook_func.o
 # $(MODULE_NAME)-m	+= kprobe.o trace.o
 # ldflags-y		+= -r -T $(KBUILD_EXTMOD)/kprobe.lds
 # ccflags-y		+= -I$(KBUILD_EXTMOD)/include
