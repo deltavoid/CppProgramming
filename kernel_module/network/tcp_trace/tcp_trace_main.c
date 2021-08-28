@@ -194,9 +194,9 @@ static struct kretprobe kretprobes[kretprobe_num] = {
 
 
 
-static int __init hook_func_example_init(void)
+static int __init tcp_trace_init(void)
 {
-    pr_debug("hook_func_example_init begin\n");
+    pr_debug("tcp_trace_init begin\n");
 
 
     if  (tracepoint_probe_context_find_tracepoints(&sched_probes) < 0)
@@ -216,13 +216,13 @@ static int __init hook_func_example_init(void)
     if  (kretprobes_init(kretprobes, kretprobe_num) < 0)
         return -1;
 
-    pr_debug("hook_func_example_init end\n");
+    pr_debug("tcp_trace_init end\n");
     return 0;
 }
 
-static void __exit hook_func_example_exit(void)
+static void __exit tcp_trace_exit(void)
 {
-    pr_debug("hook_func_example_exit begin\n");
+    pr_debug("tcp_trace_exit begin\n");
 
     tracepoint_probe_context_unregister_probes(&sched_probes);
 
@@ -231,10 +231,10 @@ static void __exit hook_func_example_exit(void)
     kretprobes_exit(kretprobes, kretprobe_num);
     
 
-    pr_debug("hook_func_example_exit end\n");
+    pr_debug("tcp_trace_exit end\n");
     pr_debug("------------------------------------------------------------------\n");
 }
 
-module_init(hook_func_example_init)
-module_exit(hook_func_example_exit)
+module_init(tcp_trace_init)
+module_exit(tcp_trace_exit)
 MODULE_LICENSE("GPL");
