@@ -41,17 +41,30 @@ int tracepoint_probe_context_find_tracepoints(struct tracepoint_probe_context* c
 
 int tracepoint_probe_context_register_probes(struct tracepoint_probe_context* ctx)
 {
-    int i;
+    int i, j;
+    int ret;
 
     for (i = 0; i < ctx->init_num; i++)
     {   struct tracepoint_probe_entry* entry = &ctx->entries[i];
-        int ret = tracepoint_probe_register(entry->tp, entry->probe, entry->priv);
+        ret = tracepoint_probe_register(entry->tp, entry->probe, entry->priv);
         if  (ret)
-            pr_warn("trace_%s probe failed\n", entry->name);
-
+        {   pr_warn("trace_%s probe failed\n", entry->name);
+            goto register_failed;
+        }
     }
 
     return 0;
+
+register_failed:
+
+    for (j = i - 1; j >= 0; j--)
+    {   struct tracepoint_probe_entry* entry = &ctx->entries[j];
+        tracepoint_probe_unregister(entry->tp, entry->probe, entry->priv);
+    }
+
+    tracepoint_synchronize_unregister();
+
+    return ret;
 }
 
 void tracepoint_probe_context_unregister_probes(struct tracepoint_probe_context* ctx)
