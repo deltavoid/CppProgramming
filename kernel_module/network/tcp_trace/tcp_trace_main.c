@@ -194,28 +194,42 @@ static struct kretprobe kretprobes[kretprobe_num] = {
 
 static int __init tcp_trace_init(void)
 {
+    int ret;
     pr_debug("tcp_trace_init begin\n");
 
-
-    if  (tracepoint_probe_context_find_tracepoints(&sched_probes) < 0)
+    ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
+    if  (ret < 0)
     {   pr_warn("find tracepoints failed\n");
-        return -1;
+        return ret;
     }
 
-    if  (tracepoint_probe_context_register_probes(&sched_probes) < 0)
-    {   pr_warn("register probes failed\n");
-        return -1;
+    ret = tracepoint_probe_context_register_probes(&sched_probes);
+    if  (ret < 0)
+    {   pr_warn("register trace probes failed\n");
+        return ret;
     }
 
-    if  (kprobes_init(kprobes, kprobe_num) < 0)
-        return -1;
-
-    
-    if  (kretprobes_init(kretprobes, kretprobe_num) < 0)
-        return -1;
+    ret = kprobes_init(kprobes, kprobe_num);
+    if  (ret < 0)
+    {   pr_warn("register kprobes failed\n");
+        goto kprobes_init_failed;
+    }
+       
+    ret = kretprobes_init(kretprobes, kretprobe_num);
+    if  (ret < 0)
+    {   pr_warn("register kretprobes failed\n");
+        goto kretprobes_init_failed;
+    }
 
     pr_debug("tcp_trace_init end\n");
     return 0;
+
+kretprobes_init_failed:
+    kprobes_exit(kprobes, kprobe_num);
+kprobes_init_failed:
+    tracepoint_probe_context_unregister_probes(&sched_probes);
+
+    return ret;
 }
 
 static void __exit tcp_trace_exit(void)
