@@ -25,16 +25,23 @@
 
 // sock common -----------------------------------------------
 
-static int sock_filter(struct sock* sk)
+static bool sock_filter(struct sock* sk)
 {
-    return 0;
+    if  (!sk)
+        return false;
+
+    return true;
 }
 
 
-static void sock_common_display(struct sock* sk)
+static void sock_common_display(const struct sock* sk)
 {
-    u16 local_port = sk->sk_num;
-    u16 remote_port = ntohs(sk->sk_dport);
+    u16 local_port, remote_port;
+
+    if  (!sk) return;
+
+    local_port = sk->sk_num;
+    remote_port = ntohs(sk->sk_dport);
 
     pr_debug("sock_common_display: local_port: %d, remote_port: %d\n", 
             local_port, remote_port);
@@ -95,7 +102,7 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
         regs->r9,
     };
 
-    struct sock* listen_sock = (struct sock*)args[0];
+    // struct sock* listen_sock = (struct sock*)args[0];
     struct sock* req_sock = (struct sock*)args[2];
 
     // pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
@@ -109,6 +116,9 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
     // dump_stack();
 
     pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler:\n");
+    if  (!sock_filter(req_sock))
+        return 0;
+
     sock_common_display(req_sock);
 
 
@@ -183,6 +193,20 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
 // 	return 0;
 // }
 
+static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    struct sock* newsk = (struct sock*)regs_return_value(regs);
+
+    pr_debug("kretprobe_inet_csk_accept_ret_handler: \n");
+    if  (!sock_filter(newsk))
+        return 0;
+    
+    sock_common_display(newsk);
+
+
+
+    return 0;
+}
 
 
 // module init -----------------------------------------------------
@@ -212,18 +236,18 @@ static struct kprobe kprobes[kprobe_num] = {
 
 
 
-#define kretprobe_num 0
+#define kretprobe_num 1
 
 static struct kretprobe kretprobes[kretprobe_num] = {
-    // {
-    //     .kp = {
-    //         .symbol_name = symbol,
-    //     },
-	//     .handler = kretprobe_symbol_ret_handler,
-	//     // .entry_handler = kretprobe_symbol_entry_handler,
-	//     // .data_size = sizeof(struct my_data),
-	//     .maxactive = 64,
-    // },
+    {
+        .kp = {
+            .symbol_name = "inet_csk_accept",
+        },
+	    .handler = kretprobe_inet_csk_accept_ret_handler,
+	    // .entry_handler = kretprobe_symbol_entry_handler,
+	    // .data_size = sizeof(struct my_data),
+	    .maxactive = 64,
+    },
 };
 
 
