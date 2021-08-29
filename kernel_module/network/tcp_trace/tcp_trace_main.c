@@ -108,28 +108,8 @@ static void trace_local_timer_entry_handler(int id)
 
 static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
-    // // x86_64 function call convention
-    // unsigned long args[6] = {
-    //     regs->di,
-    //     regs->si,
-    //     regs->dx,
-    //     regs->cx,
-    //     regs->r8,
-    //     regs->r9,
-    // };
-
     // struct sock* listen_sock = (struct sock*)args[0];
     struct sock* req_sock = (struct sock*)x86_64_get_regs_arg(regs, 2);
-
-    // pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
-    //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-    //         "preempt_count: 0x%x\n",
-    //         p->symbol_name, (unsigned long)p->addr,
-    //         args[0], args[1], args[2], args[3], args[4], args[5],
-    //         preempt_count());
-
-    /* A dump_stack() here will give a stack backtrace */
-    // dump_stack();
 
     pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler:\n");
     if  (!sock_filter(req_sock))
@@ -137,6 +117,8 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
 
     sock_common_display(req_sock);
 
+    /* A dump_stack() here will give a stack backtrace */
+    // dump_stack();
 
     return 0;
 }
@@ -218,8 +200,6 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
         return 0;
     
     sock_common_display(newsk);
-
-
 
     return 0;
 }
