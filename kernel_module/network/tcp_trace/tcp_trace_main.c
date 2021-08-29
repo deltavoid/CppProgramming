@@ -41,7 +41,7 @@ static inline unsigned long x86_64_get_regs_arg(struct pt_regs *regs, int index)
 
 // sock common -----------------------------------------------
 
-static bool sock_filter(struct sock* sk)
+static bool sock_filter(const struct sock* sk)
 {
     if  (!sk)
         return false;
@@ -64,7 +64,14 @@ static void sock_common_display(const struct sock* sk)
 }
 
 
+static void sock_filter_and_display(const struct sock* sk, const char* prefix)
+{
+    if  (!sock_filter(sk))
+        return;
 
+    pr_debug("%s\n", prefix);
+    sock_common_display(sk);
+}
 
 
 // preempt_count display ------------------------------------------
@@ -106,11 +113,12 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
     // struct sock* listen_sock = (struct sock*)args[0];
     struct sock* req_sock = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
-    pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler:\n");
-    if  (!sock_filter(req_sock))
-        return 0;
+    // pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler:\n");
+    // if  (!sock_filter(req_sock))
+    //     return 0;
 
-    sock_common_display(req_sock);
+    // sock_common_display(req_sock);
+    sock_filter_and_display(req_sock, "kprobe_tcp_v4_syn_recv_sock_pre_handler: ");
 
     /* A dump_stack() here will give a stack backtrace */
     // dump_stack();
@@ -124,11 +132,13 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
 {
     struct sock* newsk = (struct sock*)regs_return_value(regs);
 
-    pr_debug("kretprobe_inet_csk_accept_ret_handler: \n");
-    if  (!sock_filter(newsk))
-        return 0;
+    // pr_debug("kretprobe_inet_csk_accept_ret_handler: \n");
+    // if  (!sock_filter(newsk))
+    //     return 0;
     
-    sock_common_display(newsk);
+    // sock_common_display(newsk);
+
+    sock_filter_and_display(newsk, "kretprobe_inet_csk_accept_ret_handler: ");
 
     return 0;
 }
