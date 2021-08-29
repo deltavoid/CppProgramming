@@ -20,7 +20,23 @@
 
 
 
+static inline unsigned long x86_64_get_regs_arg(struct pt_regs *regs, int index)
+{
+    // x86_64 function call convention
+    unsigned long args[6] = {
+        regs->di,
+        regs->si,
+        regs->dx,
+        regs->cx,
+        regs->r8,
+        regs->r9,
+    };
 
+    if  (!(index >= 0 && index < 6))
+        return 0;
+
+    return args[index];
+}
 
 
 // sock common -----------------------------------------------
@@ -92,18 +108,18 @@ static void trace_local_timer_entry_handler(int id)
 
 static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
-    // x86_64 function call convention
-    unsigned long args[6] = {
-        regs->di,
-        regs->si,
-        regs->dx,
-        regs->cx,
-        regs->r8,
-        regs->r9,
-    };
+    // // x86_64 function call convention
+    // unsigned long args[6] = {
+    //     regs->di,
+    //     regs->si,
+    //     regs->dx,
+    //     regs->cx,
+    //     regs->r8,
+    //     regs->r9,
+    // };
 
     // struct sock* listen_sock = (struct sock*)args[0];
-    struct sock* req_sock = (struct sock*)args[2];
+    struct sock* req_sock = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
     // pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
     //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
