@@ -132,12 +132,6 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
 {
     struct sock* newsk = (struct sock*)regs_return_value(regs);
 
-    // pr_debug("kretprobe_inet_csk_accept_ret_handler: \n");
-    // if  (!sock_filter(newsk))
-    //     return 0;
-    
-    // sock_common_display(newsk);
-
     sock_filter_and_display(newsk, "kretprobe_inet_csk_accept_ret_handler: ");
 
     return 0;
