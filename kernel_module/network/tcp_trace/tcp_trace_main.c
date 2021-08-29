@@ -152,7 +152,6 @@ static int kretprobe_symbol_ret_handler(struct kretprobe_instance *ri, struct pt
 
 static struct tracepoint_probe_context sched_probes = {
     .entries = {
-
         {
             .name = "local_timer_entry",
             .probe = trace_local_timer_entry_handler,
@@ -166,12 +165,11 @@ static struct tracepoint_probe_context sched_probes = {
 #define kprobe_num 1
 
 static struct kprobe kprobes[kprobe_num] = {
-
     {
         .symbol_name	= symbol,
         .pre_handler = kprobe_symbol_pre_handler,
-        .post_handler = kprobe_symbol_post_handler,
-        .fault_handler = kprobe_generic_fault_handler,
+        // .post_handler = kprobe_symbol_post_handler,
+        // .fault_handler = kprobe_generic_fault_handler,
     },
 };
 
@@ -185,8 +183,8 @@ static struct kretprobe kretprobes[kretprobe_num] = {
             .symbol_name = symbol,
         },
 	    .handler = kretprobe_symbol_ret_handler,
-	    .entry_handler = kretprobe_symbol_entry_handler,
-	    .data_size = sizeof(struct my_data),
+	    // .entry_handler = kretprobe_symbol_entry_handler,
+	    // .data_size = sizeof(struct my_data),
 	    .maxactive = 64,
     },
 };
