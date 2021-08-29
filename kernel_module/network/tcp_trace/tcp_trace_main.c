@@ -11,6 +11,36 @@
 #include <trace/events/sched.h>
 
 
+#include <linux/tcp.h>
+#include <net/tcp.h>
+#include <net/sock.h>
+
+
+
+
+
+
+
+
+
+// sock common -----------------------------------------------
+
+static int sock_filter(struct sock* sk)
+{
+    return 0;
+}
+
+
+static void sock_common_display(struct sock* sk)
+{
+    u16 local_port = sk->sk_num;
+    u16 remote_port = ntohs(sk->sk_dport);
+
+    pr_debug("sock_common_display: local_port: %d, remote_port: %d\n", 
+            local_port, remote_port);
+}
+
+
 
 
 
@@ -65,15 +95,22 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
         regs->r9,
     };
 
-    pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
-            "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
-            "preempt_count: 0x%x\n",
-            p->symbol_name, (unsigned long)p->addr,
-            args[0], args[1], args[2], args[3], args[4], args[5],
-            preempt_count());
+    struct sock* listen_sock = (struct sock*)args[0];
+    struct sock* req_sock = (struct sock*)args[2];
+
+    // pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler: symbol name: %s, symbol addr: 0x%lx, "
+    //         "arg0: %lu, arg1, %lu, arg2: %lu, arg3: %lu, arg4: %lu, arg5: %lu, "
+    //         "preempt_count: 0x%x\n",
+    //         p->symbol_name, (unsigned long)p->addr,
+    //         args[0], args[1], args[2], args[3], args[4], args[5],
+    //         preempt_count());
 
     /* A dump_stack() here will give a stack backtrace */
     // dump_stack();
+
+    pr_debug("kprobe_tcp_v4_syn_recv_sock_pre_handler:\n");
+    sock_common_display(req_sock);
+
 
     return 0;
 }
