@@ -392,6 +392,28 @@ static int kprobe_tcp_time_wait_pre_handler(struct kprobe *p, struct pt_regs *re
     return 0;
 }
 
+static int kprobe_inet_twsk_kill_pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, "kprobe:inet_twsk_kill: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
+static int kprobe_tcp_timewait_state_process_pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_timewait_state_process: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
@@ -406,7 +428,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 11
+#define kprobe_num 13
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -452,6 +474,14 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_time_wait",
         .pre_handler = kprobe_tcp_time_wait_pre_handler,
+    },
+    {
+        .symbol_name	= "inet_twsk_kill",
+        .pre_handler = kprobe_inet_twsk_kill_pre_handler,
+    },
+    {
+        .symbol_name	= "tcp_timewait_state_process",
+        .pre_handler = kprobe_tcp_timewait_state_process_pre_handler,
     },
 };
 
