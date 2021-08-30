@@ -140,6 +140,22 @@ static bool sock_filter(const struct sock* sk)
 }
 
 
+const char* tcp_state_desc[TCP_MAX_STATES] = {
+    "NONE",
+    "TCP_ESTABLISHED",
+    "TCP_SYN_SENT",
+    "TCP_SYN_RECV",
+    "TCP_FIN_WAIT1",
+    "TCP_FIN_WAIT2",
+    "TCP_TIME_WAIT",
+    "TCP_CLOSE",
+    "TCP_CLOSE_WAIT",
+    "TCP_LAST_ACK",
+    "TCP_LISTEN",
+    "TCP_CLOSING",
+    "TCP_NEW_SYN_RECV",
+};
+
 static void sock_common_display(const struct sock* sk)
 {
     u16 local_port, remote_port, family;
@@ -152,8 +168,8 @@ static void sock_common_display(const struct sock* sk)
     family = sk->sk_family;
     state = sk->sk_state;
 
-    pr_debug("sock_common_display: local_port: %d, remote_port: %d, family: %d, state: %d\n", 
-            local_port, remote_port, family, state);
+    pr_debug("sock_common_display: local_port: %d, remote_port: %d, state: %s\n", 
+            local_port, remote_port, tcp_state_desc[state]);
 
     if  (family == AF_INET)
     {
