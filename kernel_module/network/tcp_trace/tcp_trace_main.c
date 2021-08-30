@@ -43,8 +43,18 @@ static inline unsigned long x86_64_get_regs_arg(struct pt_regs *regs, int index)
 
 static bool sock_filter(const struct sock* sk)
 {
+    u16 local_port, remote_port, family;
+
     if  (!sk)
         return false;
+
+    local_port = sk->sk_num;
+    remote_port = ntohs(sk->sk_dport);
+
+    family = sk->sk_family;
+
+
+    
 
     return true;
 }
@@ -52,15 +62,16 @@ static bool sock_filter(const struct sock* sk)
 
 static void sock_common_display(const struct sock* sk)
 {
-    u16 local_port, remote_port;
+    u16 local_port, remote_port, family;
 
     if  (!sk) return;
 
     local_port = sk->sk_num;
     remote_port = ntohs(sk->sk_dport);
+    family = sk->sk_family;
 
-    pr_debug("sock_common_display: local_port: %d, remote_port: %d\n", 
-            local_port, remote_port);
+    pr_debug("sock_common_display: local_port: %d, remote_port: %d, family: %d\n", 
+            local_port, remote_port, family);
 }
 
 
