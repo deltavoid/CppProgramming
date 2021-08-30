@@ -232,7 +232,14 @@ static void trace_local_timer_entry_handler(int id)
 }
 
 
+static int kprobe_tcp_rcv_state_process_pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
+    sock_filter_and_display(sk, "kprobe_tcp_rcv_state_process_pre_handler: ");
+
+    return 0;
+}
 
 static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
@@ -278,9 +285,13 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 1
+#define kprobe_num 2
 
 static struct kprobe kprobes[kprobe_num] = {
+    {
+        .symbol_name	= "tcp_rcv_state_process",
+        .pre_handler = kprobe_tcp_rcv_state_process_pre_handler,
+    },    
     {
         .symbol_name	= "tcp_v4_syn_recv_sock",
         .pre_handler = kprobe_tcp_v4_syn_recv_sock_pre_handler,
