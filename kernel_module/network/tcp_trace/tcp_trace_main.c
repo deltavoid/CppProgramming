@@ -72,7 +72,7 @@ static void sock_filter_config_display(struct sock_filter_config* config)
 }
 
 struct sock_filter_config sock_config = {
-    .local_port = 2280,
+    .local_port = 0,
     .remote_port = 0,
     .enable_ipv4 = true,
     .local_addr_ipv4 = 0,
@@ -83,18 +83,18 @@ struct sock_filter_config sock_config = {
 
 
 
-// static u16 param_local_port = 0, param_remote_port = 0;
-// module_param_named(local_port, param_local_port, u16, 0444);
-// module_param_named(remote_port, param_remote_port, u16, 0444);
+static int param_local_port = 0, param_remote_port = 0;
+module_param_named(local_port, param_local_port, int, 0444);
+module_param_named(remote_port, param_remote_port, int, 0444);
 
 
-// static int init_sock_config_from_param()
-// {
-//     sock_config.local_port = param_local_port;
-//     sock_config.remote_port = param_remote_port;
+static int init_sock_config_from_param(void)
+{
+    sock_config.local_port = param_local_port;
+    sock_config.remote_port = param_remote_port;
 
-//     return 0;
-// }
+    return 0;
+}
 
 
 
@@ -297,6 +297,7 @@ static int __init tcp_trace_init(void)
     int ret;
     pr_debug("tcp_trace_init begin\n");
 
+    init_sock_config_from_param();
     sock_filter_config_display(&sock_config);
 
     ret = tracepoint_probe_context_find_tracepoints(&sched_probes);

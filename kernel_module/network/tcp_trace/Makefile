@@ -38,7 +38,7 @@ clean:
 
 
 insmod: rmmod build
-	sudo insmod $(MODULE_NAME).ko
+	sudo insmod $(MODULE_NAME).ko local_port=2280 remote_port=0
 
 rmmod:
 	-sudo rmmod $(MODULE_NAME)
