@@ -105,6 +105,7 @@ static bool sock_filter(const struct sock* sk)
     if  (!sk)
         return false;
 
+
     local_port = sk->sk_num;
     remote_port = ntohs(sk->sk_dport);
 
@@ -116,10 +117,30 @@ static bool sock_filter(const struct sock* sk)
             || remote_port == sock_config.remote_port))
         return false;
 
+
     family = sk->sk_family;
+    if  (family == AF_INET)
+    {
+        u32 local_addr, remote_addr;
+        if  (!sock_config.enable_ipv4)
+            return false;
 
+        local_addr = sk->sk_rcv_saddr;
+        if  (!(sock_config.local_addr_ipv4 == 0
+                || local_addr == sock_config.local_addr_ipv4))
+            return false;
 
-    
+        remote_addr = sk->sk_daddr;
+        if  (!(sock_config.remote_addr_ipv4 == 0
+                || remote_addr == sock_config.remote_addr_ipv4))
+            return false;
+    }
+    else if  (family == AF_INET6)
+    {
+        if  (!sock_config.enable_ipv6)
+            return false;
+    }
+
 
     return true;
 }
