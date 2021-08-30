@@ -79,10 +79,15 @@ static void sock_common_display(const struct sock* sk)
         u32 remote_addr = sk->sk_daddr;
 
         pr_debug("local_addr: %pI4, remote_addr: %pI4\n",
-            &local_addr, &remote_addr);
+                &local_addr, &remote_addr);
     }
     else if  (family == AF_INET6)
     {
+        struct in6_addr local_addr = sk->sk_v6_rcv_saddr;
+        struct in6_addr remote_addr = sk->sk_v6_daddr;
+
+        pr_debug("local_addr: %pI6, remote_addr: %pI6\n",
+                &local_addr, &remote_addr);
 
     }
 }
