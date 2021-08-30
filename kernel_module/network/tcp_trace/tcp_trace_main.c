@@ -72,6 +72,19 @@ static void sock_common_display(const struct sock* sk)
 
     pr_debug("sock_common_display: local_port: %d, remote_port: %d, family: %d\n", 
             local_port, remote_port, family);
+
+    if  (family == AF_INET)
+    {
+        u32 local_addr = sk->sk_rcv_saddr;
+        u32 remote_addr = sk->sk_daddr;
+
+        pr_debug("local_addr: %pI4, remote_addr: %pI4\n",
+            &local_addr, &remote_addr);
+    }
+    else if  (family == AF_INET6)
+    {
+
+    }
 }
 
 
