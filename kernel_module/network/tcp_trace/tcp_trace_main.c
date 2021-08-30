@@ -291,7 +291,8 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
     if  (!sock_filter_and_display(req_sock, "kprobe:tcp_v4_syn_recv_sock: "))
         return 0;
 
-    // dump_stack();
+    dump_stack();
+    
     pr_debug("\n");
     return 0;
 }
