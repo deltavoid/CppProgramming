@@ -349,6 +349,8 @@ static int kprobe_tcp_set_state_pre_handler(struct kprobe *p, struct pt_regs *re
     sock_common_display(sk);
     current_display();
 
+    dump_stack();
+
     pr_debug("\n");
     return 0;
 }
