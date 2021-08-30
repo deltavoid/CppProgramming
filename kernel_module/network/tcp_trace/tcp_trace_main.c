@@ -168,7 +168,8 @@ static void sock_common_display(const struct sock* sk)
     family = sk->sk_family;
     state = sk->sk_state;
 
-    pr_debug("sock_common_display: local_port: %d, remote_port: %d, state: %s\n", 
+    // sock_common_display: 
+    pr_debug("local_port: %d, remote_port: %d, state: %s\n", 
             local_port, remote_port, tcp_state_desc[state]);
 
     if  (family == AF_INET)
@@ -197,6 +198,7 @@ static void sock_filter_and_display(const struct sock* sk, const char* prefix)
 
     pr_debug("%s\n", prefix);
     sock_common_display(sk);
+    pr_debug("\n");
 }
 
 
