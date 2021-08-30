@@ -140,7 +140,7 @@ static bool sock_filter(const struct sock* sk)
 }
 
 
-const char* tcp_state_desc[TCP_MAX_STATES] = {
+static const char* tcp_state_desc[TCP_MAX_STATES] = {
     "NONE",
     "TCP_ESTABLISHED",
     "TCP_SYN_SENT",
