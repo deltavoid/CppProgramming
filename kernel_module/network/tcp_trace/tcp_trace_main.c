@@ -241,6 +241,15 @@ static int kprobe_tcp_rcv_state_process_pre_handler(struct kprobe *p, struct pt_
     return 0;
 }
 
+static int kprobe_tcp_conn_request_pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
+
+    sock_filter_and_display(sk, "kprobe_tcp_conn_request_pre_handler: ");
+
+    return 0;
+}
+
 static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     // struct sock* listen_sock = (struct sock*)args[0];
@@ -285,7 +294,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 2
+#define kprobe_num 3
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -295,6 +304,10 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_v4_syn_recv_sock",
         .pre_handler = kprobe_tcp_v4_syn_recv_sock_pre_handler,
+    },
+    {
+        .symbol_name	= "tcp_conn_request",
+        .pre_handler = kprobe_tcp_conn_request_pre_handler,
     },
 };
 
