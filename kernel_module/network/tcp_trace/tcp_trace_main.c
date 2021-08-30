@@ -72,7 +72,7 @@ static void sock_filter_config_display(struct sock_filter_config* config)
 }
 
 struct sock_filter_config sock_config = {
-    .local_port = 0,
+    .local_port = 2280,
     .remote_port = 0,
     .enable_ipv4 = true,
     .local_addr_ipv4 = 0,
