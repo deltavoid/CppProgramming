@@ -292,7 +292,7 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
         return 0;
 
     dump_stack();
-    
+
     pr_debug("\n");
     return 0;
 }
@@ -369,6 +369,18 @@ static int kprobe_tcp_close_pre_handler(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+
+static int kprobe_tcp_fin_pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_fin: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
@@ -383,7 +395,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 9
+#define kprobe_num 10
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -421,6 +433,10 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_close",
         .pre_handler = kprobe_tcp_close_pre_handler,
+    },
+    {
+        .symbol_name	= "tcp_fin",
+        .pre_handler = kprobe_tcp_fin_pre_handler,
     },
 };
 
