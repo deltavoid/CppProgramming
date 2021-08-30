@@ -315,6 +315,29 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
 }
 
 
+
+static int kprobe_tcp_set_state_pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    int dest_state = (int)x86_64_get_regs_arg(regs, 1);
+
+    // if  (!sock_filter_and_display(sk, "kprobe_tcp_set_state_pre_handler: "))
+    //     return 0;
+    if  (!sock_filter(sk))
+        return 0;
+
+    pr_debug("kprobe_tcp_set_state_pre_handler: %s -> %s\n", 
+            tcp_state_desc[sk->sk_state], tcp_state_desc[dest_state]);
+
+    sock_common_display(sk);
+    current_display();
+
+    pr_debug("\n");
+    return 0;
+}
+
+
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
@@ -329,7 +352,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 5
+#define kprobe_num 6
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -351,6 +374,10 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_check_req",
         .pre_handler = kprobe_tcp_check_req_pre_handler,
+    },
+    {
+        .symbol_name	= "tcp_set_state",
+        .pre_handler = kprobe_tcp_set_state_pre_handler,
     },
 };
 
