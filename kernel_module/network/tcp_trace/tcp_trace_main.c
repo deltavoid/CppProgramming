@@ -241,7 +241,7 @@ static int kprobe_tcp_rcv_state_process_pre_handler(struct kprobe *p, struct pt_
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe_tcp_rcv_state_process_pre_handler: "))
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_rcv_state_process: "))
         return 0;
 
     pr_debug("\n");
@@ -252,7 +252,7 @@ static int kprobe_tcp_conn_request_pre_handler(struct kprobe *p, struct pt_regs 
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
-    if  (!sock_filter_and_display(sk, "kprobe_tcp_conn_request_pre_handler: "))
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_conn_request: "))
         return 0;
 
     pr_debug("\n");
@@ -263,7 +263,7 @@ static int kprobe_tcp_v4_send_synack_pre_handler(struct kprobe *p, struct pt_reg
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 3);
 
-    if  (!sock_filter_and_display(sk, "kprobe_tcp_v4_send_synack_pre_handler: "))
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_v4_send_synack: "))
         return 0;
 
     pr_debug("\n");
@@ -274,7 +274,7 @@ static int kprobe_tcp_check_req_pre_handler(struct kprobe *p, struct pt_regs *re
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
-    if  (!sock_filter_and_display(sk, "kprobe_tcp_check_req_pre_handler: "))
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_check_req: "))
         return 0;
 
     pr_debug("\n");
@@ -291,7 +291,7 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
     //     return 0;
 
     // sock_common_display(req_sock);
-    if  (!sock_filter_and_display(req_sock, "kprobe_tcp_v4_syn_recv_sock_pre_handler: "))
+    if  (!sock_filter_and_display(req_sock, "kprobe:tcp_v4_syn_recv_sock: "))
         return 0;
 
     /* A dump_stack() here will give a stack backtrace */
@@ -307,7 +307,7 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
 {
     struct sock* newsk = (struct sock*)regs_return_value(regs);
 
-    if  (!sock_filter_and_display(newsk, "kretprobe_inet_csk_accept_ret_handler: "))
+    if  (!sock_filter_and_display(newsk, "kretprobe:inet_csk_accept: "))
         return 0;
 
     pr_debug("\n");
@@ -326,7 +326,7 @@ static int kprobe_tcp_set_state_pre_handler(struct kprobe *p, struct pt_regs *re
     if  (!sock_filter(sk))
         return 0;
 
-    pr_debug("kprobe_tcp_set_state_pre_handler: %s -> %s\n", 
+    pr_debug("kprobe:tcp_set_state: %s -> %s\n", 
             tcp_state_desc[sk->sk_state], tcp_state_desc[dest_state]);
 
     sock_common_display(sk);
