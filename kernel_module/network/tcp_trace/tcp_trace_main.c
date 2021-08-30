@@ -41,6 +41,63 @@ static inline unsigned long x86_64_get_regs_arg(struct pt_regs *regs, int index)
 
 // sock common -----------------------------------------------
 
+struct sock_filter_config {
+    u16 local_port, remote_port; // 0 indicates not filter;
+    bool enable_ipv4;
+    bool enable_ipv6;
+    u32 local_addr_ipv4, remote_addr_ipv4; // 0 indicates not filter;
+};
+
+
+// static void sock_filter_config_init(struct sock_filter_config* config)
+// {
+//     config->local_port = 0;
+//     config->local_port = 0;
+//     config->enable_ipv4 = true;
+//     config->local_addr_ipv4 = 0;
+//     config->remote_addr_ipv4 = 0;
+//     config->enable_ipv6 = true;
+// }
+
+static void sock_filter_config_display(struct sock_filter_config* config)
+{
+    pr_debug("local_port: %d, remote_port: %d\n",
+        config->local_port, config->remote_port);
+
+    pr_debug("enable_ipv4: %d, local_addr: %pI4, remote_addr: %pI4\n",
+            config->enable_ipv4, &config->local_addr_ipv4, &config->remote_addr_ipv4);
+    
+    pr_debug("enable ipv6: %d\n", config->enable_ipv6);
+
+}
+
+struct sock_filter_config sock_config = {
+    .local_port = 0,
+    .remote_port = 0,
+    .enable_ipv4 = true,
+    .local_addr_ipv4 = 0,
+    .remote_addr_ipv4 = 0,
+    .enable_ipv6 = true,
+};
+
+
+
+
+// static u16 param_local_port = 0, param_remote_port = 0;
+// module_param_named(local_port, param_local_port, u16, 0444);
+// module_param_named(remote_port, param_remote_port, u16, 0444);
+
+
+// static int init_sock_config_from_param()
+// {
+//     sock_config.local_port = param_local_port;
+//     sock_config.remote_port = param_remote_port;
+
+//     return 0;
+// }
+
+
+
 static bool sock_filter(const struct sock* sk)
 {
     u16 local_port, remote_port, family;
@@ -50,6 +107,14 @@ static bool sock_filter(const struct sock* sk)
 
     local_port = sk->sk_num;
     remote_port = ntohs(sk->sk_dport);
+
+    if  (!(sock_config.local_port == 0
+            || local_port == sock_config.local_port))
+        return false;
+
+    if  (!(sock_config.remote_port == 0
+            || remote_port == sock_config.remote_port))
+        return false;
 
     family = sk->sk_family;
 
@@ -88,7 +153,6 @@ static void sock_common_display(const struct sock* sk)
 
         pr_debug("local_addr: %pI6, remote_addr: %pI6\n",
                 &local_addr, &remote_addr);
-
     }
 }
 
@@ -211,6 +275,8 @@ static int __init tcp_trace_init(void)
 {
     int ret;
     pr_debug("tcp_trace_init begin\n");
+
+    sock_filter_config_display(&sock_config);
 
     ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
     if  (ret < 0)
