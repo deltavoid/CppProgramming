@@ -414,6 +414,18 @@ static int kprobe__tcp_timewait_state_process__pre_handler(struct kprobe *p, str
     return 0;
 }
 
+static int kprobe__tcp_done__pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_done: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
@@ -428,7 +440,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 13
+#define kprobe_num 14
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -482,6 +494,10 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_timewait_state_process",
         .pre_handler = kprobe__tcp_timewait_state_process__pre_handler,
+    },
+    {
+        .symbol_name	= "tcp_done",
+        .pre_handler = kprobe__tcp_done__pre_handler,
     },
 };
 
