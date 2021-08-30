@@ -240,7 +240,7 @@ static void trace_local_timer_entry_handler(int id)
 }
 
 
-static int kprobe_tcp_rcv_state_process_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_rcv_state_process__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
@@ -251,7 +251,7 @@ static int kprobe_tcp_rcv_state_process_pre_handler(struct kprobe *p, struct pt_
     return 0;
 }
 
-static int kprobe_tcp_conn_request_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_conn_request_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
@@ -262,7 +262,7 @@ static int kprobe_tcp_conn_request_pre_handler(struct kprobe *p, struct pt_regs 
     return 0;
 }
 
-static int kprobe_tcp_v4_send_synack_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_v4_send_synack_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 3);
 
@@ -273,7 +273,7 @@ static int kprobe_tcp_v4_send_synack_pre_handler(struct kprobe *p, struct pt_reg
     return 0;
 }
 
-static int kprobe_tcp_check_req_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_check_req_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
@@ -284,7 +284,7 @@ static int kprobe_tcp_check_req_pre_handler(struct kprobe *p, struct pt_regs *re
     return 0;
 }
 
-static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* req_sock = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
@@ -311,7 +311,7 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
 }
 
 
-static int kprobe_tcp_connect_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_connect_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
     
@@ -323,7 +323,7 @@ static int kprobe_tcp_connect_pre_handler(struct kprobe *p, struct pt_regs *regs
 }
 
 
-static int kprobe_tcp_finish_connect_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_finish_connect_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
     
@@ -334,12 +334,12 @@ static int kprobe_tcp_finish_connect_pre_handler(struct kprobe *p, struct pt_reg
     return 0;
 }
 
-static int kprobe_tcp_set_state_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_set_state_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
     int dest_state = (int)x86_64_get_regs_arg(regs, 1);
 
-    // if  (!sock_filter_and_display(sk, "kprobe_tcp_set_state_pre_handler: "))
+    // if  (!sock_filter_and_display(sk, "kprobe__tcp_set_state_pre_handler: "))
     //     return 0;
     if  (!sock_filter(sk))
         return 0;
@@ -358,7 +358,7 @@ static int kprobe_tcp_set_state_pre_handler(struct kprobe *p, struct pt_regs *re
 
 
 
-static int kprobe_tcp_close_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_close_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
@@ -370,7 +370,7 @@ static int kprobe_tcp_close_pre_handler(struct kprobe *p, struct pt_regs *regs)
 }
 
 
-static int kprobe_tcp_fin_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_fin_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
@@ -381,7 +381,7 @@ static int kprobe_tcp_fin_pre_handler(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
-static int kprobe_tcp_time_wait_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_time_wait_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
@@ -392,7 +392,7 @@ static int kprobe_tcp_time_wait_pre_handler(struct kprobe *p, struct pt_regs *re
     return 0;
 }
 
-static int kprobe_inet_twsk_kill_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__inet_twsk_kill_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
@@ -403,7 +403,7 @@ static int kprobe_inet_twsk_kill_pre_handler(struct kprobe *p, struct pt_regs *r
     return 0;
 }
 
-static int kprobe_tcp_timewait_state_process_pre_handler(struct kprobe *p, struct pt_regs *regs)
+static int kprobe__tcp_timewait_state_process_pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
@@ -433,55 +433,55 @@ static struct tracepoint_probe_context sched_probes = {
 static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_rcv_state_process",
-        .pre_handler = kprobe_tcp_rcv_state_process_pre_handler,
+        .pre_handler = kprobe__tcp_rcv_state_process__pre_handler,
     },    
     {
         .symbol_name	= "tcp_v4_syn_recv_sock",
-        .pre_handler = kprobe_tcp_v4_syn_recv_sock_pre_handler,
+        .pre_handler = kprobe__tcp_v4_syn_recv_sock_pre_handler,
     },
     {
         .symbol_name	= "tcp_conn_request",
-        .pre_handler = kprobe_tcp_conn_request_pre_handler,
+        .pre_handler = kprobe__tcp_conn_request_pre_handler,
     },
     {
         .symbol_name	= "tcp_v4_send_synack",
-        .pre_handler = kprobe_tcp_v4_send_synack_pre_handler,
+        .pre_handler = kprobe__tcp_v4_send_synack_pre_handler,
     },
     {
         .symbol_name	= "tcp_check_req",
-        .pre_handler = kprobe_tcp_check_req_pre_handler,
+        .pre_handler = kprobe__tcp_check_req_pre_handler,
     },
     {
         .symbol_name	= "tcp_set_state",
-        .pre_handler = kprobe_tcp_set_state_pre_handler,
+        .pre_handler = kprobe__tcp_set_state_pre_handler,
     },
     {
         .symbol_name	= "tcp_connect",
-        .pre_handler = kprobe_tcp_connect_pre_handler,
+        .pre_handler = kprobe__tcp_connect_pre_handler,
     },
     {
         .symbol_name	= "tcp_finish_connect",
-        .pre_handler = kprobe_tcp_finish_connect_pre_handler,
+        .pre_handler = kprobe__tcp_finish_connect_pre_handler,
     },
     {
         .symbol_name	= "tcp_close",
-        .pre_handler = kprobe_tcp_close_pre_handler,
+        .pre_handler = kprobe__tcp_close_pre_handler,
     },
     {
         .symbol_name	= "tcp_fin",
-        .pre_handler = kprobe_tcp_fin_pre_handler,
+        .pre_handler = kprobe__tcp_fin_pre_handler,
     },
     {
         .symbol_name	= "tcp_time_wait",
-        .pre_handler = kprobe_tcp_time_wait_pre_handler,
+        .pre_handler = kprobe__tcp_time_wait_pre_handler,
     },
     {
         .symbol_name	= "inet_twsk_kill",
-        .pre_handler = kprobe_inet_twsk_kill_pre_handler,
+        .pre_handler = kprobe__inet_twsk_kill_pre_handler,
     },
     {
         .symbol_name	= "tcp_timewait_state_process",
-        .pre_handler = kprobe_tcp_timewait_state_process_pre_handler,
+        .pre_handler = kprobe__tcp_timewait_state_process_pre_handler,
     },
 };
 
