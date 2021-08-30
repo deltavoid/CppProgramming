@@ -190,33 +190,36 @@ static void sock_common_display(const struct sock* sk)
     }
 }
 
-
-static void sock_filter_and_display(const struct sock* sk, const char* prefix)
-{
-    if  (!sock_filter(sk))
-        return;
-
-    pr_debug("%s\n", prefix);
-    sock_common_display(sk);
-    pr_debug("\n");
-}
-
-
-// preempt_count display ------------------------------------------
-
-static void preempt_count_display(void)
+static void current_display(void)
 {
     struct task_struct* task_p = current;
 
     preempt_disable();
     // comm should use get_task_comm
-    pr_debug("cpu_id: %d, task tid/pid: %d, pid/tgid: %d, comm: %s\n", 
-            smp_processor_id(), task_p->pid, task_p->tgid, task_p->comm);
+    pr_debug("task tid/pid: %d, pid/tgid: %d, comm: %s, cpu_id: %d\n", 
+            task_p->pid, task_p->tgid, task_p->comm, smp_processor_id());
     preempt_enable();
 
     pr_debug("preempt_count: 0x%08x, test_preempt_need_resched: %d\n", preempt_count(), test_preempt_need_resched());
     // pr_debug("test_preempt_need_resched: %d\n", test_preempt_need_resched());
 }
+
+static bool sock_filter_and_display(const struct sock* sk, const char* prefix)
+{
+    if  (!sock_filter(sk))
+        return false;
+
+    pr_debug("%s\n", prefix);
+    sock_common_display(sk);
+    current_display();
+
+    return true;
+}
+
+
+// preempt_count display ------------------------------------------
+
+
 
 static void trace_local_timer_entry_handler(int id)
 {
@@ -224,7 +227,7 @@ static void trace_local_timer_entry_handler(int id)
     {
 
         pr_debug("probe_local_timer_entry, jiffies: %ld\n", jiffies);
-        preempt_count_display();
+        // preempt_count_display();
 
         dump_stack();
 
@@ -238,8 +241,10 @@ static int kprobe_tcp_rcv_state_process_pre_handler(struct kprobe *p, struct pt_
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    sock_filter_and_display(sk, "kprobe_tcp_rcv_state_process_pre_handler: ");
+    if  (!sock_filter_and_display(sk, "kprobe_tcp_rcv_state_process_pre_handler: "))
+        return 0;
 
+    pr_debug("\n");
     return 0;
 }
 
@@ -247,8 +252,10 @@ static int kprobe_tcp_conn_request_pre_handler(struct kprobe *p, struct pt_regs 
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
-    sock_filter_and_display(sk, "kprobe_tcp_conn_request_pre_handler: ");
+    if  (!sock_filter_and_display(sk, "kprobe_tcp_conn_request_pre_handler: "))
+        return 0;
 
+    pr_debug("\n");
     return 0;
 }
 
@@ -262,11 +269,13 @@ static int kprobe_tcp_v4_syn_recv_sock_pre_handler(struct kprobe *p, struct pt_r
     //     return 0;
 
     // sock_common_display(req_sock);
-    sock_filter_and_display(req_sock, "kprobe_tcp_v4_syn_recv_sock_pre_handler: ");
+    if  (!sock_filter_and_display(req_sock, "kprobe_tcp_v4_syn_recv_sock_pre_handler: "))
+        return 0;
 
     /* A dump_stack() here will give a stack backtrace */
     // dump_stack();
 
+    pr_debug("\n");
     return 0;
 }
 
@@ -276,8 +285,10 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
 {
     struct sock* newsk = (struct sock*)regs_return_value(regs);
 
-    sock_filter_and_display(newsk, "kretprobe_inet_csk_accept_ret_handler: ");
+    if  (!sock_filter_and_display(newsk, "kretprobe_inet_csk_accept_ret_handler: "))
+        return 0;
 
+    pr_debug("\n");
     return 0;
 }
 
