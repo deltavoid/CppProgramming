@@ -169,24 +169,24 @@ static void sock_common_display(const struct sock* sk)
     state = sk->sk_state;
 
     // sock_common_display: 
-    pr_debug("local_port: %d, remote_port: %d, state: %s\n", 
-            local_port, remote_port, tcp_state_desc[state]);
+    // pr_debug("local_port: %d, remote_port: %d, state: %s\n", 
+    //         local_port, remote_port, tcp_state_desc[state]);
 
     if  (family == AF_INET)
     {
         u32 local_addr = sk->sk_rcv_saddr;
         u32 remote_addr = sk->sk_daddr;
 
-        pr_debug("local_addr: %pI4, remote_addr: %pI4\n",
-                &local_addr, &remote_addr);
+        pr_debug("local: %pI4:%d, remote: %pI4:%d, state: %s\n",
+                &local_addr, local_port, &remote_addr, remote_port, tcp_state_desc[state]);
     }
     else if  (family == AF_INET6)
     {
         struct in6_addr local_addr = sk->sk_v6_rcv_saddr;
         struct in6_addr remote_addr = sk->sk_v6_daddr;
 
-        pr_debug("local_addr: %pI6, remote_addr: %pI6\n",
-                &local_addr, &remote_addr);
+        pr_debug("local: [%pI6]:%d, remote: [%pI6]:%d state: %s\n",
+                &local_addr, local_port, &remote_addr, remote_port, tcp_state_desc[state]);
     }
 }
 
@@ -196,11 +196,14 @@ static void current_display(void)
 
     preempt_disable();
     // comm should use get_task_comm
-    pr_debug("task tid/pid: %d, pid/tgid: %d, comm: %s, cpu_id: %d\n", 
-            task_p->pid, task_p->tgid, task_p->comm, smp_processor_id());
+    pr_debug("tid: %d, pid: %d, comm: %s, cpu_id: %d, "
+            "preempt_count: 0x%08x, need_resched: %d\n", 
+            task_p->pid, task_p->tgid, task_p->comm, smp_processor_id(),
+            preempt_count(), test_preempt_need_resched());
     preempt_enable();
 
-    pr_debug("preempt_count: 0x%08x, test_preempt_need_resched: %d\n", preempt_count(), test_preempt_need_resched());
+    // pr_debug("preempt_count: 0x%08x, test_preempt_need_resched: %d\n", 
+    //         preempt_count(), test_preempt_need_resched());
     // pr_debug("test_preempt_need_resched: %d\n", test_preempt_need_resched());
 }
 
