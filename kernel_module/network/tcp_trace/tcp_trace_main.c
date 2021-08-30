@@ -87,7 +87,7 @@ static int param_local_port = 0, param_remote_port = 0;
 module_param_named(local_port, param_local_port, int, 0444);
 module_param_named(remote_port, param_remote_port, int, 0444);
 
-static int param_enable_ipv4 = 1, param_enable_ipv6 = 0;
+static int param_enable_ipv4 = 1, param_enable_ipv6 = 1;
 module_param_named(enable_ipv4, param_enable_ipv4, int, 0444);
 module_param_named(enable_ipv6, param_enable_ipv6, int, 0444);
 
