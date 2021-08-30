@@ -452,6 +452,19 @@ static int kprobe__tcp_reset__pre_handler(struct kprobe *p, struct pt_regs *regs
     return 0;
 }
 
+
+static int kprobe__tcp_v4_send_reset__pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_v4_send_reset: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
@@ -466,7 +479,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 16
+#define kprobe_num 17
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -532,6 +545,10 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_reset",
         .pre_handler = kprobe__tcp_reset__pre_handler,
+    },
+    {
+        .symbol_name	= "tcp_v4_send_reset",
+        .pre_handler = kprobe__tcp_v4_send_reset__pre_handler,
     },
 };
 
