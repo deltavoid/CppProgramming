@@ -48,17 +48,6 @@ struct sock_filter_config {
     u32 local_addr_ipv4, remote_addr_ipv4; // 0 indicates not filter;
 };
 
-
-// static void sock_filter_config_init(struct sock_filter_config* config)
-// {
-//     config->local_port = 0;
-//     config->local_port = 0;
-//     config->enable_ipv4 = true;
-//     config->local_addr_ipv4 = 0;
-//     config->remote_addr_ipv4 = 0;
-//     config->enable_ipv6 = true;
-// }
-
 static void sock_filter_config_display(struct sock_filter_config* config)
 {
     pr_debug("local_port: %d, remote_port: %d\n",
@@ -71,6 +60,7 @@ static void sock_filter_config_display(struct sock_filter_config* config)
 
 }
 
+
 struct sock_filter_config sock_config = {
     .local_port = 0,
     .remote_port = 0,
@@ -81,8 +71,6 @@ struct sock_filter_config sock_config = {
 };
 
 
-
-
 static int param_local_port = 0, param_remote_port = 0;
 module_param_named(local_port, param_local_port, int, 0444);
 module_param_named(remote_port, param_remote_port, int, 0444);
@@ -90,8 +78,6 @@ module_param_named(remote_port, param_remote_port, int, 0444);
 static int param_enable_ipv4 = 1, param_enable_ipv6 = 1;
 module_param_named(enable_ipv4, param_enable_ipv4, int, 0444);
 module_param_named(enable_ipv6, param_enable_ipv6, int, 0444);
-
-
 
 static int init_sock_config_from_param(void)
 {
@@ -157,15 +143,17 @@ static bool sock_filter(const struct sock* sk)
 static void sock_common_display(const struct sock* sk)
 {
     u16 local_port, remote_port, family;
+    u8 state;
 
     if  (!sk) return;
 
     local_port = sk->sk_num;
     remote_port = ntohs(sk->sk_dport);
     family = sk->sk_family;
+    state = sk->sk_state;
 
-    pr_debug("sock_common_display: local_port: %d, remote_port: %d, family: %d\n", 
-            local_port, remote_port, family);
+    pr_debug("sock_common_display: local_port: %d, remote_port: %d, family: %d, state: %d\n", 
+            local_port, remote_port, family, state);
 
     if  (family == AF_INET)
     {
