@@ -280,6 +280,18 @@ static int kprobe__tcp_v4_syn_recv_sock__pre_handler(struct kprobe *p, struct pt
 }
 
 
+static int kretprobe__tcp_v4_syn_recv_sock__ret_handler(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    struct sock* req_sock = (struct sock*)regs_return_value(regs);
+
+    if  (!sock_filter_and_display(req_sock, "kretprobe:tcp_v4_syn_recv_sock: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
+
 static int kprobe__tcp_child_process__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
@@ -617,7 +629,7 @@ static struct kprobe kprobes[kprobe_num] = {
 
 
 
-#define kretprobe_num 1
+#define kretprobe_num 2
 
 static struct kretprobe kretprobes[kretprobe_num] = {
     {
@@ -625,6 +637,13 @@ static struct kretprobe kretprobes[kretprobe_num] = {
             .symbol_name = "inet_csk_accept",
         },
 	    .handler = kretprobe_inet_csk_accept_ret_handler,
+	    .maxactive = 64,
+    },
+    {
+        .kp = {
+            .symbol_name = "tcp_v4_syn_recv_sock",
+        },
+	    .handler = kretprobe__tcp_v4_syn_recv_sock__ret_handler,
 	    .maxactive = 64,
     },
 };
