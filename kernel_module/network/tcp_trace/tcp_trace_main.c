@@ -239,6 +239,7 @@ static int kprobe__tcp_conn_request__pre_handler(struct kprobe *p, struct pt_reg
     if  (!sock_filter_and_display(sk, "kprobe:tcp_conn_request: "))
         return 0;
 
+    dump_stack();
     pr_debug("\n");
     return 0;
 }
@@ -622,7 +623,7 @@ static int __init tcp_trace_init(void)
 
     init_sock_config_from_param();
     sock_filter_config_display(&sock_config);
-    pr_debug("\n");
+
 
     ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
     if  (ret < 0)
@@ -649,6 +650,7 @@ static int __init tcp_trace_init(void)
     }
 
     pr_debug("tcp_trace_init end\n");
+    pr_debug("\n");
     return 0;
 
 kretprobes_init_failed:
