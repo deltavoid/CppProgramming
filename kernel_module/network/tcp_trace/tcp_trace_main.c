@@ -219,26 +219,7 @@ static bool sock_filter_and_display(const struct sock* sk, const char* prefix)
     return true;
 }
 
-
-// preempt_count display ------------------------------------------
-
-
-
-// static void trace_local_timer_entry_handler(int id)
-// {
-//     if  (smp_processor_id() == 0)
-//     {
-
-//         pr_debug("probe_local_timer_entry, jiffies: %ld\n", jiffies);
-//         // preempt_count_display();
-
-//         dump_stack();
-
-//         printk("\n");
-//     }
-
-// }
-
+// tcp connection hook point ----------------------------------------
 
 static int kprobe__tcp_rcv_state_process__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
@@ -381,6 +362,37 @@ static int kprobe__tcp_fin__pre_handler(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+
+
+
+static int kprobe__tcp_done__pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, "kprobe:tcp_done: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
+
+static int kprobe__inet_csk_destroy_sock__pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, "kprobe:inet_csk_destroy_sock: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
+
+
+
+
+
 static int kprobe__tcp_time_wait__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
@@ -414,29 +426,6 @@ static int kprobe__tcp_timewait_state_process__pre_handler(struct kprobe *p, str
     return 0;
 }
 
-static int kprobe__tcp_done__pre_handler(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_done: "))
-        return 0;
-
-    pr_debug("\n");
-    return 0;
-}
-
-
-static int kprobe__inet_csk_destroy_sock__pre_handler(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, "kprobe:inet_csk_destroy_sock: "))
-        return 0;
-
-    pr_debug("\n");
-    return 0;
-}
-
 
 
 
@@ -452,6 +441,14 @@ static int kprobe__tcp_reset__pre_handler(struct kprobe *p, struct pt_regs *regs
     return 0;
 }
 
+static void trace__tcp_receive_reset__handler(struct sock* sk)
+{
+    if  (!sock_filter_and_display(sk, "trace:tcp_receive_reset: "))
+        return;
+
+    pr_debug("\n");
+}
+
 
 static int kprobe__tcp_v4_send_reset__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
@@ -464,17 +461,6 @@ static int kprobe__tcp_v4_send_reset__pre_handler(struct kprobe *p, struct pt_re
     return 0;
 }
 
-
-// static void trace_local_timer_entry_handler(int id)
-static void trace__tcp_receive_reset__handler(struct sock* sk)
-{
-    if  (!sock_filter_and_display(sk, "trace:tcp_receive_reset: "))
-        return;
-
-    pr_debug("\n");
-}
-
-
 static void trace__tcp_send_reset__handler(const struct sock *sk, const struct sk_buff *skb)
 {
     if  (!sock_filter_and_display(sk, "trace:tcp_send_reset: "))
@@ -482,6 +468,9 @@ static void trace__tcp_send_reset__handler(const struct sock *sk, const struct s
 
     pr_debug("\n");
 }
+
+
+
 
 // module init -----------------------------------------------------
 
