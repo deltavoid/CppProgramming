@@ -411,6 +411,7 @@ static int kprobe__inet_twsk_kill__pre_handler(struct kprobe *p, struct pt_regs 
     if  (!sock_filter_and_display(sk, "kprobe:inet_twsk_kill: "))
         return 0;
 
+    dump_stack();
     pr_debug("\n");
     return 0;
 }
