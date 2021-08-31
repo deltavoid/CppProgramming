@@ -291,17 +291,30 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
     return 0;
 }
 
-
-static int kprobe__tcp_v4_connect__pre_handler(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+// // not dest port here
+// static int kprobe__tcp_v4_connect__pre_handler(struct kprobe *p, struct pt_regs *regs)
+// {
+//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
     
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_v4_connect: "))
+//     if  (!sock_filter_and_display(sk, "kprobe:tcp_v4_connect: "))
+//         return 0;
+
+//     pr_debug("\n");
+//     return 0;
+// }
+
+
+static int kprobe__inet_hash_connect__pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
+    
+    if  (!sock_filter_and_display(sk, "kprobe:inet_hash_connect: "))
         return 0;
 
     pr_debug("\n");
     return 0;
 }
+
 
 static int kprobe__tcp_connect__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
@@ -314,16 +327,6 @@ static int kprobe__tcp_connect__pre_handler(struct kprobe *p, struct pt_regs *re
     return 0;
 }
 
-static int kprobe__inet_hash_connect__pre_handler(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
-    
-    if  (!sock_filter_and_display(sk, "kprobe:inet_hash_connect: "))
-        return 0;
-
-    pr_debug("\n");
-    return 0;
-}
 
 
 static int kprobe__tcp_finish_connect__pre_handler(struct kprobe *p, struct pt_regs *regs)
@@ -514,7 +517,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 19
+#define kprobe_num 18
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -541,17 +544,17 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "tcp_set_state",
         .pre_handler = kprobe__tcp_set_state__pre_handler,
     },
-    {
-        .symbol_name	= "tcp_v4_connect",
-        .pre_handler = kprobe__tcp_v4_connect__pre_handler,
-    },
-    {
-        .symbol_name	= "tcp_connect",
-        .pre_handler = kprobe__tcp_connect__pre_handler,
-    },
+    // {
+    //     .symbol_name	= "tcp_v4_connect",
+    //     .pre_handler = kprobe__tcp_v4_connect__pre_handler,
+    // },
     {
         .symbol_name	= "inet_hash_connect",
         .pre_handler = kprobe__inet_hash_connect__pre_handler,
+    },    
+    {
+        .symbol_name	= "tcp_connect",
+        .pre_handler = kprobe__tcp_connect__pre_handler,
     },
     {
         .symbol_name	= "tcp_finish_connect",
