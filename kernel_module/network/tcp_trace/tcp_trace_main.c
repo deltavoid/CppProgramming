@@ -475,6 +475,14 @@ static void trace__tcp_receive_reset__handler(struct sock* sk)
 }
 
 
+static void trace__tcp_send_reset__handler(const struct sock *sk, const struct sk_buff *skb)
+{
+    if  (!sock_filter_and_display(sk, "trace:tcp_send_reset: "))
+        return;
+
+    pr_debug("\n");
+}
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
@@ -484,8 +492,13 @@ static struct tracepoint_probe_context sched_probes = {
             .probe = trace__tcp_receive_reset__handler,
             .priv = NULL,
         },
+        {
+            .name = "tcp_send_reset",
+            .probe = trace__tcp_send_reset__handler,
+            .priv = NULL,
+        },
     },
-    .init_num = 1
+    .init_num = 2
 };
 
 
