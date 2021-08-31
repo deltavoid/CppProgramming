@@ -622,6 +622,7 @@ static int __init tcp_trace_init(void)
 
     init_sock_config_from_param();
     sock_filter_config_display(&sock_config);
+    pr_debug("\n");
 
     ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
     if  (ret < 0)
