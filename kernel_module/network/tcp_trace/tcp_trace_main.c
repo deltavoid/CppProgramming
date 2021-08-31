@@ -224,20 +224,20 @@ static bool sock_filter_and_display(const struct sock* sk, const char* prefix)
 
 
 
-static void trace_local_timer_entry_handler(int id)
-{
-    if  (smp_processor_id() == 0)
-    {
+// static void trace_local_timer_entry_handler(int id)
+// {
+//     if  (smp_processor_id() == 0)
+//     {
 
-        pr_debug("probe_local_timer_entry, jiffies: %ld\n", jiffies);
-        // preempt_count_display();
+//         pr_debug("probe_local_timer_entry, jiffies: %ld\n", jiffies);
+//         // preempt_count_display();
 
-        dump_stack();
+//         dump_stack();
 
-        printk("\n");
-    }
+//         printk("\n");
+//     }
 
-}
+// }
 
 
 static int kprobe__tcp_rcv_state_process__pre_handler(struct kprobe *p, struct pt_regs *regs)
@@ -465,17 +465,27 @@ static int kprobe__tcp_v4_send_reset__pre_handler(struct kprobe *p, struct pt_re
 }
 
 
+// static void trace_local_timer_entry_handler(int id)
+static void trace__tcp_receive_reset__handler(struct sock* sk)
+{
+    if  (!sock_filter_and_display(sk, "trace:tcp_receive_reset: "))
+        return;
+
+    pr_debug("\n");
+}
+
+
 // module init -----------------------------------------------------
 
 static struct tracepoint_probe_context sched_probes = {
     .entries = {
         {
-            .name = "local_timer_entry",
-            .probe = trace_local_timer_entry_handler,
+            .name = "tcp_receive_reset",
+            .probe = trace__tcp_receive_reset__handler,
             .priv = NULL,
         },
     },
-    .init_num = 0
+    .init_num = 1
 };
 
 
