@@ -302,6 +302,17 @@ static int kprobe__tcp_create_openreq_child__pre_handler(struct kprobe *p, struc
     return 0;
 }
 
+static int kprobe__inet_csk_clone_lock__pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
+
+    if  (!sock_filter_and_display(sk, "kprobe:inet_csk_clone_lock: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
 
 static int kprobe__tcp_child_process__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
@@ -553,7 +564,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 20
+#define kprobe_num 21
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -579,6 +590,10 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_create_openreq_child",
         .pre_handler = kprobe__tcp_create_openreq_child__pre_handler,
+    },
+    {
+        .symbol_name	= "inet_csk_clone_lock",
+        .pre_handler = kprobe__inet_csk_clone_lock__pre_handler,
     },
     {
         .symbol_name	= "tcp_child_process",
