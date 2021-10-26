@@ -90,15 +90,18 @@ static int init_sock_config_from_param(void)
     return 0;
 }
 
+static int trace_level = 2;
 
 
-static bool sock_filter(const struct sock* sk)
+static bool sock_filter(const struct sock* sk, int func_level)
 {
     u16 local_port, remote_port, family;
 
     if  (!sk)
         return false;
 
+    if  (trace_level < func_level)
+        return false;
 
     local_port = sk->sk_num;
     remote_port = ntohs(sk->sk_dport);
@@ -207,9 +210,9 @@ static void current_display(void)
     // pr_debug("test_preempt_need_resched: %d\n", test_preempt_need_resched());
 }
 
-static bool sock_filter_and_display(const struct sock* sk, const char* prefix)
+static bool sock_filter_and_display(const struct sock* sk, int func_level, const char* prefix)
 {
-    if  (!sock_filter(sk))
+    if  (!sock_filter(sk, func_level))
         return false;
 
     pr_debug("%s\n", prefix);
@@ -225,7 +228,7 @@ static int kprobe__tcp_rcv_state_process__pre_handler(struct kprobe *p, struct p
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_rcv_state_process: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_rcv_state_process: "))
         return 0;
 
     pr_debug("\n");
@@ -236,7 +239,7 @@ static int kprobe__tcp_conn_request__pre_handler(struct kprobe *p, struct pt_reg
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_conn_request: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_conn_request: "))
         return 0;
 
     dump_stack();
@@ -248,7 +251,7 @@ static int kprobe__tcp_v4_send_synack__pre_handler(struct kprobe *p, struct pt_r
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 3);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_v4_send_synack: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_send_synack: "))
         return 0;
 
     pr_debug("\n");
@@ -259,7 +262,7 @@ static int kprobe__tcp_check_req__pre_handler(struct kprobe *p, struct pt_regs *
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_check_req: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_check_req: "))
         return 0;
 
     pr_debug("\n");
@@ -270,7 +273,7 @@ static int kprobe__tcp_v4_syn_recv_sock__pre_handler(struct kprobe *p, struct pt
 {
     struct sock* req_sock = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
-    if  (!sock_filter_and_display(req_sock, "kprobe:tcp_v4_syn_recv_sock: "))
+    if  (!sock_filter_and_display(req_sock, 2, "kprobe:tcp_v4_syn_recv_sock: "))
         return 0;
 
     dump_stack();
@@ -284,7 +287,7 @@ static int kretprobe__tcp_v4_syn_recv_sock__ret_handler(struct kretprobe_instanc
 {
     struct sock* req_sock = (struct sock*)regs_return_value(regs);
 
-    if  (!sock_filter_and_display(req_sock, "kretprobe:tcp_v4_syn_recv_sock: "))
+    if  (!sock_filter_and_display(req_sock, 2, "kretprobe:tcp_v4_syn_recv_sock: "))
         return 0;
 
     pr_debug("\n");
@@ -295,7 +298,7 @@ static int kprobe__tcp_create_openreq_child__pre_handler(struct kprobe *p, struc
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_create_openreq_child: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_create_openreq_child: "))
         return 0;
 
     pr_debug("\n");
@@ -306,7 +309,7 @@ static int kprobe__inet_csk_clone_lock__pre_handler(struct kprobe *p, struct pt_
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
 
-    if  (!sock_filter_and_display(sk, "kprobe:inet_csk_clone_lock: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:inet_csk_clone_lock: "))
         return 0;
 
     pr_debug("\n");
@@ -318,7 +321,7 @@ static int kprobe__tcp_child_process__pre_handler(struct kprobe *p, struct pt_re
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_child_process: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_child_process: "))
         return 0;
 
     pr_debug("\n");
@@ -331,7 +334,7 @@ static int kretprobe_inet_csk_accept_ret_handler(struct kretprobe_instance *ri, 
 {
     struct sock* newsk = (struct sock*)regs_return_value(regs);
 
-    if  (!sock_filter_and_display(newsk, "kretprobe:inet_csk_accept: "))
+    if  (!sock_filter_and_display(newsk, 2, "kretprobe:inet_csk_accept: "))
         return 0;
 
     pr_debug("\n");
@@ -355,7 +358,7 @@ static int kprobe__inet_hash_connect__pre_handler(struct kprobe *p, struct pt_re
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
     
-    if  (!sock_filter_and_display(sk, "kprobe:inet_hash_connect: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:inet_hash_connect: "))
         return 0;
 
     pr_debug("\n");
@@ -367,7 +370,7 @@ static int kprobe__tcp_connect__pre_handler(struct kprobe *p, struct pt_regs *re
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
     
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_connect: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_connect: "))
         return 0;
 
     pr_debug("\n");
@@ -380,7 +383,7 @@ static int kprobe__tcp_finish_connect__pre_handler(struct kprobe *p, struct pt_r
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
     
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_finish_connect: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_finish_connect: "))
         return 0;
 
     pr_debug("\n");
@@ -394,7 +397,7 @@ static int kprobe__tcp_set_state__pre_handler(struct kprobe *p, struct pt_regs *
 
     // if  (!sock_filter_and_display(sk, "kprobe__tcp_set_state__pre_handler: "))
     //     return 0;
-    if  (!sock_filter(sk))
+    if  (!sock_filter(sk, 2))
         return 0;
 
     pr_debug("kprobe:tcp_set_state: %s -> %s\n", 
@@ -415,7 +418,7 @@ static int kprobe__tcp_close__pre_handler(struct kprobe *p, struct pt_regs *regs
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_close: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_close: "))
         return 0;
 
     pr_debug("\n");
@@ -427,7 +430,7 @@ static int kprobe__tcp_fin__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_fin: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_fin: "))
         return 0;
 
     pr_debug("\n");
@@ -441,7 +444,7 @@ static int kprobe__tcp_done__pre_handler(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_done: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_done: "))
         return 0;
 
     pr_debug("\n");
@@ -453,7 +456,7 @@ static int kprobe__inet_csk_destroy_sock__pre_handler(struct kprobe *p, struct p
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:inet_csk_destroy_sock: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:inet_csk_destroy_sock: "))
         return 0;
 
     pr_debug("\n");
@@ -469,7 +472,7 @@ static int kprobe__tcp_time_wait__pre_handler(struct kprobe *p, struct pt_regs *
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_time_wait: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_time_wait: "))
         return 0;
 
     pr_debug("\n");
@@ -480,7 +483,7 @@ static int kprobe__inet_twsk_kill__pre_handler(struct kprobe *p, struct pt_regs 
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:inet_twsk_kill: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:inet_twsk_kill: "))
         return 0;
 
     dump_stack();
@@ -492,7 +495,7 @@ static int kprobe__tcp_timewait_state_process__pre_handler(struct kprobe *p, str
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_timewait_state_process: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_timewait_state_process: "))
         return 0;
 
     pr_debug("\n");
@@ -507,7 +510,7 @@ static int kprobe__tcp_reset__pre_handler(struct kprobe *p, struct pt_regs *regs
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_reset: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_reset: "))
         return 0;
 
     pr_debug("\n");
@@ -516,7 +519,7 @@ static int kprobe__tcp_reset__pre_handler(struct kprobe *p, struct pt_regs *regs
 
 static void trace__tcp_receive_reset__handler(struct sock* sk)
 {
-    if  (!sock_filter_and_display(sk, "trace:tcp_receive_reset: "))
+    if  (!sock_filter_and_display(sk, 2, "trace:tcp_receive_reset: "))
         return;
 
     pr_debug("\n");
@@ -527,7 +530,7 @@ static int kprobe__tcp_v4_send_reset__pre_handler(struct kprobe *p, struct pt_re
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, "kprobe:tcp_v4_send_reset: "))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_send_reset: "))
         return 0;
 
     pr_debug("\n");
@@ -536,7 +539,7 @@ static int kprobe__tcp_v4_send_reset__pre_handler(struct kprobe *p, struct pt_re
 
 static void trace__tcp_send_reset__handler(const struct sock *sk, const struct sk_buff *skb)
 {
-    if  (!sock_filter_and_display(sk, "trace:tcp_send_reset: "))
+    if  (!sock_filter_and_display(sk, 2, "trace:tcp_send_reset: "))
         return;
 
     pr_debug("\n");

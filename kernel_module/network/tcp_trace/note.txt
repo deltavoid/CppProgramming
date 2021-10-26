@@ -1,0 +1,18 @@
+
+
+
+tcp  func level
+
+
+
+0 none
+
+1 tcp异常
+
+2 tcp建连
+
+3 tcp收发包基础
+
+4 tcp收发包详细
+
+5 tcp详细trace
