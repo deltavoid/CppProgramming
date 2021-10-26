@@ -90,7 +90,7 @@ static int init_sock_config_from_param(void)
     return 0;
 }
 
-static int trace_level = 2;
+static int trace_level = 3;
 
 
 static bool sock_filter(const struct sock* sk, int func_level)
@@ -552,7 +552,7 @@ static int kprobe__tcp_rcv_established__pre_handler(struct kprobe *p, struct pt_
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_rcv_established: "))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_rcv_established: "))
         return 0;
 
     pr_debug("\n");
@@ -565,7 +565,7 @@ static int kprobe____tcp_transmit_skb__pre_handler(struct kprobe *p, struct pt_r
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:__tcp_transmit_skb: "))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:__tcp_transmit_skb: "))
         return 0;
 
     pr_debug("\n");
@@ -577,7 +577,7 @@ static int kprobe__tcp_write_xmit__pre_handler(struct kprobe *p, struct pt_regs 
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_write_xmit: "))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_write_xmit: "))
         return 0;
 
     pr_debug("\n");
@@ -591,7 +591,7 @@ static int kprobe__tcp_recvmsg__pre_handler(struct kprobe *p, struct pt_regs *re
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_recvmsg: "))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_recvmsg: "))
         return 0;
 
     pr_debug("\n");
@@ -603,7 +603,7 @@ static int kprobe__tcp_sendmsg__pre_handler(struct kprobe *p, struct pt_regs *re
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_sendmsg: "))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_sendmsg: "))
         return 0;
 
     pr_debug("\n");
