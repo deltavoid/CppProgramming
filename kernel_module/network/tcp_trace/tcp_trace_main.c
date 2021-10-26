@@ -242,7 +242,7 @@ static int kprobe__tcp_conn_request__pre_handler(struct kprobe *p, struct pt_reg
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_conn_request: "))
         return 0;
 
-    dump_stack();
+    // dump_stack();
     pr_debug("\n");
     return 0;
 }
@@ -276,7 +276,7 @@ static int kprobe__tcp_v4_syn_recv_sock__pre_handler(struct kprobe *p, struct pt
     if  (!sock_filter_and_display(req_sock, 2, "kprobe:tcp_v4_syn_recv_sock: "))
         return 0;
 
-    dump_stack();
+    // dump_stack();
 
     pr_debug("\n");
     return 0;
@@ -406,7 +406,7 @@ static int kprobe__tcp_set_state__pre_handler(struct kprobe *p, struct pt_regs *
     sock_common_display(sk);
     current_display();
 
-    dump_stack();
+    // dump_stack();
 
     pr_debug("\n");
     return 0;
@@ -486,7 +486,7 @@ static int kprobe__inet_twsk_kill__pre_handler(struct kprobe *p, struct pt_regs 
     if  (!sock_filter_and_display(sk, 2, "kprobe:inet_twsk_kill: "))
         return 0;
 
-    dump_stack();
+    // dump_stack();
     pr_debug("\n");
     return 0;
 }
