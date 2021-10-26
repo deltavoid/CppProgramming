@@ -503,7 +503,7 @@ static int kprobe__tcp_timewait_state_process__pre_handler(struct kprobe *p, str
 }
 
 
-
+// reset ----------------------------------------------------------
 
 
 static int kprobe__tcp_reset__pre_handler(struct kprobe *p, struct pt_regs *regs)
@@ -610,7 +610,23 @@ static int kprobe__tcp_sendmsg__pre_handler(struct kprobe *p, struct pt_regs *re
     return 0;
 }
 
+// tcp_poll -------------------------------------------------------
 
+
+
+// timer and retrans ----------------------------------------------
+
+
+static int kprobe__tcp_write_timer__pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_write_timer: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
 
 
 
@@ -635,7 +651,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 26
+#define kprobe_num 27
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -745,6 +761,10 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_sendmsg",
         .pre_handler = kprobe__tcp_sendmsg__pre_handler,
+    },
+    {
+        .symbol_name	= "tcp_write_timer",
+        .pre_handler = kprobe__tcp_write_timer__pre_handler,
     },
 };
 
