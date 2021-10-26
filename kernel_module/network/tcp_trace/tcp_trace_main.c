@@ -599,6 +599,17 @@ static int kprobe__tcp_recvmsg__pre_handler(struct kprobe *p, struct pt_regs *re
 }
 
 
+static int kprobe__tcp_sendmsg__pre_handler(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_sendmsg: "))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
 
 
 
@@ -624,7 +635,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 25
+#define kprobe_num 26
 
 static struct kprobe kprobes[kprobe_num] = {
     {
@@ -730,6 +741,10 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_recvmsg",
         .pre_handler = kprobe__tcp_recvmsg__pre_handler,
+    },
+    {
+        .symbol_name	= "tcp_sendmsg",
+        .pre_handler = kprobe__tcp_sendmsg__pre_handler,
     },
 };
 
