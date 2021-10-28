@@ -20,8 +20,14 @@ static int net_seg_pton(const char* input, __be32* res_net_p, __be32* res_prefix
 {
     const char* end = NULL;
     int ret = in4_pton(input, strlen(input), (u8*)res_net_p, '/', &end);
+    int prefix_num = 0;
 
     pr_debug("res_net_p: %pI4\n", res_net_p);
+
+
+    sscanf(end + 1, "%d", &prefix_num);
+    pr_debug("prefix_num: %d\n", prefix_num);
+
 }
 
 
