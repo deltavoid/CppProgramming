@@ -16,10 +16,12 @@ __be32 res_net, res_prefix;
 
 
 
-static int net_set_pton(const char* input, __be32* res_net_p, __be32* res_prefix_p)
+static int net_seg_pton(const char* input, __be32* res_net_p, __be32* res_prefix_p)
 {
     const char* end = NULL;
-    int ret = in4_pton(input, sizeof(input), (u8*)res_net_p, '/', &end);
+    int ret = in4_pton(input, strlen(input), (u8*)res_net_p, '/', &end);
+
+    pr_debug("res_net_p: %pI4\n", res_net_p);
 }
 
 
@@ -32,7 +34,7 @@ static int __init hello_init(void)
     pr_info("hello_init begin\n");
 
 
-
+    net_seg_pton(input, &res_net, &res_prefix);
 
 
 
