@@ -8,6 +8,21 @@
 #include <linux/version.h>
 
 
+#include <linux/inet.h>
+
+
+const char* input = "10.16.118.56/24";
+__be32 res_net, res_prefix;
+
+
+
+static int net_set_pton(const char* input, __be32* res_net_p, __be32* res_prefix_p)
+{
+    const char* end = NULL;
+    int ret = in4_pton(input, sizeof(input), (u8*)res_net_p, '/', &end);
+}
+
+
 
 
 // module init ----------------------------------------------------------
@@ -15,6 +30,10 @@
 static int __init hello_init(void)
 {
     pr_info("hello_init begin\n");
+
+
+
+
 
 
     pr_info("hello_init end\n");
