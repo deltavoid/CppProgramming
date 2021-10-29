@@ -29,7 +29,7 @@ static int net_seg_pton(const char* input, unsigned* res_net_p, unsigned* res_pr
     int len = strlen(input);
     pr_debug("len: %d\n", len);
 
-    ret = in4_pton(input, strlen(input), (u8*)&res_net_net_seq, '/', &end);
+    ret = in4_pton(input, len, (u8*)&res_net_net_seq, '/', &end);
     pr_debug("res_net_p: %pI4\n", &res_net_net_seq);
     
     res_net_host_seq = ntohl(res_net_net_seq);
