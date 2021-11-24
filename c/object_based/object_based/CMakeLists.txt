@@ -18,8 +18,14 @@ message("CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
 
 
+add_library(hello STATIC 
+    hello.c)
+
 
 add_executable(main main.c)
-
+target_link_libraries(main
+    PRIVATE
+        hello
+)
 
 # message("hello CMakeLists end")
