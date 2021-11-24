@@ -34,7 +34,7 @@ void hello_impl_print_id(void* data)
 
 
 
-struct hello_ops hello_impl_ops = {
+const struct hello_ops hello_impl_ops = {
     .set_id = hello_impl_set_id,
     .get_id = hello_impl_get_id,
     .print_id = hello_impl_print_id,

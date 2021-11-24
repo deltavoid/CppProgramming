@@ -15,7 +15,7 @@ extern int hello_impl_get_id(void* data);
 extern void hello_impl_print_id(void* data);
 
 
-extern struct hello_ops hello_impl_ops;
+extern const struct hello_ops hello_impl_ops;
 
 
 
