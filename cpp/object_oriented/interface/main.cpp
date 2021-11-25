@@ -19,10 +19,21 @@ int main(int argc, char** argv, char** env)
     // for (int i = 0; i < argc; i++)
     //     printf("%s\n", argv[i]);
 
-    std::unique_ptr<Hello> hello = std::make_unique<HelloImpl>();
 
-    hello->setId(1);
-    hello->printId();
+    Hello* hello1 = new HelloImpl();
+    
+    hello1->setId(1);
+    hello1->printId();
+    
+    delete hello1;
+
+
+
+    std::unique_ptr<Hello> hello2 = std::make_unique<HelloImpl>();
+
+    hello2->setId(2);
+    hello2->printId();
+
 
     return 0;
 }
