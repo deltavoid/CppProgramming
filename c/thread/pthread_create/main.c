@@ -12,27 +12,21 @@
 pthread_t threads[THREAD_NUM];
 
 
+int thread_ids[THREAD_NUM];
 
 
 
-struct worker {
-    int id;
-};
 
-int worker_init(struct worker* obj, int id)
-{
-    obj->id = id;
-}
 
 void* worker_run(void* arg)
 {
-    struct worker* worker = (struct worker*)arg;
+    int id = *(int*)arg;
     int i;
 
 
     for (i = 0; i < 3; i++)
     {
-        printf("worker: %d, cnt: %d\n", worker->id, i);
+        printf("worker: %d, cnt: %d\n", id, i);
 
         sleep(1);
     }
@@ -41,7 +35,7 @@ void* worker_run(void* arg)
     return NULL;
 }
 
-struct worker workers[THREAD_NUM];
+
 
 
 int main(int argc, char** argv, char** env)
@@ -60,9 +54,9 @@ int main(int argc, char** argv, char** env)
 
     for (i = 0; i < THREAD_NUM; i++)
     {
-        worker_init(&workers[i], i);
+        thread_ids[i] = i;
 
-        ret = pthread_create(&threads[i], NULL, worker_run, (void*)&workers[i]);
+        ret = pthread_create(&threads[i], NULL, worker_run, (void*)&thread_ids[i]);
         if  (ret < 0)
             return -1;
     }
