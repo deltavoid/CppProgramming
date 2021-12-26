@@ -7,21 +7,49 @@
 
 
 
-#define THREAD_NUM 4
 
-pthread_t threads[THREAD_NUM];
 
+struct resource {
+    int cnt;
+    pthread_spinlock_t lock;
+};
+
+int resource_init(struct resource* obj)
+{
+    obj->cnt = 0;
+    pthread_spin_init(&obj->lock, 0);
+}
+
+void resource_exit(struct resource* obj)
+{
+    pthread_spin_destroy(&obj->lock);
+}
+
+int resource_inc_cnt(struct resource* obj)
+{
+    int ret;
+
+    pthread_spin_lock(&obj->lock);
+
+    ret = ++obj->cnt;
+
+    pthread_spin_unlock(&obj->lock);
+
+    return ret;
+}
 
 
 
 
 struct worker {
     int id;
+    struct resource* res;
 };
 
-int worker_init(struct worker* obj, int id)
+int worker_init(struct worker* obj, int id, struct resource* res)
 {
     obj->id = id;
+    obj->res = res;
 }
 
 void* worker_run(void* arg)
@@ -32,7 +60,9 @@ void* worker_run(void* arg)
 
     for (i = 0; i < 3; i++)
     {
-        printf("worker: %d, cnt: %d\n", worker->id, i);
+        int cnt = resource_inc_cnt(worker->res);
+
+        printf("worker: %d, i: %d, res cnt: %d\n", worker->id, i, cnt);
 
         sleep(1);
     }
@@ -40,6 +70,12 @@ void* worker_run(void* arg)
 
     return NULL;
 }
+
+
+
+#define THREAD_NUM 4
+
+pthread_t threads[THREAD_NUM];
 
 struct worker workers[THREAD_NUM];
 
@@ -57,10 +93,13 @@ int main(int argc, char** argv, char** env)
 
     int ret;
     int i;
+    struct resource res;
+
+    resource_init(&res);
 
     for (i = 0; i < THREAD_NUM; i++)
     {
-        worker_init(&workers[i], i);
+        worker_init(&workers[i], i, &res);
 
         ret = pthread_create(&threads[i], NULL, worker_run, (void*)&workers[i]);
         if  (ret < 0)
