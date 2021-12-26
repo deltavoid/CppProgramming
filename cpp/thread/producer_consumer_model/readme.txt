@@ -3,15 +3,20 @@
 
 
 
+pthread thread interface
+
 
 mutex 
 
-condition variable
 
 semaphore
 
+condition variable
 
-BlockingQueue == single blocking producer consumer 
 
 
-BoundedBlockingQueue == ProducerConsumer
+
+BlockingQueue == consumer blocked queue
+
+
+BoundedBlockingQueue == consumer and producer both blocked queue
