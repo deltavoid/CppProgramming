@@ -1,7 +1,7 @@
 
 
 
-extra cpp projects
+extra c/cpp projects
 
 
 
@@ -40,4 +40,25 @@ https://github.com/deltavoid/ccan
 
 
 
+
+dpvs
+
+
+tldk
+
+seastar
+
+
+
+
+
+
+extra kernal modules
+
+
+https://github.com/deltavoid/toa
+
+https://github.com/deltavoid/uoa
+
+https://github.com/deltavoid/multi_hook
 
