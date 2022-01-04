@@ -14,8 +14,9 @@ https://github.com/deltavoid/rdma_interface_example
 https://github.com/deltavoid/fbthrift_workspace
 
 
-https://github.com/deltavoid/cmake_directory1
+https://github.com/deltavoid/cmake_project1
 
+https://github.com/deltavoid/cmake_project2
 
 
 
