@@ -222,7 +222,7 @@ static bool sock_filter_and_display(const struct sock* sk, int func_level, const
 
     // pr_debug("%s\n", prefix);
     
-    current_display();
+    // current_display();
     sock_common_display(sk, prefix);
     
     
@@ -280,8 +280,10 @@ static int kretprobe__tcp_rcv_state_process(struct kretprobe_instance *ri, struc
     // struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
     
 
-    if  (!sock_filter_and_display(sk, 2, "kretprobe:tcp_rcv_state_process"))
-        return 0;
+    // if  (!sock_filter_and_display(sk, 2, "kretprobe:tcp_rcv_state_process"))
+    //     return 0;
+
+    sock_common_display(sk, "kretprobe:tcp_rcv_state_process");
 
     pr_debug("\n");
     return 0;
