@@ -255,7 +255,7 @@ static int kretprobe_entry__tcp_rcv_state_process(struct kretprobe_instance *ri,
 
     ctx->sk = NULL;
 
-    if  (!sock_filter_and_display(sk, 2, "kretprobe_entry:tcp_rcv_state_process"))
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_rcv_state_process"))
         return 0;
 
     // *shifted_tid_p = get_shifted_tid();
@@ -280,7 +280,7 @@ static int kretprobe__tcp_rcv_state_process(struct kretprobe_instance *ri, struc
     // struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
     
 
-    if  (!sock_filter_and_display(sk, 2, "kretprobe:tcp_v4_syn_recv_sock"))
+    if  (!sock_filter_and_display(sk, 2, "kretprobe:tcp_rcv_state_process"))
         return 0;
 
     pr_debug("\n");
@@ -770,13 +770,13 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 33
+#define kprobe_num 32
 
 static struct kprobe kprobes[kprobe_num] = {
-    {
-        .symbol_name	= "tcp_rcv_state_process",
-        .pre_handler = kprobe__tcp_rcv_state_process,
-    },    
+    // {
+    //     .symbol_name	= "tcp_rcv_state_process",
+    //     .pre_handler = kprobe__tcp_rcv_state_process,
+    // },    
     {
         .symbol_name	= "tcp_conn_request",
         .pre_handler = kprobe__tcp_conn_request,
