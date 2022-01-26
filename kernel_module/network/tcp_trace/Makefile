@@ -38,7 +38,8 @@ clean:
 
 
 insmod: rmmod build
-	sudo insmod $(MODULE_NAME).ko local_port=8192 remote_port=0 enable_ipv4=1 enable_ipv6=1
+# 	sudo insmod $(MODULE_NAME).ko local_port=8192 remote_port=0 enable_ipv4=1 enable_ipv6=1
+	sudo insmod $(MODULE_NAME).ko local_port=8080 remote_port=0 enable_ipv4=1 enable_ipv6=0
 
 rmmod:
 	-sudo rmmod $(MODULE_NAME)
