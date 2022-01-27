@@ -855,19 +855,10 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 33
+#define kprobe_num 32
 
 static struct kprobe kprobes[kprobe_num] = {
-    kprobe_hook__tcp_v4_do_rcv,
-
-    // {
-    //     .symbol_name	= "tcp_v4_do_rcv",
-    //     .pre_handler = kprobe__tcp_v4_do_rcv,
-    // },
-    // {
-    //     .symbol_name	= "tcp_rcv_state_process",
-    //     .pre_handler = kprobe__tcp_rcv_state_process,
-    // },    
+    // kprobe_hook__tcp_v4_do_rcv,   
     // kprobe_hook__tcp_rcv_state_process,
     {
         .symbol_name	= "tcp_conn_request",
