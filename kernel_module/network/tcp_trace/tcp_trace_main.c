@@ -270,6 +270,12 @@ static int kprobe__tcp_rcv_state_process(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+const struct kprobe kprobe_hook__tcp_rcv_state_process = {
+    .symbol_name	= "tcp_rcv_state_process",
+    .pre_handler = kprobe__tcp_rcv_state_process,
+};
+
+
 
 struct tcp_rcv_state_process__ctx {
     // unsigned shifted_tid;
@@ -804,7 +810,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 33
+#define kprobe_num 34
 
 static struct kprobe kprobes[kprobe_num] = {
 
@@ -816,6 +822,7 @@ static struct kprobe kprobes[kprobe_num] = {
     //     .symbol_name	= "tcp_rcv_state_process",
     //     .pre_handler = kprobe__tcp_rcv_state_process,
     // },    
+    kprobe_hook__tcp_rcv_state_process,
     {
         .symbol_name	= "tcp_conn_request",
         .pre_handler = kprobe__tcp_conn_request,
