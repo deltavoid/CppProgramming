@@ -245,7 +245,17 @@ static int kprobe__tcp_v4_do_rcv(struct kprobe *p, struct pt_regs *regs)
 
 
 
+typedef struct sock* sock_pointer;
 
+static int kretprobe_entry__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    return 0;
+}
+
+static int kretprobe__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    return 0;
+}
 
 
 
