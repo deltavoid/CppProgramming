@@ -458,9 +458,13 @@ static int kprobe__tcp_set_state(struct kprobe *p, struct pt_regs *regs)
     // pr_debug("kprobe:tcp_set_state: %s -> %s\n", 
     //         tcp_state_desc[sk->sk_state], tcp_state_desc[dest_state]);
 
-    current_display();
+    // current_display();
     sock_common_display(sk, "kprobe:tcp_set_state");
     
+    pr_debug("%s -> %s\n", 
+            tcp_state_desc[sk->sk_state], tcp_state_desc[dest_state]);
+
+
     // dump_stack();
 
     pr_debug("\n");
