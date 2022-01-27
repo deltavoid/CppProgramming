@@ -243,6 +243,10 @@ static int kprobe__tcp_v4_do_rcv(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+const struct kprobe kprobe_hook__tcp_v4_do_rcv = {
+    .symbol_name	= "tcp_v4_do_rcv",
+    .pre_handler = kprobe__tcp_v4_do_rcv,
+};
 
 
 // typedef struct sock* sock_pointer;
@@ -262,6 +266,7 @@ static int kretprobe_entry__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct 
     ctx->sk = sk;
 
     pr_debug("\n");
+    return 0;
 }
 
 static int kretprobe__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -850,19 +855,20 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 34
+#define kprobe_num 33
 
 static struct kprobe kprobes[kprobe_num] = {
+    kprobe_hook__tcp_v4_do_rcv,
 
-    {
-        .symbol_name	= "tcp_v4_do_rcv",
-        .pre_handler = kprobe__tcp_v4_do_rcv,
-    },
+    // {
+    //     .symbol_name	= "tcp_v4_do_rcv",
+    //     .pre_handler = kprobe__tcp_v4_do_rcv,
+    // },
     // {
     //     .symbol_name	= "tcp_rcv_state_process",
     //     .pre_handler = kprobe__tcp_rcv_state_process,
     // },    
-    kprobe_hook__tcp_rcv_state_process,
+    // kprobe_hook__tcp_rcv_state_process,
     {
         .symbol_name	= "tcp_conn_request",
         .pre_handler = kprobe__tcp_conn_request,
