@@ -185,7 +185,7 @@ static void sock_common_display(const struct sock* sk, const char* prefix)
         u32 local_addr = sk->sk_rcv_saddr;
         u32 remote_addr = sk->sk_daddr;
 
-        pr_debug("%-24s  sock: 0x%lx, local: %pI4:%d, remote: %pI4:%d, state: %s\n",
+        pr_debug("%-25s  sock: 0x%lx, local: %pI4:%d, remote: %pI4:%d, state: %s\n",
                 prefix, (unsigned long)sk, &local_addr, local_port, &remote_addr, remote_port, tcp_state_desc[state]);
     }
     else if  (family == AF_INET6)
@@ -193,7 +193,7 @@ static void sock_common_display(const struct sock* sk, const char* prefix)
         struct in6_addr local_addr = sk->sk_v6_rcv_saddr;
         struct in6_addr remote_addr = sk->sk_v6_daddr;
 
-        pr_debug("%-24s  sock: 0x%lx, local: [%pI6]:%d, remote: [%pI6]:%d state: %s\n",
+        pr_debug("%-25s  sock: 0x%lx, local: [%pI6]:%d, remote: [%pI6]:%d state: %s\n",
                 prefix, (unsigned long)sk, &local_addr, local_port, &remote_addr, remote_port, tcp_state_desc[state]);
     }
 }
@@ -239,7 +239,7 @@ static int kprobe__tcp_v4_do_rcv(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_do_rcv"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -265,7 +265,7 @@ static int kretprobe_entry__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct 
 
     ctx->sk = sk;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -301,7 +301,7 @@ static int kprobe__tcp_rcv_state_process(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_rcv_state_process"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -332,7 +332,7 @@ static int kretprobe_entry__tcp_rcv_state_process(struct kretprobe_instance *ri,
     ctx->sk = sk;
 
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 
 }
@@ -354,7 +354,7 @@ static int kretprobe__tcp_rcv_state_process(struct kretprobe_instance *ri, struc
 
     sock_common_display(sk, "kretprobe:tcp_rcv_state_process");
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -377,7 +377,7 @@ static int kprobe__tcp_conn_request(struct kprobe *p, struct pt_regs *regs)
         return 0;
 
     // dump_stack();
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -388,7 +388,7 @@ static int kprobe__tcp_v4_send_synack(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_send_synack"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -399,7 +399,7 @@ static int kprobe__tcp_check_req(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_check_req"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -412,7 +412,7 @@ static int kprobe__tcp_v4_syn_recv_sock(struct kprobe *p, struct pt_regs *regs)
 
     // dump_stack();
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -424,7 +424,7 @@ static int kretprobe__tcp_v4_syn_recv_sock(struct kretprobe_instance *ri, struct
     if  (!sock_filter_and_display(req_sock, 2, "kretprobe:tcp_v4_syn_recv_sock"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -435,7 +435,7 @@ static int kprobe__tcp_create_openreq_child(struct kprobe *p, struct pt_regs *re
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_create_openreq_child"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -446,7 +446,7 @@ static int kprobe__inet_csk_clone_lock(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:inet_csk_clone_lock"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -458,7 +458,7 @@ static int kprobe__tcp_child_process(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_child_process"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -471,7 +471,7 @@ static int kretprobe_inet_csk_accept(struct kretprobe_instance *ri, struct pt_re
     if  (!sock_filter_and_display(newsk, 2, "kretprobe:inet_csk_accept"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -483,7 +483,7 @@ static int kretprobe_inet_csk_accept(struct kretprobe_instance *ri, struct pt_re
 //     if  (!sock_filter_and_display(sk, "kprobe:tcp_v4_connect"))
 //         return 0;
 
-//     pr_debug("\n");
+//     // pr_debug("\n");
 //     return 0;
 // }
 
@@ -495,7 +495,7 @@ static int kprobe__inet_hash_connect(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:inet_hash_connect"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -507,7 +507,7 @@ static int kprobe__tcp_connect(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_connect"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -520,7 +520,7 @@ static int kprobe__tcp_finish_connect(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_finish_connect"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -546,7 +546,7 @@ static int kprobe__tcp_set_state(struct kprobe *p, struct pt_regs *regs)
 
     // dump_stack();
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -559,7 +559,7 @@ static int kprobe__tcp_close(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_close"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -571,7 +571,7 @@ static int kprobe__tcp_fin(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_fin"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -585,7 +585,7 @@ static int kprobe__tcp_done(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_done"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -597,7 +597,7 @@ static int kprobe__inet_csk_destroy_sock(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:inet_csk_destroy_sock"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -613,7 +613,7 @@ static int kprobe__tcp_time_wait(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_time_wait"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -625,7 +625,7 @@ static int kprobe__inet_twsk_kill(struct kprobe *p, struct pt_regs *regs)
         return 0;
 
     // dump_stack();
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -636,7 +636,7 @@ static int kprobe__tcp_timewait_state_process(struct kprobe *p, struct pt_regs *
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_timewait_state_process"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -651,7 +651,7 @@ static int kprobe__tcp_reset(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_reset"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -660,7 +660,7 @@ static void trace__tcp_receive_reset(struct sock* sk)
     if  (!sock_filter_and_display(sk, 2, "trace:tcp_receive_reset"))
         return;
 
-    pr_debug("\n");
+    // pr_debug("\n");
 }
 
 
@@ -671,7 +671,7 @@ static int kprobe__tcp_v4_send_reset(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_send_reset"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -680,7 +680,7 @@ static void trace__tcp_send_reset(const struct sock *sk, const struct sk_buff *s
     if  (!sock_filter_and_display(sk, 2, "trace:tcp_send_reset"))
         return;
 
-    pr_debug("\n");
+    // pr_debug("\n");
 }
 
 
@@ -693,7 +693,7 @@ static int kprobe__tcp_rcv_established(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_rcv_established"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -706,7 +706,7 @@ static int kprobe____tcp_transmit_skb(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:__tcp_transmit_skb"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -718,7 +718,7 @@ static int kprobe__tcp_write_xmit(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_write_xmit"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -732,7 +732,7 @@ static int kprobe__tcp_recvmsg(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_recvmsg"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -744,7 +744,7 @@ static int kprobe__tcp_sendmsg(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_sendmsg"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -758,7 +758,7 @@ static int kprobe__sock_def_wakeup(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:sock_def_wakeup"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -769,7 +769,7 @@ static int kprobe__sock_def_readable(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:sock_def_readable"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -780,7 +780,7 @@ static int kprobe__sock_def_write_space(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:sock_def_write_space"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -791,7 +791,7 @@ static int kprobe__sk_stream_write_space(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:sk_stream_write_space"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -806,7 +806,7 @@ static int kprobe__tcp_write_timer(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_write_timer"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -817,7 +817,7 @@ static int kprobe__tcp_delack_timer(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_delack_timer"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -828,7 +828,7 @@ static int kprobe__tcp_keepalive_timer(struct kprobe *p, struct pt_regs *regs)
     if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_keepalive_timer"))
         return 0;
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
