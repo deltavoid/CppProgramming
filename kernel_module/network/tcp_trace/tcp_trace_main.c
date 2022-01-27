@@ -231,6 +231,24 @@ static bool sock_filter_and_display(const struct sock* sk, int func_level, const
 
 // tcp connection hook point ----------------------------------------
 
+
+static int kprobe__tcp_v4_do_rcv(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_do_rcv"))
+        return 0;
+
+    pr_debug("\n");
+    return 0;
+}
+
+
+
+
+
+
+
 static int kprobe__tcp_rcv_state_process(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
@@ -776,9 +794,14 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 32
+#define kprobe_num 33
 
 static struct kprobe kprobes[kprobe_num] = {
+
+    {
+        .symbol_name	= "tcp_v4_do_rcv",
+        .pre_handler = kprobe__tcp_v4_do_rcv,
+    },
     // {
     //     .symbol_name	= "tcp_rcv_state_process",
     //     .pre_handler = kprobe__tcp_rcv_state_process,
