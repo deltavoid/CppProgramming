@@ -245,18 +245,48 @@ static int kprobe__tcp_v4_do_rcv(struct kprobe *p, struct pt_regs *regs)
 
 
 
-typedef struct sock* sock_pointer;
+// typedef struct sock* sock_pointer;
+struct kretprobe_tcp_common_ctx {
+    struct sock* sk;
+};
 
 static int kretprobe_entry__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
-    return 0;
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+    ctx->sk = NULL;
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_do_rcv"))
+        return 0;
+
+    ctx->sk = sk;
+
+    pr_debug("\n");
 }
 
 static int kretprobe__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
+    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+    struct sock* sk = ctx->sk;
+
+    if  (!sk)
+        return 0;
+
+    sock_common_display(sk, "kretprobe:tcp_v4_do_rcv");
+
+    pr_debug("\n");
     return 0;
 }
 
+const struct kretprobe kretprobe_hook__tcp_v4_do_rcv = {
+    .kp = {
+        .symbol_name = "tcp_v4_do_rcv",
+    },
+    .entry_handler = kretprobe_entry__tcp_v4_do_rcv,
+    .handler = kretprobe__tcp_v4_do_rcv,
+    .data_size = sizeof(struct kretprobe_tcp_common_ctx),
+    .maxactive = 64,
+};
 
 
 static int kprobe__tcp_rcv_state_process(struct kprobe *p, struct pt_regs *regs)
@@ -969,7 +999,7 @@ static struct kprobe kprobes[kprobe_num] = {
 
 
 
-#define kretprobe_num 3
+#define kretprobe_num 4
 
 static struct kretprobe kretprobes[kretprobe_num] = {
     {
@@ -996,6 +1026,7 @@ static struct kretprobe kretprobes[kretprobe_num] = {
 	//     .maxactive = 64,
     // },
     kretprobe_hook__tcp_rcv_state_process,
+    kretprobe_hook__tcp_v4_do_rcv,
 };
 
 
