@@ -323,6 +323,16 @@ static int kretprobe__tcp_rcv_state_process(struct kretprobe_instance *ri, struc
     return 0;
 }
 
+const struct kretprobe kretprobe_hook__tcp_rcv_state_process = {
+    .kp = {
+        .symbol_name = "tcp_rcv_state_process",
+    },
+    .entry_handler = kretprobe_entry__tcp_rcv_state_process,
+    .handler = kretprobe__tcp_rcv_state_process,
+    .data_size = sizeof(struct tcp_rcv_state_process__ctx),
+    .maxactive = 64,
+};
+
 
 static int kprobe__tcp_conn_request(struct kprobe *p, struct pt_regs *regs)
 {
@@ -976,15 +986,16 @@ static struct kretprobe kretprobes[kretprobe_num] = {
 	    .handler = kretprobe__tcp_v4_syn_recv_sock,
 	    .maxactive = 64,
     },
-    {
-        .kp = {
-            .symbol_name = "tcp_rcv_state_process",
-        },
-        .entry_handler = kretprobe_entry__tcp_rcv_state_process,
-	    .handler = kretprobe__tcp_rcv_state_process,
-        .data_size = sizeof(struct tcp_rcv_state_process__ctx),
-	    .maxactive = 64,
-    },
+    // {
+    //     .kp = {
+    //         .symbol_name = "tcp_rcv_state_process",
+    //     },
+    //     .entry_handler = kretprobe_entry__tcp_rcv_state_process,
+	//     .handler = kretprobe__tcp_rcv_state_process,
+    //     .data_size = sizeof(struct tcp_rcv_state_process__ctx),
+	//     .maxactive = 64,
+    // },
+    kretprobe_hook__tcp_rcv_state_process,
 };
 
 
