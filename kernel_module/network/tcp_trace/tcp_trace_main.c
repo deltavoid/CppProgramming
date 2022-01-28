@@ -988,7 +988,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 32
+#define kprobe_num 30
 
 static struct kprobe kprobes[kprobe_num] = {
     // kprobe_hook__tcp_v4_do_rcv,   
@@ -1096,15 +1096,15 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "tcp_write_xmit",
         .pre_handler = kprobe__tcp_write_xmit,
     },
-    {
-        .symbol_name	= "tcp_recvmsg",
-        .pre_handler = kprobe__tcp_recvmsg,
-    },
+    // {
+    //     .symbol_name	= "tcp_recvmsg",
+    //     .pre_handler = kprobe__tcp_recvmsg,
+    // },
     // {
     //     .symbol_name	= "tcp_sendmsg",
     //     .pre_handler = kprobe__tcp_sendmsg,
     // },
-    kprobe_hook__tcp_sendmsg,
+    // kprobe_hook__tcp_sendmsg,
     {
         .symbol_name	= "tcp_write_timer",
         .pre_handler = kprobe__tcp_write_timer,
