@@ -185,7 +185,7 @@ static void sock_common_display(const struct sock* sk, const char* prefix)
         u32 local_addr = sk->sk_rcv_saddr;
         u32 remote_addr = sk->sk_daddr;
 
-        pr_debug("%-25s  sock: 0x%lx, local: %pI4:%d, remote: %pI4:%d, state: %s\n",
+        pr_debug("%-32s  sock: 0x%lx, local: %pI4:%d, remote: %pI4:%d, state: %s\n",
                 prefix, (unsigned long)sk, &local_addr, local_port, &remote_addr, remote_port, tcp_state_desc[state]);
     }
     else if  (family == AF_INET6)
@@ -193,7 +193,7 @@ static void sock_common_display(const struct sock* sk, const char* prefix)
         struct in6_addr local_addr = sk->sk_v6_rcv_saddr;
         struct in6_addr remote_addr = sk->sk_v6_daddr;
 
-        pr_debug("%-25s  sock: 0x%lx, local: [%pI6]:%d, remote: [%pI6]:%d state: %s\n",
+        pr_debug("%-32s  sock: 0x%lx, local: [%pI6]:%d, remote: [%pI6]:%d state: %s\n",
                 prefix, (unsigned long)sk, &local_addr, local_port, &remote_addr, remote_port, tcp_state_desc[state]);
     }
 }
@@ -471,7 +471,7 @@ static int kretprobe_inet_csk_accept(struct kretprobe_instance *ri, struct pt_re
     if  (!sock_filter_and_display(newsk, 2, "kretprobe:inet_csk_accept"))
         return 0;
 
-    // pr_debug("\n");
+    pr_debug("\n");
     return 0;
 }
 
