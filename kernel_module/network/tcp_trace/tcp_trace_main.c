@@ -381,6 +381,11 @@ static int kprobe__tcp_conn_request(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+const struct kprobe kprobe_hook__tcp_conn_request = {
+        .symbol_name	= "tcp_conn_request",
+        .pre_handler = kprobe__tcp_conn_request,
+};
+
 static int kprobe__tcp_v4_send_synack(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 3);
@@ -392,6 +397,12 @@ static int kprobe__tcp_v4_send_synack(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+const struct kprobe kprobe_hook__tcp_v4_send_synack = 
+    {
+        .symbol_name	= "tcp_v4_send_synack",
+        .pre_handler = kprobe__tcp_v4_send_synack,
+    };
+
 static int kprobe__tcp_check_req(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
@@ -402,6 +413,12 @@ static int kprobe__tcp_check_req(struct kprobe *p, struct pt_regs *regs)
     // pr_debug("\n");
     return 0;
 }
+
+const struct kprobe kprobe_hook__tcp_check_req = 
+    {
+        .symbol_name	= "tcp_check_req",
+        .pre_handler = kprobe__tcp_check_req,
+    };
 
 static int kprobe__tcp_v4_syn_recv_sock(struct kprobe *p, struct pt_regs *regs)
 {
@@ -416,6 +433,11 @@ static int kprobe__tcp_v4_syn_recv_sock(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+const struct kprobe kprobe_hook__tcp_v4_syn_recv_sock = 
+    {
+        .symbol_name	= "tcp_v4_syn_recv_sock",
+        .pre_handler = kprobe__tcp_v4_syn_recv_sock,
+    };
 
 static int kretprobe__tcp_v4_syn_recv_sock(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -439,6 +461,12 @@ static int kprobe__tcp_create_openreq_child(struct kprobe *p, struct pt_regs *re
     return 0;
 }
 
+const struct kprobe kprobe_hook__tcp_create_openreq_child = 
+    {
+        .symbol_name	= "tcp_create_openreq_child",
+        .pre_handler = kprobe__tcp_create_openreq_child,
+    };
+
 static int kprobe__inet_csk_clone_lock(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
@@ -450,6 +478,11 @@ static int kprobe__inet_csk_clone_lock(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+const struct kprobe kprobe_hook__inet_csk_clone_lock = 
+    {
+        .symbol_name	= "inet_csk_clone_lock",
+        .pre_handler = kprobe__inet_csk_clone_lock,
+    };
 
 static int kprobe__tcp_child_process(struct kprobe *p, struct pt_regs *regs)
 {
@@ -462,7 +495,11 @@ static int kprobe__tcp_child_process(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
-
+const struct kprobe kprobe_hook__tcp_child_process = 
+    {
+        .symbol_name	= "tcp_child_process",
+        .pre_handler = kprobe__tcp_child_process,
+    };
 
 static int kretprobe_inet_csk_accept(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -860,34 +897,41 @@ static struct tracepoint_probe_context sched_probes = {
 static struct kprobe kprobes[kprobe_num] = {
     // kprobe_hook__tcp_v4_do_rcv,   
     // kprobe_hook__tcp_rcv_state_process,
-    {
-        .symbol_name	= "tcp_conn_request",
-        .pre_handler = kprobe__tcp_conn_request,
-    },
-    {
-        .symbol_name	= "tcp_v4_send_synack",
-        .pre_handler = kprobe__tcp_v4_send_synack,
-    },
-    {
-        .symbol_name	= "tcp_check_req",
-        .pre_handler = kprobe__tcp_check_req,
-    },
-    {
-        .symbol_name	= "tcp_v4_syn_recv_sock",
-        .pre_handler = kprobe__tcp_v4_syn_recv_sock,
-    },
-    {
-        .symbol_name	= "tcp_create_openreq_child",
-        .pre_handler = kprobe__tcp_create_openreq_child,
-    },
-    {
-        .symbol_name	= "inet_csk_clone_lock",
-        .pre_handler = kprobe__inet_csk_clone_lock,
-    },
-    {
-        .symbol_name	= "tcp_child_process",
-        .pre_handler = kprobe__tcp_child_process,
-    },
+    // {
+    //     .symbol_name	= "tcp_conn_request",
+    //     .pre_handler = kprobe__tcp_conn_request,
+    // },
+    kprobe_hook__tcp_conn_request,
+    // {
+    //     .symbol_name	= "tcp_v4_send_synack",
+    //     .pre_handler = kprobe__tcp_v4_send_synack,
+    // },
+    kprobe_hook__tcp_v4_send_synack,
+    // {
+    //     .symbol_name	= "tcp_check_req",
+    //     .pre_handler = kprobe__tcp_check_req,
+    // },
+    kprobe_hook__tcp_check_req,
+    // {
+    //     .symbol_name	= "tcp_v4_syn_recv_sock",
+    //     .pre_handler = kprobe__tcp_v4_syn_recv_sock,
+    // },
+    kprobe_hook__tcp_v4_syn_recv_sock,
+    // {
+    //     .symbol_name	= "tcp_create_openreq_child",
+    //     .pre_handler = kprobe__tcp_create_openreq_child,
+    // },
+    kprobe_hook__tcp_create_openreq_child,
+    // {
+    //     .symbol_name	= "inet_csk_clone_lock",
+    //     .pre_handler = kprobe__inet_csk_clone_lock,
+    // },
+    kprobe_hook__inet_csk_clone_lock,
+    // {
+    //     .symbol_name	= "tcp_child_process",
+    //     .pre_handler = kprobe__tcp_child_process,
+    // },
+    kprobe_hook__tcp_child_process,
     {
         .symbol_name	= "tcp_set_state",
         .pre_handler = kprobe__tcp_set_state,
