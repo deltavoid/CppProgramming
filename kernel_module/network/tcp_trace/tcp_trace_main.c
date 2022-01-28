@@ -630,7 +630,7 @@ static int kretprobe__tcp_close(struct kretprobe_instance *ri, struct pt_regs *r
     // for close may destroy the sock, so just print sk addr.
     pr_debug("%-32s  sock: 0x%lx\n", "kretprobe:tcp_close", sk);
 
-    // pr_debug("\n");
+    pr_debug("\n");
     return 0;
 }
 
@@ -852,7 +852,7 @@ static int kretprobe__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs 
 
     sock_common_display(sk, "kretprobe:tcp_recvmsg");
 
-    // pr_debug("\n");
+    pr_debug("\n");
     return 0;
 }
 
@@ -914,7 +914,7 @@ static int kretprobe__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs 
 
     sock_common_display(sk, "kretprobe:tcp_sendmsg");
 
-    // pr_debug("\n");
+    pr_debug("\n");
     return 0;
 }
 
