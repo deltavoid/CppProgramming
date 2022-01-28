@@ -785,6 +785,56 @@ static int kprobe__tcp_sendmsg(struct kprobe *p, struct pt_regs *regs)
     return 0;
 }
 
+const struct kprobe kprobe_hook__tcp_sendmsg = 
+    {
+        .symbol_name	= "tcp_sendmsg",
+        .pre_handler = kprobe__tcp_sendmsg,
+    };
+
+
+
+
+static int kretprobe_entry__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+    ctx->sk = NULL;
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_sendmsg"))
+        return 0;
+
+    ctx->sk = sk;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+
+static int kretprobe__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+    struct sock* sk = ctx->sk;
+
+    if  (!sk)
+        return 0;
+
+    sock_common_display(sk, "kretprobe:tcp_sendmsg");
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kretprobe kretprobe_hook__tcp_sendmsg = {
+    .kp = {
+        .symbol_name = "tcp_sendmsg",
+    },
+    .entry_handler = kretprobe_entry__tcp_sendmsg,
+    .handler = kretprobe__tcp_sendmsg,
+    .data_size = sizeof(struct kretprobe_tcp_common_ctx),
+    .maxactive = 64,
+};
+
+
 // tcp_poll -------------------------------------------------------
 
 
@@ -1004,10 +1054,11 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "tcp_recvmsg",
         .pre_handler = kprobe__tcp_recvmsg,
     },
-    {
-        .symbol_name	= "tcp_sendmsg",
-        .pre_handler = kprobe__tcp_sendmsg,
-    },
+    // {
+    //     .symbol_name	= "tcp_sendmsg",
+    //     .pre_handler = kprobe__tcp_sendmsg,
+    // },
+    kprobe_hook__tcp_sendmsg,
     {
         .symbol_name	= "tcp_write_timer",
         .pre_handler = kprobe__tcp_write_timer,
@@ -1040,7 +1091,7 @@ static struct kprobe kprobes[kprobe_num] = {
 
 
 
-#define kretprobe_num 4
+#define kretprobe_num 5
 
 static struct kretprobe kretprobes[kretprobe_num] = {
     {
@@ -1068,6 +1119,7 @@ static struct kretprobe kretprobes[kretprobe_num] = {
     // },
     kretprobe_hook__tcp_rcv_state_process,
     kretprobe_hook__tcp_v4_do_rcv,
+    kretprobe_hook__tcp_sendmsg,
 };
 
 
