@@ -234,6 +234,57 @@ const struct kprobe kprobe_hook__tcp_check_req =
         .pre_handler = kprobe__tcp_check_req,
     };
 
+static int kprobe__tcp_create_openreq_child(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_create_openreq_child"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kprobe kprobe_hook__tcp_create_openreq_child = {
+    .symbol_name	= "tcp_create_openreq_child",
+    .pre_handler = kprobe__tcp_create_openreq_child,
+};
+
+
+
+
+static int kprobe__inet_csk_clone_lock(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:inet_csk_clone_lock"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kprobe kprobe_hook__inet_csk_clone_lock = {
+    .symbol_name	= "inet_csk_clone_lock",
+    .pre_handler = kprobe__inet_csk_clone_lock,
+};
+
+
+static int kprobe__tcp_child_process(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_child_process"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kprobe kprobe_hook__tcp_child_process = {
+    .symbol_name	= "tcp_child_process",
+    .pre_handler = kprobe__tcp_child_process,
+};
 
 
 
@@ -292,7 +343,7 @@ const struct kretprobe kretprobe_hook__tcp_close = {
 
 // init -----------------------------------------
 
-#define kprobe_num 4
+#define kprobe_num 7
 
 static struct kprobe kprobes[kprobe_num] = {
 
@@ -301,6 +352,10 @@ static struct kprobe kprobes[kprobe_num] = {
 
     kprobe_hook__tcp_check_req,
     kprobe_hook__tcp_v4_syn_recv_sock,
+
+    kprobe_hook__tcp_create_openreq_child,
+    kprobe_hook__inet_csk_clone_lock,
+    kprobe_hook__tcp_child_process,
 
 
 
