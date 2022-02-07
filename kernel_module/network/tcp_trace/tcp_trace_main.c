@@ -123,6 +123,7 @@ static void __exit tcp_trace_exit(void)
     pr_debug("------------------------------------------------------------------\n");
 }
 
-module_init(tcp_trace_init)
-module_exit(tcp_trace_exit)
+module_init(tcp_trace_init);
+module_exit(tcp_trace_exit);
 MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Qianyu Zhang <850074816@qq.com>");
