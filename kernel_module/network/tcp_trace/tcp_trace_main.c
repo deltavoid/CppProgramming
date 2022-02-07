@@ -386,22 +386,22 @@ const struct kretprobe kretprobe_hook__tcp_rcv_state_process = {
 //         .pre_handler = kprobe__tcp_conn_request,
 // };
 
-static int kprobe__tcp_v4_send_synack(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 3);
+// static int kprobe__tcp_v4_send_synack(struct kprobe *p, struct pt_regs *regs)
+// {
+//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 3);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_send_synack"))
-        return 0;
+//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_send_synack"))
+//         return 0;
 
-    // pr_debug("\n");
-    return 0;
-}
+//     // pr_debug("\n");
+//     return 0;
+// }
 
-const struct kprobe kprobe_hook__tcp_v4_send_synack = 
-    {
-        .symbol_name	= "tcp_v4_send_synack",
-        .pre_handler = kprobe__tcp_v4_send_synack,
-    };
+// const struct kprobe kprobe_hook__tcp_v4_send_synack = 
+//     {
+//         .symbol_name	= "tcp_v4_send_synack",
+//         .pre_handler = kprobe__tcp_v4_send_synack,
+//     };
 
 static int kprobe__tcp_check_req(struct kprobe *p, struct pt_regs *regs)
 {
@@ -1036,7 +1036,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 28
+#define kprobe_num 27
 
 static struct kprobe kprobes[kprobe_num] = {
     // kprobe_hook__tcp_v4_do_rcv,   
@@ -1050,7 +1050,7 @@ static struct kprobe kprobes[kprobe_num] = {
     //     .symbol_name	= "tcp_v4_send_synack",
     //     .pre_handler = kprobe__tcp_v4_send_synack,
     // },
-    kprobe_hook__tcp_v4_send_synack,
+    // kprobe_hook__tcp_v4_send_synack,
     // {
     //     .symbol_name	= "tcp_check_req",
     //     .pre_handler = kprobe__tcp_check_req,
