@@ -106,6 +106,14 @@ int tcp_trace_conn_init(void)
     {   pr_warn("register kprobes_failed\n");
     }
 
+
+    ret = kretprobes_init(kretprobes, kretprobe_num);
+    if  (ret < 0)
+    {   pr_warn("register kretprobes failed\n");
+    }
+
+
+
     pr_debug("tcp_trace_conn_init: 2, end\n");
     return 0;
 }
@@ -115,6 +123,8 @@ void tcp_trace_conn_exit(void)
     pr_debug("tcp_trace_conn_exit: 1\n");
 
     kprobes_exit(kprobes, kprobe_num);
+
+    kretprobes_exit(kretprobes, kretprobe_num);
 
 
     pr_debug("tcp_trace_conn_exit: 2, end\n");

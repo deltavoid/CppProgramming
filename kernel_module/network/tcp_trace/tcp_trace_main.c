@@ -1185,7 +1185,7 @@ static struct kprobe kprobes[kprobe_num] = {
 
 
 
-#define kretprobe_num 7
+#define kretprobe_num 6
 
 static struct kretprobe kretprobes[kretprobe_num] = {
     {
