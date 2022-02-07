@@ -2,7 +2,6 @@
 #define TCP_TRACE_H
 
 
-#include <stdbool.h>
 
 #include <linux/sched.h>
 
@@ -36,8 +35,8 @@ static inline unsigned get_shifted_tid(void)
     return current->pid + smp_processor_id();
 }
 
-
 extern const char* tcp_state_desc[TCP_MAX_STATES];
+
 
 
 struct sock_filter_config {
@@ -50,9 +49,16 @@ struct sock_filter_config {
 
 extern void sock_filter_config_display(struct sock_filter_config* config);
 
+
+// default global configuraiotn
+extern struct sock_filter_config sock_config;
+
+// depends on sock_config
 extern bool sock_filter(const struct sock* sk, int func_level);
 extern void sock_common_display(const struct sock* sk, const char* prefix);
 extern bool sock_filter_and_display(const struct sock* sk, int func_level, const char* prefix);
+
+
 
 
 
