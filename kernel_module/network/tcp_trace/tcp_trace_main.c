@@ -276,17 +276,17 @@ static int __init tcp_trace_init(void)
 
 
 
-    ret = kprobes_init(kprobes, kprobe_num);
-    if  (ret < 0)
-    {   pr_warn("register kprobes failed\n");
-        goto kprobes_init_failed;
-    }
+    // ret = kprobes_init(kprobes, kprobe_num);
+    // if  (ret < 0)
+    // {   pr_warn("register kprobes failed\n");
+    //     goto kprobes_init_failed;
+    // }
        
-    ret = kretprobes_init(kretprobes, kretprobe_num);
-    if  (ret < 0)
-    {   pr_warn("register kretprobes failed\n");
-        goto kretprobes_init_failed;
-    }
+    // ret = kretprobes_init(kretprobes, kretprobe_num);
+    // if  (ret < 0)
+    // {   pr_warn("register kretprobes failed\n");
+    //     goto kretprobes_init_failed;
+    // }
 
     ret = tcp_trace_conn_init();
     if  (ret < 0)
@@ -316,9 +316,9 @@ static void __exit tcp_trace_exit(void)
 
 
 
-    kprobes_exit(kprobes, kprobe_num);
+    // kprobes_exit(kprobes, kprobe_num);
 
-    kretprobes_exit(kretprobes, kretprobe_num);
+    // kretprobes_exit(kretprobes, kretprobe_num);
     
     tcp_trace_conn_exit();
 
