@@ -905,10 +905,6 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "tcp_set_state",
         .pre_handler = kprobe__tcp_set_state,
     },
-    // {
-    //     .symbol_name	= "tcp_v4_connect",
-    //     .pre_handler = kprobe__tcp_v4_connect,
-    // },
     {
         .symbol_name	= "inet_hash_connect",
         .pre_handler = kprobe__inet_hash_connect,
@@ -921,10 +917,6 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "tcp_finish_connect",
         .pre_handler = kprobe__tcp_finish_connect,
     },
-    // {
-    //     .symbol_name	= "tcp_close",
-    //     .pre_handler = kprobe__tcp_close,
-    // },
     {
         .symbol_name	= "tcp_fin",
         .pre_handler = kprobe__tcp_fin,
@@ -969,15 +961,6 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "tcp_write_xmit",
         .pre_handler = kprobe__tcp_write_xmit,
     },
-    // {
-    //     .symbol_name	= "tcp_recvmsg",
-    //     .pre_handler = kprobe__tcp_recvmsg,
-    // },
-    // {
-    //     .symbol_name	= "tcp_sendmsg",
-    //     .pre_handler = kprobe__tcp_sendmsg,
-    // },
-    // kprobe_hook__tcp_sendmsg,
     {
         .symbol_name	= "tcp_write_timer",
         .pre_handler = kprobe__tcp_write_timer,
