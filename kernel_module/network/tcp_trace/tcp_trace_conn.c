@@ -4,6 +4,7 @@
 #include "tcp_trace.h"
 
 
+// tcp_conn_request
 
 static int kprobe__tcp_conn_request(struct kprobe *p, struct pt_regs *regs)
 {
@@ -24,7 +25,7 @@ const struct kprobe kprobe_hook__tcp_conn_request = {
 
 
 
-
+// tcp_close
 
 static int kretprobe_entry__tcp_close(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -71,7 +72,7 @@ const struct kretprobe kretprobe_hook__tcp_close = {
 
 
 
-
+// init -----------------------------------------
 
 #define kprobe_num 1
 

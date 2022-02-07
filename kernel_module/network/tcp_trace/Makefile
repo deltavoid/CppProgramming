@@ -14,7 +14,7 @@ MODULE_NAME		:= tcp_trace
 # ifneq ($(KERNELRELEASE),)
 ifneq ($(KBUILD_EXTMOD),)
 obj-m			:= $(MODULE_NAME).o
-$(MODULE_NAME)-m	:= tcp_trace_main.o tcp_trace_conn.o hook_func_lib.o
+$(MODULE_NAME)-m	:= tcp_trace_main.o tcp_trace_conn.o tcp_trace_data.o hook_func_lib.o
 # $(MODULE_NAME)-m	+= kprobe.o trace.o
 # ldflags-y		+= -r -T $(KBUILD_EXTMOD)/kprobe.lds
 # ccflags-y		+= -I$(KBUILD_EXTMOD)/include
