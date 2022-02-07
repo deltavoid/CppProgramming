@@ -329,18 +329,6 @@ static int kprobe__tcp_close(struct kprobe *p, struct pt_regs *regs)
 
 
 
-static int kprobe__tcp_fin(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_fin"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-
 
 
 static int kprobe__tcp_done(struct kprobe *p, struct pt_regs *regs)
@@ -371,39 +359,10 @@ static int kprobe__inet_csk_destroy_sock(struct kprobe *p, struct pt_regs *regs)
 
 
 
-static int kprobe__tcp_time_wait(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_time_wait"))
-        return 0;
 
-    // pr_debug("\n");
-    return 0;
-}
 
-static int kprobe__inet_twsk_kill(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:inet_twsk_kill"))
-        return 0;
-
-    // dump_stack();
-    // pr_debug("\n");
-    return 0;
-}
-
-static int kprobe__tcp_timewait_state_process(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_timewait_state_process"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
 
 
 // reset ----------------------------------------------------------
@@ -677,28 +636,13 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 18
+#define kprobe_num 14
 
 static struct kprobe kprobes[kprobe_num] = {
 
     
 
-    {
-        .symbol_name	= "tcp_fin",
-        .pre_handler = kprobe__tcp_fin,
-    },
-    {
-        .symbol_name	= "tcp_time_wait",
-        .pre_handler = kprobe__tcp_time_wait,
-    },
-    {
-        .symbol_name	= "inet_twsk_kill",
-        .pre_handler = kprobe__inet_twsk_kill,
-    },
-    {
-        .symbol_name	= "tcp_timewait_state_process",
-        .pre_handler = kprobe__tcp_timewait_state_process,
-    },
+
     {
         .symbol_name	= "tcp_done",
         .pre_handler = kprobe__tcp_done,
