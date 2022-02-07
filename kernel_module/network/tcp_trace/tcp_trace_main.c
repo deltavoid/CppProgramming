@@ -331,28 +331,7 @@ static int kprobe__tcp_close(struct kprobe *p, struct pt_regs *regs)
 
 
 
-static int kprobe__tcp_done(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_done"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-
-static int kprobe__inet_csk_destroy_sock(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, 2, "kprobe:inet_csk_destroy_sock"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
 
 
 
@@ -636,21 +615,14 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 14
+#define kprobe_num 12
 
 static struct kprobe kprobes[kprobe_num] = {
 
     
 
 
-    {
-        .symbol_name	= "tcp_done",
-        .pre_handler = kprobe__tcp_done,
-    },
-    {
-        .symbol_name	= "inet_csk_destroy_sock",
-        .pre_handler = kprobe__inet_csk_destroy_sock,
-    },
+
     {
         .symbol_name	= "tcp_reset",
         .pre_handler = kprobe__tcp_reset,
