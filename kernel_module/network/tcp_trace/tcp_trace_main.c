@@ -23,14 +23,9 @@
 
 // sock common -----------------------------------------------
 
-struct sock_filter_config {
-    u16 local_port, remote_port; // 0 indicates not filter;
-    bool enable_ipv4;
-    bool enable_ipv6;
-    u32 local_addr_ipv4, remote_addr_ipv4; // 0 indicates not filter;
-};
 
-static void sock_filter_config_display(struct sock_filter_config* config)
+
+void sock_filter_config_display(struct sock_filter_config* config)
 {
     pr_debug("local_port: %d, remote_port: %d\n",
         config->local_port, config->remote_port);
