@@ -20,29 +20,6 @@
 
 
 
-// static inline unsigned long x86_64_get_regs_arg(struct pt_regs *regs, int index)
-// {
-//     // x86_64 function call convention
-//     unsigned long args[6] = {
-//         regs->di,
-//         regs->si,
-//         regs->dx,
-//         regs->cx,
-//         regs->r8,
-//         regs->r9,
-//     };
-
-//     if  (!(index >= 0 && index < 6))
-//         return 0;
-
-//     return args[index];
-// }
-
-// static inline unsigned get_shifted_tid(void)
-// {
-//     return current->pid + smp_processor_id();
-// }
-
 
 // sock common -----------------------------------------------
 
@@ -249,50 +226,6 @@ const struct kprobe kprobe_hook__tcp_v4_do_rcv = {
 };
 
 
-// // typedef struct sock* sock_pointer;
-// struct kretprobe_tcp_common_ctx {
-//     struct sock* sk;
-// };
-
-// static int kretprobe_entry__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-//     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
-//     ctx->sk = NULL;
-
-//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_do_rcv"))
-//         return 0;
-
-//     ctx->sk = sk;
-
-//     // pr_debug("\n");
-//     return 0;
-// }
-
-// static int kretprobe__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-//     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
-//     struct sock* sk = ctx->sk;
-
-//     if  (!sk)
-//         return 0;
-
-//     sock_common_display(sk, "kretprobe:tcp_v4_do_rcv");
-
-//     pr_debug("\n");
-//     return 0;
-// }
-
-// const struct kretprobe kretprobe_hook__tcp_v4_do_rcv = {
-//     .kp = {
-//         .symbol_name = "tcp_v4_do_rcv",
-//     },
-//     .entry_handler = kretprobe_entry__tcp_v4_do_rcv,
-//     .handler = kretprobe__tcp_v4_do_rcv,
-//     .data_size = sizeof(struct kretprobe_tcp_common_ctx),
-//     .maxactive = 64,
-// };
-
 
 static int kprobe__tcp_rcv_state_process(struct kprobe *p, struct pt_regs *regs)
 {
@@ -309,102 +242,6 @@ const struct kprobe kprobe_hook__tcp_rcv_state_process = {
     .symbol_name	= "tcp_rcv_state_process",
     .pre_handler = kprobe__tcp_rcv_state_process,
 };
-
-
-
-struct tcp_rcv_state_process__ctx {
-    // unsigned shifted_tid;
-    struct sock* sk;
-};
-
-// static int kretprobe_entry__tcp_rcv_state_process(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-//     struct tcp_rcv_state_process__ctx* ctx = (struct tcp_rcv_state_process__ctx*)ri->data;
-
-//     ctx->sk = NULL;
-
-//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_rcv_state_process"))
-//         return 0;
-
-//     // *shifted_tid_p = get_shifted_tid();
-//     // ctx->shifted_tid = get_shifted_tid();
-//     ctx->sk = sk;
-
-
-//     // pr_debug("\n");
-//     return 0;
-
-// }
-
-// static int kretprobe__tcp_rcv_state_process(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-//     struct tcp_rcv_state_process__ctx* ctx = (struct tcp_rcv_state_process__ctx*)ri->data;
-//     // unsigned shifted_tid = ctx->shifted_tid;
-//     struct sock* sk = ctx->sk;
-
-//     if  (!sk)
-//         return 0;
-
-//     // struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-    
-
-//     // if  (!sock_filter_and_display(sk, 2, "kretprobe:tcp_rcv_state_process"))
-//     //     return 0;
-
-//     sock_common_display(sk, "kretprobe:tcp_rcv_state_process");
-
-//     // pr_debug("\n");
-//     return 0;
-// }
-
-// const struct kretprobe kretprobe_hook__tcp_rcv_state_process = {
-//     .kp = {
-//         .symbol_name = "tcp_rcv_state_process",
-//     },
-//     .entry_handler = kretprobe_entry__tcp_rcv_state_process,
-//     .handler = kretprobe__tcp_rcv_state_process,
-//     .data_size = sizeof(struct tcp_rcv_state_process__ctx),
-//     .maxactive = 64,
-// };
-
-
-// static int kprobe__tcp_conn_request(struct kprobe *p, struct pt_regs *regs)
-// {
-//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
-
-//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_conn_request"))
-//         return 0;
-
-//     // dump_stack();
-//     // pr_debug("\n");
-//     return 0;
-// }
-
-// const struct kprobe kprobe_hook__tcp_conn_request = {
-//         .symbol_name	= "tcp_conn_request",
-//         .pre_handler = kprobe__tcp_conn_request,
-// };
-
-// static int kprobe__tcp_v4_send_synack(struct kprobe *p, struct pt_regs *regs)
-// {
-//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 3);
-
-//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_send_synack"))
-//         return 0;
-
-//     // pr_debug("\n");
-//     return 0;
-// }
-
-// const struct kprobe kprobe_hook__tcp_v4_send_synack = 
-//     {
-//         .symbol_name	= "tcp_v4_send_synack",
-//         .pre_handler = kprobe__tcp_v4_send_synack,
-//     };
-
-
-
 
 
 
