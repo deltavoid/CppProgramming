@@ -403,41 +403,6 @@ struct tcp_rcv_state_process__ctx {
 //         .pre_handler = kprobe__tcp_v4_send_synack,
 //     };
 
-static int kprobe__tcp_check_req(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
-
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_check_req"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-const struct kprobe kprobe_hook__tcp_check_req = 
-    {
-        .symbol_name	= "tcp_check_req",
-        .pre_handler = kprobe__tcp_check_req,
-    };
-
-static int kprobe__tcp_v4_syn_recv_sock(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* req_sock = (struct sock*)x86_64_get_regs_arg(regs, 2);
-
-    if  (!sock_filter_and_display(req_sock, 2, "kprobe:tcp_v4_syn_recv_sock"))
-        return 0;
-
-    // dump_stack();
-
-    // pr_debug("\n");
-    return 0;
-}
-
-const struct kprobe kprobe_hook__tcp_v4_syn_recv_sock = 
-    {
-        .symbol_name	= "tcp_v4_syn_recv_sock",
-        .pre_handler = kprobe__tcp_v4_syn_recv_sock,
-    };
 
 
 
@@ -980,31 +945,15 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 27
+#define kprobe_num 25
 
 static struct kprobe kprobes[kprobe_num] = {
-    // kprobe_hook__tcp_v4_do_rcv,   
-    // kprobe_hook__tcp_rcv_state_process,
-    // {
-    //     .symbol_name	= "tcp_conn_request",
-    //     .pre_handler = kprobe__tcp_conn_request,
-    // },
-    // kprobe_hook__tcp_conn_request,
-    // {
-    //     .symbol_name	= "tcp_v4_send_synack",
-    //     .pre_handler = kprobe__tcp_v4_send_synack,
-    // },
-    // kprobe_hook__tcp_v4_send_synack,
-    // {
-    //     .symbol_name	= "tcp_check_req",
-    //     .pre_handler = kprobe__tcp_check_req,
-    // },
-    kprobe_hook__tcp_check_req,
+    
     // {
     //     .symbol_name	= "tcp_v4_syn_recv_sock",
     //     .pre_handler = kprobe__tcp_v4_syn_recv_sock,
     // },
-    kprobe_hook__tcp_v4_syn_recv_sock,
+    
     // {
     //     .symbol_name	= "tcp_create_openreq_child",
     //     .pre_handler = kprobe__tcp_create_openreq_child,
