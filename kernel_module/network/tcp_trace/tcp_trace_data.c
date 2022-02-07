@@ -69,6 +69,9 @@ static int kretprobe__tcp_rcv_established(struct kretprobe_instance *ri, struct 
 
     sock_common_display(sk, "kretprobe:tcp_rcv_established");
 
+    tcp_sock_display(sk);
+    
+
     // pr_debug("\n");
     return 0;
 }
