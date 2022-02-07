@@ -34,7 +34,7 @@ static inline unsigned get_shifted_tid(void)
 }
 
 
-
+extern void sock_common_display(const struct sock* sk, const char* prefix);
 extern bool sock_filter_and_display(const struct sock* sk, int func_level, const char* prefix);
 
 

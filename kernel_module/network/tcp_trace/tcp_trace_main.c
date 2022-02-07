@@ -164,7 +164,7 @@ static const char* tcp_state_desc[TCP_MAX_STATES] = {
     "TCP_NEW_SYN_RECV",
 };
 
-static void sock_common_display(const struct sock* sk, const char* prefix)
+void sock_common_display(const struct sock* sk, const char* prefix)
 {
     u16 local_port, remote_port, family;
     u8 state;
@@ -826,45 +826,45 @@ static int kprobe__tcp_recvmsg(struct kprobe *p, struct pt_regs *regs)
 
 
 
-static int kretprobe_entry__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
-    ctx->sk = NULL;
+// static int kretprobe_entry__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
+// {
+//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+//     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+//     ctx->sk = NULL;
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_recvmsg"))
-        return 0;
+//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_recvmsg"))
+//         return 0;
 
-    ctx->sk = sk;
+//     ctx->sk = sk;
 
-    // pr_debug("\n");
-    return 0;
-}
+//     // pr_debug("\n");
+//     return 0;
+// }
 
 
-static int kretprobe__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
-    struct sock* sk = ctx->sk;
+// static int kretprobe__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
+// {
+//     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+//     struct sock* sk = ctx->sk;
 
-    if  (!sk)
-        return 0;
+//     if  (!sk)
+//         return 0;
 
-    sock_common_display(sk, "kretprobe:tcp_recvmsg");
+//     sock_common_display(sk, "kretprobe:tcp_recvmsg");
 
-    pr_debug("\n");
-    return 0;
-}
+//     pr_debug("\n");
+//     return 0;
+// }
 
-const struct kretprobe kretprobe_hook__tcp_recvmsg = {
-    .kp = {
-        .symbol_name = "tcp_recvmsg",
-    },
-    .entry_handler = kretprobe_entry__tcp_recvmsg,
-    .handler = kretprobe__tcp_recvmsg,
-    .data_size = sizeof(struct kretprobe_tcp_common_ctx),
-    .maxactive = 64,
-};
+// const struct kretprobe kretprobe_hook__tcp_recvmsg = {
+//     .kp = {
+//         .symbol_name = "tcp_recvmsg",
+//     },
+//     .entry_handler = kretprobe_entry__tcp_recvmsg,
+//     .handler = kretprobe__tcp_recvmsg,
+//     .data_size = sizeof(struct kretprobe_tcp_common_ctx),
+//     .maxactive = 64,
+// };
 
 
 
@@ -1185,7 +1185,7 @@ static struct kprobe kprobes[kprobe_num] = {
 
 
 
-#define kretprobe_num 6
+#define kretprobe_num 5
 
 static struct kretprobe kretprobes[kretprobe_num] = {
     {
@@ -1214,7 +1214,7 @@ static struct kretprobe kretprobes[kretprobe_num] = {
     kretprobe_hook__tcp_rcv_state_process,
     kretprobe_hook__tcp_v4_do_rcv,
     kretprobe_hook__tcp_sendmsg,
-    kretprobe_hook__tcp_recvmsg,
+    // kretprobe_hook__tcp_recvmsg,
     // kretprobe_hook__tcp_close,
 };
 
