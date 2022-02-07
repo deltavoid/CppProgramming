@@ -284,6 +284,38 @@ const struct kretprobe kretprobe_hook__inet_csk_accept = {
 };
 
 
+static int kprobe__tcp_set_state(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    int dest_state = (int)x86_64_get_regs_arg(regs, 1);
+
+    // if  (!sock_filter_and_display(sk, "kprobe__tcp_set_state"))
+    //     return 0;
+    if  (!sock_filter(sk, 2))
+        return 0;
+
+    // pr_debug("kprobe:tcp_set_state: %s -> %s\n", 
+    //         tcp_state_desc[sk->sk_state], tcp_state_desc[dest_state]);
+
+    // current_display();
+    sock_common_display(sk, "kprobe:tcp_set_state");
+    
+    pr_debug("%s -> %s\n", 
+            tcp_state_desc[sk->sk_state], tcp_state_desc[dest_state]);
+
+
+    // dump_stack();
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kprobe kprobe_hook__tcp_set_state = {
+    .symbol_name	= "tcp_set_state",
+    .pre_handler = kprobe__tcp_set_state,
+};
+
+
 
 
 
@@ -343,7 +375,7 @@ const struct kretprobe kretprobe_hook__tcp_close = {
 
 // init -----------------------------------------
 
-#define kprobe_num 7
+#define kprobe_num 8
 
 static struct kprobe kprobes[kprobe_num] = {
 
@@ -356,6 +388,8 @@ static struct kprobe kprobes[kprobe_num] = {
     kprobe_hook__tcp_create_openreq_child,
     kprobe_hook__inet_csk_clone_lock,
     kprobe_hook__tcp_child_process,
+
+    kprobe_hook__tcp_set_state,
 
 
 
