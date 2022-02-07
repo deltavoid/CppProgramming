@@ -7,6 +7,21 @@
 
 
 
+static int kprobe__tcp_rcv_established(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_rcv_established"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+
+
+
+
 
 
 // tcp_recvmsg
@@ -53,6 +68,10 @@ const struct kretprobe kretprobe_hook__tcp_recvmsg = {
 
 
 
+
+
+
+
 // tcp_sendmsg
 
 static int kretprobe_entry__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -69,6 +88,7 @@ static int kretprobe_entry__tcp_sendmsg(struct kretprobe_instance *ri, struct pt
     // pr_debug("\n");
     return 0;
 }
+
 
 
 static int kretprobe__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
@@ -96,14 +116,59 @@ const struct kretprobe kretprobe_hook__tcp_sendmsg = {
 };
 
 
+static int kprobe__tcp_write_xmit(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_write_xmit"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+
+
+
+static int kprobe____tcp_transmit_skb(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:__tcp_transmit_skb"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+
+
+
 
 // init -----------------------------------------
 
-#define kprobe_num 0
+#define kprobe_num 3
 
 static struct kprobe kprobes[kprobe_num] = {
 
     // kprobe_hook__tcp_conn_request,
+
+
+    
+    {
+        .symbol_name	= "tcp_rcv_established",
+        .pre_handler = kprobe__tcp_rcv_established,
+    },
+    {
+        .symbol_name	= "__tcp_transmit_skb",
+        .pre_handler = kprobe____tcp_transmit_skb,
+    },
+    {
+        .symbol_name	= "tcp_write_xmit",
+        .pre_handler = kprobe__tcp_write_xmit,
+    },
+
+
 
 
 };
