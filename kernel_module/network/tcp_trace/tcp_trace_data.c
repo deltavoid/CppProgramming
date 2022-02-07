@@ -6,6 +6,22 @@
 
 
 
+
+static void tcp_sock_display(struct sock* sk)
+{
+    struct tcp_sock* tp = (struct tcp_sock*)sk;
+
+    pr_debug("snd_una:    0x%08x\n", tp->snd_una);
+    pr_debug("snd_nxt:    0x%08x\n", tp->snd_nxt);
+    pr_debug("snd_wnd:    0x%08x\n", tp->snd_wnd);
+    pr_debug("write_seq:  0x%08x\n", tp->write_seq);
+
+    pr_debug("copied_seq: 0x%08x\n", tp->copied_seq);
+    pr_debug("rcv_nxt:    0x%08x\n", tp->rcv_nxt);
+    pr_debug("rcv_wnd:    0x%08x\n", tp->rcv_wnd);
+
+}
+
 // send and recv 
 
 // recv -----------------------------
@@ -35,6 +51,8 @@ static int kretprobe_entry__tcp_rcv_established(struct kretprobe_instance *ri, s
         return 0;
 
     ctx->sk = sk;
+
+    tcp_sock_display(sk);
 
     // pr_debug("\n");
     return 0;
