@@ -15,33 +15,33 @@
 #include <net/tcp.h>
 #include <net/sock.h>
 
+#include "tcp_trace.h"
 
 
 
 
+// static inline unsigned long x86_64_get_regs_arg(struct pt_regs *regs, int index)
+// {
+//     // x86_64 function call convention
+//     unsigned long args[6] = {
+//         regs->di,
+//         regs->si,
+//         regs->dx,
+//         regs->cx,
+//         regs->r8,
+//         regs->r9,
+//     };
 
-static inline unsigned long x86_64_get_regs_arg(struct pt_regs *regs, int index)
-{
-    // x86_64 function call convention
-    unsigned long args[6] = {
-        regs->di,
-        regs->si,
-        regs->dx,
-        regs->cx,
-        regs->r8,
-        regs->r9,
-    };
+//     if  (!(index >= 0 && index < 6))
+//         return 0;
 
-    if  (!(index >= 0 && index < 6))
-        return 0;
+//     return args[index];
+// }
 
-    return args[index];
-}
-
-static inline unsigned get_shifted_tid(void)
-{
-    return current->pid + smp_processor_id();
-}
+// static inline unsigned get_shifted_tid(void)
+// {
+//     return current->pid + smp_processor_id();
+// }
 
 
 // sock common -----------------------------------------------
@@ -215,7 +215,7 @@ static void current_display(void)
     // pr_debug("test_preempt_need_resched: %d\n", test_preempt_need_resched());
 }
 
-static bool sock_filter_and_display(const struct sock* sk, int func_level, const char* prefix)
+bool sock_filter_and_display(const struct sock* sk, int func_level, const char* prefix)
 {
     if  (!sock_filter(sk, func_level))
         return false;
@@ -369,22 +369,22 @@ const struct kretprobe kretprobe_hook__tcp_rcv_state_process = {
 };
 
 
-static int kprobe__tcp_conn_request(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
+// static int kprobe__tcp_conn_request(struct kprobe *p, struct pt_regs *regs)
+// {
+//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_conn_request"))
-        return 0;
+//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_conn_request"))
+//         return 0;
 
-    // dump_stack();
-    // pr_debug("\n");
-    return 0;
-}
+//     // dump_stack();
+//     // pr_debug("\n");
+//     return 0;
+// }
 
-const struct kprobe kprobe_hook__tcp_conn_request = {
-        .symbol_name	= "tcp_conn_request",
-        .pre_handler = kprobe__tcp_conn_request,
-};
+// const struct kprobe kprobe_hook__tcp_conn_request = {
+//         .symbol_name	= "tcp_conn_request",
+//         .pre_handler = kprobe__tcp_conn_request,
+// };
 
 static int kprobe__tcp_v4_send_synack(struct kprobe *p, struct pt_regs *regs)
 {
@@ -628,7 +628,7 @@ static int kretprobe__tcp_close(struct kretprobe_instance *ri, struct pt_regs *r
     // sock_common_display(sk, "kretprobe:tcp_close");
 
     // for close may destroy the sock, so just print sk addr.
-    pr_debug("%-32s  sock: 0x%lx\n", "kretprobe:tcp_close", sk);
+    pr_debug("%-32s  sock: 0x%lx\n", "kretprobe:tcp_close", (unsigned long)sk);
 
     pr_debug("\n");
     return 0;
@@ -1036,7 +1036,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 29
+#define kprobe_num 28
 
 static struct kprobe kprobes[kprobe_num] = {
     // kprobe_hook__tcp_v4_do_rcv,   
@@ -1045,7 +1045,7 @@ static struct kprobe kprobes[kprobe_num] = {
     //     .symbol_name	= "tcp_conn_request",
     //     .pre_handler = kprobe__tcp_conn_request,
     // },
-    kprobe_hook__tcp_conn_request,
+    // kprobe_hook__tcp_conn_request,
     // {
     //     .symbol_name	= "tcp_v4_send_synack",
     //     .pre_handler = kprobe__tcp_v4_send_synack,
