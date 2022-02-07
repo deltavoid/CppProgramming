@@ -11,6 +11,10 @@ static void tcp_sock_display(struct sock* sk)
 {
     struct tcp_sock* tp = (struct tcp_sock*)sk;
 
+    // pr_debug("bytes_acked:     0x%016lx\n", tp->bytes_acked);
+    // pr_debug("bytes_received:  0x%016lx\n", tp->bytes_received);
+    // lose bits
+    pr_debug("bytes_acked:     0x%08x,   bytes_received:  0x%08x\n", (unsigned)tp->bytes_acked, (unsigned)tp->bytes_received);
     pr_debug("snd_una:         0x%08x,   copied_seq:      0x%08x\n", tp->snd_una, tp->copied_seq);
     pr_debug("snd_nxt:         0x%08x,   rcv_nxt:         0x%08x\n", tp->snd_nxt, tp->rcv_nxt);
     pr_debug("write_seq:       0x%08x,   recv not copy:   0x%08x\n", tp->write_seq, tp->rcv_nxt - tp->copied_seq);
@@ -116,6 +120,8 @@ static int kretprobe_entry__tcp_recvmsg(struct kretprobe_instance *ri, struct pt
 
     ctx->sk = sk;
 
+    tcp_sock_display(sk);
+
     // pr_debug("\n");
     return 0;
 }
@@ -130,6 +136,8 @@ static int kretprobe__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs 
         return 0;
 
     sock_common_display(sk, "kretprobe:tcp_recvmsg");
+
+    tcp_sock_display(sk);
 
     pr_debug("\n");
     return 0;
@@ -183,6 +191,8 @@ static int kretprobe_entry__tcp_sendmsg(struct kretprobe_instance *ri, struct pt
 
     ctx->sk = sk;
 
+    tcp_sock_display(sk);
+
     // pr_debug("\n");
     return 0;
 }
@@ -198,6 +208,8 @@ static int kretprobe__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs 
         return 0;
 
     sock_common_display(sk, "kretprobe:tcp_sendmsg");
+
+    tcp_sock_display(sk);
 
     pr_debug("\n");
     return 0;
