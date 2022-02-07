@@ -25,6 +25,14 @@ static void tcp_sock_display(struct sock* sk)
 
 }
 
+static void tcp_recv_skb_display(struct sk_buff* skb)
+{
+    struct tcphdr* th = (struct tcphdr*)skb->data;
+
+    pr_debug("recv ack:        0x%08x,   recv seq:        0x%08x\n", ntohl(th->ack_seq), ntohl(th->seq));
+    pr_debug("recv wnd:        0x%08x,   recv len:        0x%08x\n", ntohs(th->window), skb->len - (th->doff << 2));
+}
+
 // send and recv 
 
 // recv -----------------------------
@@ -47,6 +55,7 @@ static int kprobe__tcp_rcv_established(struct kprobe *p, struct pt_regs *regs)
 static int kretprobe_entry__tcp_rcv_established(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    struct sk_buff* skb = (struct sk_buff*)x86_64_get_regs_arg(regs, 1);
     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
     ctx->sk = NULL;
 
@@ -56,6 +65,8 @@ static int kretprobe_entry__tcp_rcv_established(struct kretprobe_instance *ri, s
     ctx->sk = sk;
 
     tcp_sock_display(sk);
+
+    tcp_recv_skb_display(skb);
 
     // pr_debug("\n");
     return 0;
