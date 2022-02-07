@@ -6,6 +6,9 @@
 
 #include <linux/sched.h>
 
+#include <linux/tcp.h>
+#include <net/tcp.h>
+
 
 
 // tcp_trace_filter.c
@@ -34,6 +37,9 @@ static inline unsigned get_shifted_tid(void)
 }
 
 
+extern const char* tcp_state_desc[TCP_MAX_STATES];
+
+extern bool sock_filter(const struct sock* sk, int func_level);
 extern void sock_common_display(const struct sock* sk, const char* prefix);
 extern bool sock_filter_and_display(const struct sock* sk, int func_level, const char* prefix);
 
