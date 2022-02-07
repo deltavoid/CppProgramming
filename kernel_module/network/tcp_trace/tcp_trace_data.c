@@ -11,17 +11,12 @@ static void tcp_sock_display(struct sock* sk)
 {
     struct tcp_sock* tp = (struct tcp_sock*)sk;
 
-    pr_debug("snd_una:         0x%08x\n", tp->snd_una);
-    pr_debug("snd_nxt:         0x%08x\n", tp->snd_nxt);
-    pr_debug("write_seq:       0x%08x\n", tp->write_seq);
-    pr_debug("send not ack:    0x%08x\n", tp->snd_nxt - tp->snd_una);
+    pr_debug("snd_una:         0x%08x,   copied_seq:      0x%08x\n", tp->snd_una, tp->copied_seq);
+    pr_debug("snd_nxt:         0x%08x,   rcv_nxt:         0x%08x\n", tp->snd_nxt, tp->rcv_nxt);
+    pr_debug("write_seq:       0x%08x,   recv not copy:   0x%08x\n", tp->write_seq, tp->rcv_nxt - tp->copied_seq);
+    pr_debug("send not ack:    0x%08x,   rcv_wnd:         0x%08x\n", tp->snd_nxt - tp->snd_una, tp->rcv_wnd);
     pr_debug("write not send:  0x%08x\n", tp->write_seq - tp->snd_nxt);
     pr_debug("snd_wnd:         0x%08x\n", tp->snd_wnd);
-
-    pr_debug("copied_seq:      0x%08x\n", tp->copied_seq);
-    pr_debug("rcv_nxt:         0x%08x\n", tp->rcv_nxt);
-    pr_debug("recv not copy:   0x%08x\n", tp->rcv_nxt - tp->copied_seq);
-    pr_debug("rcv_wnd:         0x%08x\n", tp->rcv_wnd);
 
 }
 
