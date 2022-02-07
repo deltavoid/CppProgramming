@@ -462,51 +462,6 @@ const struct kprobe kprobe_hook__tcp_sendmsg =
 // tcp_poll -------------------------------------------------------
 
 
-static int kprobe__sock_def_wakeup(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, 3, "kprobe:sock_def_wakeup"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-static int kprobe__sock_def_readable(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, 3, "kprobe:sock_def_readable"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-static int kprobe__sock_def_write_space(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, 3, "kprobe:sock_def_write_space"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-static int kprobe__sk_stream_write_space(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-
-    if  (!sock_filter_and_display(sk, 3, "kprobe:sk_stream_write_space"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-
 // timer and retrans ----------------------------------------------
 
 
@@ -566,7 +521,7 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 7
+#define kprobe_num 3
 
 static struct kprobe kprobes[kprobe_num] = {
 
@@ -584,28 +539,13 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "tcp_delack_timer",
         .pre_handler = kprobe__tcp_delack_timer,
     },
-
-
     {
         .symbol_name	= "tcp_keepalive_timer",
         .pre_handler = kprobe__tcp_keepalive_timer,
     },
-    {
-        .symbol_name	= "sock_def_wakeup",
-        .pre_handler = kprobe__sock_def_wakeup,
-    },
-    {
-        .symbol_name	= "sock_def_readable",
-        .pre_handler = kprobe__sock_def_readable,
-    },
-    {
-        .symbol_name	= "sock_def_write_space",
-        .pre_handler = kprobe__sock_def_write_space,
-    },
-    {
-        .symbol_name	= "sk_stream_write_space",
-        .pre_handler = kprobe__sk_stream_write_space,
-    },
+
+
+
 };
 
 
