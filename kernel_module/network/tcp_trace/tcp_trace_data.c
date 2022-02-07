@@ -51,7 +51,7 @@ static int kretprobe__tcp_rcv_established(struct kretprobe_instance *ri, struct 
 
     sock_common_display(sk, "kretprobe:tcp_rcv_established");
 
-    pr_debug("\n");
+    // pr_debug("\n");
     return 0;
 }
 
@@ -208,6 +208,48 @@ static int kprobe__tcp_write_xmit(struct kprobe *p, struct pt_regs *regs)
 
 
 
+static int kretprobe_entry__tcp_write_xmit(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+    ctx->sk = NULL;
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_write_xmit"))
+        return 0;
+
+    ctx->sk = sk;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+
+static int kretprobe__tcp_write_xmit(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+    struct sock* sk = ctx->sk;
+
+    if  (!sk)
+        return 0;
+
+    sock_common_display(sk, "kretprobe:tcp_write_xmit");
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kretprobe kretprobe_hook__tcp_write_xmit = {
+    .kp = {
+        .symbol_name = "tcp_write_xmit",
+    },
+    .entry_handler = kretprobe_entry__tcp_write_xmit,
+    .handler = kretprobe__tcp_write_xmit,
+    .data_size = sizeof(struct kretprobe_tcp_common_ctx),
+    .maxactive = 64,
+};
+
+
+
 
 static int kprobe____tcp_transmit_skb(struct kprobe *p, struct pt_regs *regs)
 {
@@ -315,7 +357,7 @@ static int kprobe__tcp_keepalive_timer(struct kprobe *p, struct pt_regs *regs)
 
 // init -----------------------------------------
 
-#define kprobe_num 9
+#define kprobe_num 8
 
 static struct kprobe kprobes[kprobe_num] = {
 
@@ -328,10 +370,10 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "__tcp_transmit_skb",
         .pre_handler = kprobe____tcp_transmit_skb,
     },
-    {
-        .symbol_name	= "tcp_write_xmit",
-        .pre_handler = kprobe__tcp_write_xmit,
-    },
+    // {
+    //     .symbol_name	= "tcp_write_xmit",
+    //     .pre_handler = kprobe__tcp_write_xmit,
+    // },
 
 
      
@@ -371,13 +413,14 @@ static struct kprobe kprobes[kprobe_num] = {
 };
 
 
-#define kretprobe_num 3
+#define kretprobe_num 4
 
 static struct kretprobe kretprobes[kretprobe_num] = {
 
     kretprobe_hook__tcp_rcv_established,
     kretprobe_hook__tcp_recvmsg,
     kretprobe_hook__tcp_sendmsg,
+    kretprobe_hook__tcp_write_xmit,
 
 };
 
