@@ -487,6 +487,12 @@ static int kprobe__tcp_set_state(struct kprobe *p, struct pt_regs *regs)
 }
 
 
+const struct kprobe kprobe_hook__tcp_set_state = {
+    .symbol_name	= "tcp_set_state",
+    .pre_handler = kprobe__tcp_set_state,
+};
+
+
 
 static int kprobe__tcp_close(struct kprobe *p, struct pt_regs *regs)
 {
@@ -900,11 +906,8 @@ static struct tracepoint_probe_context sched_probes = {
 
 static struct kprobe kprobes[kprobe_num] = {
 
+    kprobe_hook__tcp_set_state,
 
-    {
-        .symbol_name	= "tcp_set_state",
-        .pre_handler = kprobe__tcp_set_state,
-    },
     {
         .symbol_name	= "inet_hash_connect",
         .pre_handler = kprobe__inet_hash_connect,
