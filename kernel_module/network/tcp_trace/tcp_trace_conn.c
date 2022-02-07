@@ -478,10 +478,33 @@ static int kprobe__inet_csk_destroy_sock(struct kprobe *p, struct pt_regs *regs)
 }
 
 
+static int kprobe__tcp_reset(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_reset"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+static int kprobe__tcp_v4_send_reset(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_send_reset"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+
 
 // init -----------------------------------------
 
-#define kprobe_num 17
+#define kprobe_num 19
 
 static struct kprobe kprobes[kprobe_num] = {
 
@@ -540,6 +563,18 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "inet_csk_destroy_sock",
         .pre_handler = kprobe__inet_csk_destroy_sock,
     },
+
+    {
+        .symbol_name	= "tcp_reset",
+        .pre_handler = kprobe__tcp_reset,
+    },
+    {
+        .symbol_name	= "tcp_v4_send_reset",
+        .pre_handler = kprobe__tcp_v4_send_reset,
+    },
+
+
+
 
 };
 
