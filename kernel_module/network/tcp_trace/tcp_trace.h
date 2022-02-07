@@ -39,6 +39,13 @@ extern bool sock_filter_and_display(const struct sock* sk, int func_level, const
 
 
 
+// typedef struct sock* sock_pointer;
+struct kretprobe_tcp_common_ctx {
+    struct sock* sk;
+};
+
+
+
 // tcp_trace_conn.c
 
 extern int tcp_trace_conn_init(void);
