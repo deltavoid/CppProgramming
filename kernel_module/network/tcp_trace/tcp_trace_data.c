@@ -53,8 +53,47 @@ const struct kretprobe kretprobe_hook__tcp_recvmsg = {
 
 
 
+// tcp_sendmsg
+
+static int kretprobe_entry__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+    ctx->sk = NULL;
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_sendmsg"))
+        return 0;
+
+    ctx->sk = sk;
+
+    // pr_debug("\n");
+    return 0;
+}
 
 
+static int kretprobe__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
+{
+    struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
+    struct sock* sk = ctx->sk;
+
+    if  (!sk)
+        return 0;
+
+    sock_common_display(sk, "kretprobe:tcp_sendmsg");
+
+    pr_debug("\n");
+    return 0;
+}
+
+const struct kretprobe kretprobe_hook__tcp_sendmsg = {
+    .kp = {
+        .symbol_name = "tcp_sendmsg",
+    },
+    .entry_handler = kretprobe_entry__tcp_sendmsg,
+    .handler = kretprobe__tcp_sendmsg,
+    .data_size = sizeof(struct kretprobe_tcp_common_ctx),
+    .maxactive = 64,
+};
 
 
 
@@ -70,12 +109,12 @@ static struct kprobe kprobes[kprobe_num] = {
 };
 
 
-#define kretprobe_num 1
+#define kretprobe_num 2
 
 static struct kretprobe kretprobes[kretprobe_num] = {
 
-    // kretprobe_hook__tcp_close,
     kretprobe_hook__tcp_recvmsg,
+    kretprobe_hook__tcp_sendmsg,
 
 };
 
