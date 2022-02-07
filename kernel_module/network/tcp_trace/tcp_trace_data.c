@@ -142,7 +142,7 @@ static int kprobe____tcp_transmit_skb(struct kprobe *p, struct pt_regs *regs)
 }
 
 
-// sock event ---------------------------
+// tcp_poll / sock event ---------------------------
 
 
 
@@ -193,9 +193,47 @@ static int kprobe__sk_stream_write_space(struct kprobe *p, struct pt_regs *regs)
 
 
 
+// timer and retrans ----------------------------------------------
+
+
+static int kprobe__tcp_write_timer(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_write_timer"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+static int kprobe__tcp_delack_timer(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_delack_timer"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+static int kprobe__tcp_keepalive_timer(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_keepalive_timer"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+
+
 // init -----------------------------------------
 
-#define kprobe_num 7
+#define kprobe_num 10
 
 static struct kprobe kprobes[kprobe_num] = {
 
@@ -231,6 +269,22 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "sk_stream_write_space",
         .pre_handler = kprobe__sk_stream_write_space,
     },
+
+
+    {
+        .symbol_name	= "tcp_write_timer",
+        .pre_handler = kprobe__tcp_write_timer,
+    },
+    {
+        .symbol_name	= "tcp_delack_timer",
+        .pre_handler = kprobe__tcp_delack_timer,
+    },
+    {
+        .symbol_name	= "tcp_keepalive_timer",
+        .pre_handler = kprobe__tcp_keepalive_timer,
+    },
+
+
 
 };
 
