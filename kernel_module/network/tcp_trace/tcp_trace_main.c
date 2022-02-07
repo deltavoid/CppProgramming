@@ -1133,22 +1133,6 @@ static struct kprobe kprobes[kprobe_num] = {
 
 static struct kretprobe kretprobes[kretprobe_num] = {
 
-
-
-    // {
-    //     .kp = {
-    //         .symbol_name = "tcp_rcv_state_process",
-    //     },
-    //     .entry_handler = kretprobe_entry__tcp_rcv_state_process,
-	//     .handler = kretprobe__tcp_rcv_state_process,
-    //     .data_size = sizeof(struct tcp_rcv_state_process__ctx),
-	//     .maxactive = 64,
-    // },
-    // kretprobe_hook__tcp_rcv_state_process,
-    // kretprobe_hook__tcp_v4_do_rcv,
-    
-    // kretprobe_hook__tcp_recvmsg,
-    // kretprobe_hook__tcp_close,
 };
 
 
