@@ -439,25 +439,6 @@ const struct kprobe kprobe_hook__tcp_v4_syn_recv_sock =
         .pre_handler = kprobe__tcp_v4_syn_recv_sock,
     };
 
-static int kretprobe__tcp_v4_syn_recv_sock(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-    struct sock* req_sock = (struct sock*)regs_return_value(regs);
-
-    if  (!sock_filter_and_display(req_sock, 2, "kretprobe:tcp_v4_syn_recv_sock"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-const struct kretprobe kretprobe_hook_tcp_v4_syn_recv_sock = {
-        .kp = {
-            .symbol_name = "tcp_v4_syn_recv_sock",
-        },
-	    .handler = kretprobe__tcp_v4_syn_recv_sock,
-	    .maxactive = 64,
-};
-
 
 
 
@@ -512,25 +493,7 @@ const struct kprobe kprobe_hook__tcp_child_process =
         .pre_handler = kprobe__tcp_child_process,
     };
 
-static int kretprobe_inet_csk_accept(struct kretprobe_instance *ri, struct pt_regs *regs)
-{
-    struct sock* newsk = (struct sock*)regs_return_value(regs);
 
-    if  (!sock_filter_and_display(newsk, 2, "kretprobe:inet_csk_accept"))
-        return 0;
-
-    pr_debug("\n");
-    return 0;
-}
-
-
-const struct kretprobe kretprobe_hook__inet_csk_accept = {
-        .kp = {
-            .symbol_name = "inet_csk_accept",
-        },
-	    .handler = kretprobe_inet_csk_accept,
-	    .maxactive = 64,
-};
 
 // // not dest port here
 // static int kprobe__tcp_v4_connect(struct kprobe *p, struct pt_regs *regs)
@@ -1166,11 +1129,10 @@ static struct kprobe kprobes[kprobe_num] = {
 
 
 
-#define kretprobe_num 2
+#define kretprobe_num 0
 
 static struct kretprobe kretprobes[kretprobe_num] = {
-    kretprobe_hook__inet_csk_accept,
-    kretprobe_hook_tcp_v4_syn_recv_sock,
+
 
 
     // {
