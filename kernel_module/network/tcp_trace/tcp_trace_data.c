@@ -33,6 +33,15 @@ static void tcp_recv_skb_display(struct sk_buff* skb)
     pr_debug("recv wnd:        0x%08x,   recv len:        0x%08x\n", ntohs(th->window), skb->len - (th->doff << 2));
 }
 
+// static void tcp_send_skb_display(struct sk_buff* skb)
+// {
+//     struct tcphdr* th = (struct tcphdr*)skb->data;
+//     struct tcp_skb_cb* tcb = (struct tcp_skb_cb*)skb->cb;
+
+//     pr_debug("send seq:        0x%08x,   send ack:        0x%08x\n", tcb->seq, tcb->ack_seq);
+//     pr_debug("send len:        0x%08x,   send wnd:        0x%08x\n", skb->len, 0);
+// }
+
 // send and recv 
 
 // recv -----------------------------
@@ -301,9 +310,17 @@ const struct kretprobe kretprobe_hook__tcp_write_xmit = {
 static int kprobe____tcp_transmit_skb(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    struct sk_buff* skb = (struct sk_buff*)x86_64_get_regs_arg(regs, 1);
+    u32 rcv_nxt = (u32)x86_64_get_regs_arg(regs, 4);
+    struct tcp_skb_cb* tcb = (struct tcp_skb_cb*)skb->cb;
 
     if  (!sock_filter_and_display(sk, 3, "kprobe:__tcp_transmit_skb"))
         return 0;
+
+    // tcp_send_skb_display(skb);
+
+    pr_debug("send seq:        0x%08x,   send ack:        0x%08x\n", tcb->seq, rcv_nxt);
+    pr_debug("send len:        0x%08x\n", skb->len);
 
     // pr_debug("\n");
     return 0;
