@@ -230,180 +230,13 @@ bool sock_filter_and_display(const struct sock* sk, int func_level, const char* 
 
 
 
-// static int kretprobe_entry__tcp_close(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-//     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
-//     ctx->sk = NULL;
 
-//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_close"))
-//         return 0;
 
-//     ctx->sk = sk;
-
-//     // pr_debug("\n");
-//     return 0;
-// }
-
-
-// static int kretprobe__tcp_close(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-//     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
-//     struct sock* sk = ctx->sk;
-
-//     if  (!sk)
-//         return 0;
-
-//     // sock_common_display(sk, "kretprobe:tcp_close");
-
-//     // for close may destroy the sock, so just print sk addr.
-//     pr_debug("%-32s  sock: 0x%lx\n", "kretprobe:tcp_close", (unsigned long)sk);
-
-//     pr_debug("\n");
-//     return 0;
-// }
-
-// const struct kretprobe kretprobe_hook__tcp_close = {
-//     .kp = {
-//         .symbol_name = "tcp_close",
-//     },
-//     .entry_handler = kretprobe_entry__tcp_close,
-//     .handler = kretprobe__tcp_close,
-//     .data_size = sizeof(struct kretprobe_tcp_common_ctx),
-//     .maxactive = 64,
-// };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// reset ----------------------------------------------------------
-
-
-
-
-static void trace__tcp_receive_reset(struct sock* sk)
-{
-    if  (!sock_filter_and_display(sk, 2, "trace:tcp_receive_reset"))
-        return;
-
-    // pr_debug("\n");
-}
-
-
-
-
-static void trace__tcp_send_reset(const struct sock *sk, const struct sk_buff *skb)
-{
-    if  (!sock_filter_and_display(sk, 2, "trace:tcp_send_reset"))
-        return;
-
-    // pr_debug("\n");
-}
-
-
-// recv and send ---------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// static int kretprobe_entry__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-//     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
-//     ctx->sk = NULL;
-
-//     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_recvmsg"))
-//         return 0;
-
-//     ctx->sk = sk;
-
-//     // pr_debug("\n");
-//     return 0;
-// }
-
-
-// static int kretprobe__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
-// {
-//     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
-//     struct sock* sk = ctx->sk;
-
-//     if  (!sk)
-//         return 0;
-
-//     sock_common_display(sk, "kretprobe:tcp_recvmsg");
-
-//     pr_debug("\n");
-//     return 0;
-// }
-
-// const struct kretprobe kretprobe_hook__tcp_recvmsg = {
-//     .kp = {
-//         .symbol_name = "tcp_recvmsg",
-//     },
-//     .entry_handler = kretprobe_entry__tcp_recvmsg,
-//     .handler = kretprobe__tcp_recvmsg,
-//     .data_size = sizeof(struct kretprobe_tcp_common_ctx),
-//     .maxactive = 64,
-// };
-
-
-
-
-
-
-
-
-
-
-
-
-// cc 
 
 
 // module init -----------------------------------------------------
 
-static struct tracepoint_probe_context sched_probes = {
-    .entries = {
-        {
-            .name = "tcp_receive_reset",
-            .probe = trace__tcp_receive_reset,
-            .priv = NULL,
-        },
-        {
-            .name = "tcp_send_reset",
-            .probe = trace__tcp_send_reset,
-            .priv = NULL,
-        },
-    },
-    .init_num = 2
-};
+
 
 
 #define kprobe_num 0
@@ -441,17 +274,7 @@ static int __init tcp_trace_init(void)
     sock_filter_config_display(&sock_config);
 
 
-    ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
-    if  (ret < 0)
-    {   pr_warn("find tracepoints failed\n");
-        return ret;
-    }
 
-    ret = tracepoint_probe_context_register_probes(&sched_probes);
-    if  (ret < 0)
-    {   pr_warn("register trace probes failed\n");
-        return ret;
-    }
 
     ret = kprobes_init(kprobes, kprobe_num);
     if  (ret < 0)
@@ -482,7 +305,7 @@ static int __init tcp_trace_init(void)
 kretprobes_init_failed:
     kprobes_exit(kprobes, kprobe_num);
 kprobes_init_failed:
-    tracepoint_probe_context_unregister_probes(&sched_probes);
+    // tracepoint_probe_context_unregister_probes(&sched_probes);
 
     return ret;
 }
@@ -491,7 +314,7 @@ static void __exit tcp_trace_exit(void)
 {
     pr_debug("tcp_trace_exit begin\n");
 
-    tracepoint_probe_context_unregister_probes(&sched_probes);
+
 
     kprobes_exit(kprobes, kprobe_num);
 
