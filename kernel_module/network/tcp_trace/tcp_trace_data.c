@@ -1,9 +1,12 @@
 
 
-
 #include "hook_func_lib.h"
 #include "tcp_trace.h"
 
+
+
+
+// send and recv 
 
 // recv -----------------------------
 
@@ -348,18 +351,23 @@ int tcp_trace_data_init(void)
     ret = kprobes_init(kprobes, kprobe_num);
     if  (ret < 0)
     {   pr_warn("register kprobes_failed\n");
+        goto kprobe_failed;
     }
-
 
     ret = kretprobes_init(kretprobes, kretprobe_num);
     if  (ret < 0)
     {   pr_warn("register kretprobes failed\n");
+        goto kretprobe_failed;
     }
-
-
 
     pr_debug("tcp_trace_data_init: 2, end\n");
     return 0;
+
+kretprobe_failed:
+    kprobes_exit(kprobes, kprobe_num);
+kprobe_failed:
+
+    return ret;
 }
 
 void tcp_trace_data_exit(void)
