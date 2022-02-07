@@ -702,11 +702,10 @@ static struct kretprobe kretprobes[kretprobe_num] = {
 int tcp_trace_conn_init(void)
 {
     int ret;
-
+    
     pr_debug("tcp_trace_conn_init: 1\n");
 
-
-        ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
+    ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
     if  (ret < 0)
     {   pr_warn("find tracepoints failed\n");
         return ret;
@@ -715,25 +714,31 @@ int tcp_trace_conn_init(void)
     ret = tracepoint_probe_context_register_probes(&sched_probes);
     if  (ret < 0)
     {   pr_warn("register trace probes failed\n");
-        return ret;
+        goto tracepoint_failed;
     }
-
 
     ret = kprobes_init(kprobes, kprobe_num);
     if  (ret < 0)
     {   pr_warn("register kprobes_failed\n");
+        goto kprobe_failed;
     }
-
 
     ret = kretprobes_init(kretprobes, kretprobe_num);
     if  (ret < 0)
     {   pr_warn("register kretprobes failed\n");
+        goto kretprobe_failed;
     }
-
-
 
     pr_debug("tcp_trace_conn_init: 2, end\n");
     return 0;
+
+kretprobe_failed:
+    kprobes_exit(kprobes, kprobe_num);
+kprobe_failed:
+    tracepoint_probe_context_unregister_probes(&sched_probes);
+tracepoint_failed:
+
+    return ret;
 }
 
 void tcp_trace_conn_exit(void)
