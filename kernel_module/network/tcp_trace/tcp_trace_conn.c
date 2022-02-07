@@ -539,6 +539,30 @@ static int kprobe__inet_csk_destroy_sock(struct kprobe *p, struct pt_regs *regs)
 }
 
 
+
+// reset ----------------------------------------------------------
+
+static void trace__tcp_receive_reset(struct sock* sk)
+{
+    if  (!sock_filter_and_display(sk, 2, "trace:tcp_receive_reset"))
+        return;
+
+    // pr_debug("\n");
+}
+
+
+
+
+static void trace__tcp_send_reset(const struct sock *sk, const struct sk_buff *skb)
+{
+    if  (!sock_filter_and_display(sk, 2, "trace:tcp_send_reset"))
+        return;
+
+    // pr_debug("\n");
+}
+
+
+
 static int kprobe__tcp_reset(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
@@ -564,6 +588,22 @@ static int kprobe__tcp_v4_send_reset(struct kprobe *p, struct pt_regs *regs)
 
 
 // init -----------------------------------------
+
+static struct tracepoint_probe_context sched_probes = {
+    .entries = {
+        {
+            .name = "tcp_receive_reset",
+            .probe = trace__tcp_receive_reset,
+            .priv = NULL,
+        },
+        {
+            .name = "tcp_send_reset",
+            .probe = trace__tcp_send_reset,
+            .priv = NULL,
+        },
+    },
+    .init_num = 2
+};
 
 #define kprobe_num 19
 
@@ -666,6 +706,19 @@ int tcp_trace_conn_init(void)
     pr_debug("tcp_trace_conn_init: 1\n");
 
 
+        ret = tracepoint_probe_context_find_tracepoints(&sched_probes);
+    if  (ret < 0)
+    {   pr_warn("find tracepoints failed\n");
+        return ret;
+    }
+
+    ret = tracepoint_probe_context_register_probes(&sched_probes);
+    if  (ret < 0)
+    {   pr_warn("register trace probes failed\n");
+        return ret;
+    }
+
+
     ret = kprobes_init(kprobes, kprobe_num);
     if  (ret < 0)
     {   pr_warn("register kprobes_failed\n");
@@ -686,6 +739,8 @@ int tcp_trace_conn_init(void)
 void tcp_trace_conn_exit(void)
 {
     pr_debug("tcp_trace_conn_exit: 1\n");
+
+    tracepoint_probe_context_unregister_probes(&sched_probes);
 
     kprobes_exit(kprobes, kprobe_num);
 
