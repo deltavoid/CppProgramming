@@ -249,26 +249,25 @@ static int __init tcp_trace_init(void)
     sock_filter_config_display(&sock_config);
 
 
-
-
     ret = tcp_trace_conn_init();
     if  (ret < 0)
     {   pr_warn("tcp_trace_conn_init failed\n");
+        goto conn_init_failed;
     }
 
     ret = tcp_trace_data_init();
     if  (ret < 0)
     {   pr_warn("tcp_trace_data_init failed\n");
+        goto data_init_failed;
     }
 
     pr_debug("tcp_trace_init end\n");
     pr_debug("\n");
     return 0;
 
-kretprobes_init_failed:
-   
-kprobes_init_failed:
-    // tracepoint_probe_context_unregister_probes(&sched_probes);
+data_init_failed:
+    tcp_trace_conn_exit();
+conn_init_failed:
 
     return ret;
 }
@@ -276,7 +275,6 @@ kprobes_init_failed:
 static void __exit tcp_trace_exit(void)
 {
     pr_debug("tcp_trace_exit begin\n");
-
 
     
     tcp_trace_conn_exit();
