@@ -8,6 +8,22 @@
 
 // tcp_v4_do_rcv
 
+static int kprobe__tcp_v4_do_rcv(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_do_rcv"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kprobe kprobe_hook__tcp_v4_do_rcv = {
+    .symbol_name	= "tcp_v4_do_rcv",
+    .pre_handler = kprobe__tcp_v4_do_rcv,
+};
+
 static int kretprobe_entry__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
@@ -51,6 +67,24 @@ const struct kretprobe kretprobe_hook__tcp_v4_do_rcv = {
 
 
 // tcp_rcv_state_process
+
+static int kprobe__tcp_rcv_state_process(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_rcv_state_process"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kprobe kprobe_hook__tcp_rcv_state_process = {
+    .symbol_name	= "tcp_rcv_state_process",
+    .pre_handler = kprobe__tcp_rcv_state_process,
+};
+
+
 
 static int kretprobe_entry__tcp_rcv_state_process(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
@@ -319,6 +353,20 @@ const struct kprobe kprobe_hook__tcp_set_state = {
 
 // connect ----------------------------------
 
+
+// // not dest port here
+// static int kprobe__tcp_v4_connect(struct kprobe *p, struct pt_regs *regs)
+// {
+//     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    
+//     if  (!sock_filter_and_display(sk, "kprobe:tcp_v4_connect"))
+//         return 0;
+
+//     // pr_debug("\n");
+//     return 0;
+// }
+
+
 static int kprobe__inet_hash_connect(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
@@ -359,6 +407,19 @@ static int kprobe__tcp_finish_connect(struct kprobe *p, struct pt_regs *regs)
 // close -------------------------------------
 
 // tcp_close
+
+
+static int kprobe__tcp_close(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_close"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
 
 static int kretprobe_entry__tcp_close(struct kretprobe_instance *ri, struct pt_regs *regs)
 {

@@ -26,6 +26,21 @@ static int kprobe__tcp_rcv_established(struct kprobe *p, struct pt_regs *regs)
 
 // tcp_recvmsg
 
+
+static int kprobe__tcp_recvmsg(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_recvmsg"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+
+
+
 static int kretprobe_entry__tcp_recvmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
@@ -73,6 +88,25 @@ const struct kretprobe kretprobe_hook__tcp_recvmsg = {
 // send ------------------------------
 
 // tcp_sendmsg
+
+
+static int kprobe__tcp_sendmsg(struct kprobe *p, struct pt_regs *regs)
+{
+    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_sendmsg"))
+        return 0;
+
+    // pr_debug("\n");
+    return 0;
+}
+
+const struct kprobe kprobe_hook__tcp_sendmsg = 
+    {
+        .symbol_name	= "tcp_sendmsg",
+        .pre_handler = kprobe__tcp_sendmsg,
+    };
+
 
 static int kretprobe_entry__tcp_sendmsg(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
