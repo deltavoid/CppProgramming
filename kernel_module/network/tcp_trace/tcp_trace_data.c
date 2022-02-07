@@ -21,6 +21,7 @@ static void tcp_sock_display(struct sock* sk)
     pr_debug("send not ack:    0x%08x,   rcv_wnd:         0x%08x\n", tp->snd_nxt - tp->snd_una, tp->rcv_wnd);
     pr_debug("write not send:  0x%08x\n", tp->write_seq - tp->snd_nxt);
     pr_debug("snd_wnd:         0x%08x\n", tp->snd_wnd);
+    pr_debug("srtt_us:           %8d\n", tp->srtt_us >> 3);
 
 }
 
