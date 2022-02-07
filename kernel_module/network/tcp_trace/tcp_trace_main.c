@@ -239,31 +239,6 @@ bool sock_filter_and_display(const struct sock* sk, int func_level, const char* 
 
 
 
-#define kprobe_num 0
-
-static struct kprobe kprobes[kprobe_num] = {
-
-    
-
-
-
-
-
-
-
-};
-
-
-
-#define kretprobe_num 0
-
-static struct kretprobe kretprobes[kretprobe_num] = {
-
-};
-
-
-
-
 
 static int __init tcp_trace_init(void)
 {
@@ -275,18 +250,6 @@ static int __init tcp_trace_init(void)
 
 
 
-
-    // ret = kprobes_init(kprobes, kprobe_num);
-    // if  (ret < 0)
-    // {   pr_warn("register kprobes failed\n");
-    //     goto kprobes_init_failed;
-    // }
-       
-    // ret = kretprobes_init(kretprobes, kretprobe_num);
-    // if  (ret < 0)
-    // {   pr_warn("register kretprobes failed\n");
-    //     goto kretprobes_init_failed;
-    // }
 
     ret = tcp_trace_conn_init();
     if  (ret < 0)
@@ -303,7 +266,7 @@ static int __init tcp_trace_init(void)
     return 0;
 
 kretprobes_init_failed:
-    kprobes_exit(kprobes, kprobe_num);
+   
 kprobes_init_failed:
     // tracepoint_probe_context_unregister_probes(&sched_probes);
 
@@ -315,10 +278,6 @@ static void __exit tcp_trace_exit(void)
     pr_debug("tcp_trace_exit begin\n");
 
 
-
-    // kprobes_exit(kprobes, kprobe_num);
-
-    // kretprobes_exit(kretprobes, kretprobe_num);
     
     tcp_trace_conn_exit();
 
