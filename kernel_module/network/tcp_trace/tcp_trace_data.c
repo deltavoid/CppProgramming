@@ -11,14 +11,17 @@ static void tcp_sock_display(struct sock* sk)
 {
     struct tcp_sock* tp = (struct tcp_sock*)sk;
 
-    pr_debug("snd_una:    0x%08x\n", tp->snd_una);
-    pr_debug("snd_nxt:    0x%08x\n", tp->snd_nxt);
-    pr_debug("snd_wnd:    0x%08x\n", tp->snd_wnd);
-    pr_debug("write_seq:  0x%08x\n", tp->write_seq);
+    pr_debug("snd_una:         0x%08x\n", tp->snd_una);
+    pr_debug("snd_nxt:         0x%08x\n", tp->snd_nxt);
+    pr_debug("write_seq:       0x%08x\n", tp->write_seq);
+    pr_debug("send not ack:    0x%08x\n", tp->snd_nxt - tp->snd_una);
+    pr_debug("write not send:  0x%08x\n", tp->write_seq - tp->snd_nxt);
+    pr_debug("snd_wnd:         0x%08x\n", tp->snd_wnd);
 
-    pr_debug("copied_seq: 0x%08x\n", tp->copied_seq);
-    pr_debug("rcv_nxt:    0x%08x\n", tp->rcv_nxt);
-    pr_debug("rcv_wnd:    0x%08x\n", tp->rcv_wnd);
+    pr_debug("copied_seq:      0x%08x\n", tp->copied_seq);
+    pr_debug("rcv_nxt:         0x%08x\n", tp->rcv_nxt);
+    pr_debug("recv not copy:   0x%08x\n", tp->rcv_nxt - tp->copied_seq);
+    pr_debug("rcv_wnd:         0x%08x\n", tp->rcv_wnd);
 
 }
 
@@ -70,7 +73,7 @@ static int kretprobe__tcp_rcv_established(struct kretprobe_instance *ri, struct 
     sock_common_display(sk, "kretprobe:tcp_rcv_established");
 
     tcp_sock_display(sk);
-    
+
 
     // pr_debug("\n");
     return 0;
@@ -240,6 +243,8 @@ static int kretprobe_entry__tcp_write_xmit(struct kretprobe_instance *ri, struct
 
     ctx->sk = sk;
 
+    tcp_sock_display(sk);
+
     // pr_debug("\n");
     return 0;
 }
@@ -254,6 +259,8 @@ static int kretprobe__tcp_write_xmit(struct kretprobe_instance *ri, struct pt_re
         return 0;
 
     sock_common_display(sk, "kretprobe:tcp_write_xmit");
+
+    tcp_sock_display(sk);
 
     // pr_debug("\n");
     return 0;
