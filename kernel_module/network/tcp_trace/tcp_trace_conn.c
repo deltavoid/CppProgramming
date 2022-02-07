@@ -508,19 +508,17 @@ static int kprobe__tcp_v4_send_reset(struct kprobe *p, struct pt_regs *regs)
 
 static struct kprobe kprobes[kprobe_num] = {
 
+    /* estab */
+
     kprobe_hook__tcp_conn_request,
     kprobe_hook__tcp_v4_send_synack,
-
     kprobe_hook__tcp_check_req,
     kprobe_hook__tcp_v4_syn_recv_sock,
-
     kprobe_hook__tcp_create_openreq_child,
     kprobe_hook__inet_csk_clone_lock,
     kprobe_hook__tcp_child_process,
 
     kprobe_hook__tcp_set_state,
-
-
 
     
     {
@@ -536,10 +534,22 @@ static struct kprobe kprobes[kprobe_num] = {
         .pre_handler = kprobe__tcp_finish_connect,
     },
 
+    /* close */
 
     {
         .symbol_name	= "tcp_fin",
         .pre_handler = kprobe__tcp_fin,
+    },
+
+    {
+        .symbol_name	= "tcp_done",
+        .pre_handler = kprobe__tcp_done,
+    },
+
+
+    {
+        .symbol_name	= "tcp_timewait_state_process",
+        .pre_handler = kprobe__tcp_timewait_state_process,
     },
     {
         .symbol_name	= "tcp_time_wait",
@@ -549,20 +559,14 @@ static struct kprobe kprobes[kprobe_num] = {
         .symbol_name	= "inet_twsk_kill",
         .pre_handler = kprobe__inet_twsk_kill,
     },
-    {
-        .symbol_name	= "tcp_timewait_state_process",
-        .pre_handler = kprobe__tcp_timewait_state_process,
-    },
 
-
-    {
-        .symbol_name	= "tcp_done",
-        .pre_handler = kprobe__tcp_done,
-    },
     {
         .symbol_name	= "inet_csk_destroy_sock",
         .pre_handler = kprobe__inet_csk_destroy_sock,
     },
+
+
+    /* reset */
 
     {
         .symbol_name	= "tcp_reset",
@@ -571,9 +575,7 @@ static struct kprobe kprobes[kprobe_num] = {
     {
         .symbol_name	= "tcp_v4_send_reset",
         .pre_handler = kprobe__tcp_v4_send_reset,
-    },
-
-
+    },    
 
 
 };
@@ -587,6 +589,8 @@ static struct kretprobe kretprobes[kretprobe_num] = {
     kretprobe_hook__tcp_rcv_state_process,
     kretprobe_hook__tcp_v4_syn_recv_sock,
     kretprobe_hook__inet_csk_accept,
+
+
     kretprobe_hook__tcp_close,
 
 };
