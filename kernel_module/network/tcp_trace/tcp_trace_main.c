@@ -1255,6 +1255,11 @@ static int __init tcp_trace_init(void)
         goto kretprobes_init_failed;
     }
 
+    ret = tcp_trace_conn_init();
+    if  (ret < 0)
+    {   pr_warn("tcp_trace_conn_init failed\n");
+    }
+
     pr_debug("tcp_trace_init end\n");
     pr_debug("\n");
     return 0;
@@ -1277,6 +1282,7 @@ static void __exit tcp_trace_exit(void)
 
     kretprobes_exit(kretprobes, kretprobe_num);
     
+    tcp_trace_conn_exit();
 
     pr_debug("tcp_trace_exit end\n");
     pr_debug("------------------------------------------------------------------\n");
