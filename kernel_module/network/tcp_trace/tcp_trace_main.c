@@ -261,41 +261,11 @@ const struct kprobe kprobe_hook__tcp_rcv_state_process = {
 // }
 
 
-static int kprobe__inet_hash_connect(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 1);
-    
-    if  (!sock_filter_and_display(sk, 2, "kprobe:inet_hash_connect"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
-
-
-static int kprobe__tcp_connect(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-    
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_connect"))
-        return 0;
-
-    // pr_debug("\n");
-    return 0;
-}
 
 
 
-static int kprobe__tcp_finish_connect(struct kprobe *p, struct pt_regs *regs)
-{
-    struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
-    
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_finish_connect"))
-        return 0;
 
-    // pr_debug("\n");
-    return 0;
-}
+
 
 
 
@@ -707,24 +677,12 @@ static struct tracepoint_probe_context sched_probes = {
 };
 
 
-#define kprobe_num 21
+#define kprobe_num 18
 
 static struct kprobe kprobes[kprobe_num] = {
 
     
 
-    {
-        .symbol_name	= "inet_hash_connect",
-        .pre_handler = kprobe__inet_hash_connect,
-    },    
-    {
-        .symbol_name	= "tcp_connect",
-        .pre_handler = kprobe__tcp_connect,
-    },
-    {
-        .symbol_name	= "tcp_finish_connect",
-        .pre_handler = kprobe__tcp_finish_connect,
-    },
     {
         .symbol_name	= "tcp_fin",
         .pre_handler = kprobe__tcp_fin,
