@@ -71,9 +71,11 @@ const struct kretprobe kretprobe_hook__tcp_v4_do_rcv = {
 static int kprobe__tcp_rcv_state_process(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    
 
     if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_rcv_state_process"))
         return 0;
+
 
     // pr_debug("\n");
     return 0;
@@ -89,6 +91,7 @@ const struct kprobe kprobe_hook__tcp_rcv_state_process = {
 static int kretprobe_entry__tcp_rcv_state_process(struct kretprobe_instance *ri, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
+    struct sk_buff* skb = (struct sk_buff*)x86_64_get_regs_arg(regs, 1);
     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
 
     ctx->sk = NULL;
@@ -100,6 +103,8 @@ static int kretprobe_entry__tcp_rcv_state_process(struct kretprobe_instance *ri,
     // ctx->shifted_tid = get_shifted_tid();
     ctx->sk = sk;
 
+
+    tcp_recv_skb_display(skb);
 
     // pr_debug("\n");
     return 0;
@@ -212,6 +217,7 @@ static int kprobe__tcp_v4_syn_recv_sock(struct kprobe *p, struct pt_regs *regs)
         return 0;
 
     // dump_stack();
+
 
     // pr_debug("\n");
     return 0;

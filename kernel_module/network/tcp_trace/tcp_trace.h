@@ -59,7 +59,7 @@ extern void sock_common_display(const struct sock* sk, const char* prefix);
 extern bool sock_filter_and_display(const struct sock* sk, int func_level, const char* prefix);
 
 
-
+extern void tcp_recv_skb_display(struct sk_buff* skb);
 
 
 // typedef struct sock* sock_pointer;

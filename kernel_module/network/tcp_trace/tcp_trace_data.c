@@ -25,7 +25,7 @@ static void tcp_sock_display(struct sock* sk)
 
 }
 
-static void tcp_recv_skb_display(struct sk_buff* skb)
+void tcp_recv_skb_display(struct sk_buff* skb)
 {
     struct tcphdr* th = (struct tcphdr*)skb->data;
 
