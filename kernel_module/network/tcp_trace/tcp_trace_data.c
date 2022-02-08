@@ -322,6 +322,9 @@ static int kprobe____tcp_transmit_skb(struct kprobe *p, struct pt_regs *regs)
 
     // tcp_send_skb_display(skb);
 
+    pr_debug("send flags:  fin: %d, syn: %d, rst: %d, psh: %d, ack: %d, urg: %d, ece: %d, cwr: %d\n", 
+            !!(tcb->tcp_flags & 0x1), !!(tcb->tcp_flags & 0x2), !!(tcb->tcp_flags & 0x4), !!(tcb->tcp_flags & 0x8),
+            !!(tcb->tcp_flags & 0x10), !!(tcb->tcp_flags & 0x20), !!(tcb->tcp_flags & 0x40), !!(tcb->tcp_flags & 0x80));
     pr_debug("send seq:        0x%08x,   send ack:        0x%08x\n", tcb->seq, rcv_nxt);
     pr_debug("send len:        0x%08x\n", skb->len);
 
