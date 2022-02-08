@@ -7,7 +7,7 @@
 
 
 
-static void tcp_sock_display(struct sock* sk)
+void tcp_sock_display(struct sock* sk)
 {
     struct tcp_sock* tp = (struct tcp_sock*)sk;
 

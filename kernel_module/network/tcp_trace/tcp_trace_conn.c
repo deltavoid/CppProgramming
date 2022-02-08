@@ -103,6 +103,7 @@ static int kretprobe_entry__tcp_rcv_state_process(struct kretprobe_instance *ri,
     // ctx->shifted_tid = get_shifted_tid();
     ctx->sk = sk;
 
+    tcp_sock_display(sk);
 
     tcp_recv_skb_display(skb);
 
