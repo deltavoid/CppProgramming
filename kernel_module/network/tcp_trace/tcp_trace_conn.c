@@ -12,7 +12,7 @@ static int kprobe__tcp_v4_do_rcv(struct kprobe *p, struct pt_regs *regs)
 {
     struct sock* sk = (struct sock*)x86_64_get_regs_arg(regs, 0);
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_do_rcv"))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_v4_do_rcv"))
         return 0;
 
     // pr_debug("\n");
@@ -30,7 +30,7 @@ static int kretprobe_entry__tcp_v4_do_rcv(struct kretprobe_instance *ri, struct 
     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
     ctx->sk = NULL;
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_v4_do_rcv"))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_v4_do_rcv"))
         return 0;
 
     ctx->sk = sk;

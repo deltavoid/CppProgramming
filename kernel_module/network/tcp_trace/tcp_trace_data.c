@@ -71,7 +71,7 @@ static int kretprobe_entry__tcp_rcv_established(struct kretprobe_instance *ri, s
     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
     ctx->sk = NULL;
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_rcv_established"))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_rcv_established"))
         return 0;
 
     ctx->sk = sk;
@@ -139,7 +139,7 @@ static int kretprobe_entry__tcp_recvmsg(struct kretprobe_instance *ri, struct pt
     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
     ctx->sk = NULL;
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_recvmsg"))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_recvmsg"))
         return 0;
 
     ctx->sk = sk;
@@ -210,7 +210,7 @@ static int kretprobe_entry__tcp_sendmsg(struct kretprobe_instance *ri, struct pt
     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
     ctx->sk = NULL;
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_sendmsg"))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_sendmsg"))
         return 0;
 
     ctx->sk = sk;
@@ -269,7 +269,7 @@ static int kretprobe_entry__tcp_write_xmit(struct kretprobe_instance *ri, struct
     struct kretprobe_tcp_common_ctx* ctx = (struct kretprobe_tcp_common_ctx*)ri->data;
     ctx->sk = NULL;
 
-    if  (!sock_filter_and_display(sk, 2, "kprobe:tcp_write_xmit"))
+    if  (!sock_filter_and_display(sk, 3, "kprobe:tcp_write_xmit"))
         return 0;
 
     ctx->sk = sk;
