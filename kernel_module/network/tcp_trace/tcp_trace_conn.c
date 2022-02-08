@@ -211,6 +211,7 @@ const struct kprobe kprobe_hook__tcp_check_req = {
 
 static int kprobe__tcp_v4_syn_recv_sock(struct kprobe *p, struct pt_regs *regs)
 {
+    struct sk_buff* skb = (struct sk_buff*)x86_64_get_regs_arg(regs, 1);
     struct sock* req_sock = (struct sock*)x86_64_get_regs_arg(regs, 2);
 
     if  (!sock_filter_and_display(req_sock, 2, "kprobe:tcp_v4_syn_recv_sock"))
@@ -218,6 +219,7 @@ static int kprobe__tcp_v4_syn_recv_sock(struct kprobe *p, struct pt_regs *regs)
 
     // dump_stack();
 
+    tcp_recv_skb_display(skb);
 
     // pr_debug("\n");
     return 0;
