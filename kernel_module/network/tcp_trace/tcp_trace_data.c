@@ -29,8 +29,11 @@ static void tcp_recv_skb_display(struct sk_buff* skb)
 {
     struct tcphdr* th = (struct tcphdr*)skb->data;
 
+    pr_debug("recv flags:  fin: %d, syn: %d, rst: %d, psh: %d, ack: %d, urg: %d, ece: %d, cwr: %d\n", 
+            th->fin, th->syn, th->rst, th->psh, th->ack, th->urg, th->ece, th->cwr);
     pr_debug("recv ack:        0x%08x,   recv seq:        0x%08x\n", ntohl(th->ack_seq), ntohl(th->seq));
     pr_debug("recv wnd:        0x%08x,   recv len:        0x%08x\n", ntohs(th->window), skb->len - (th->doff << 2));
+
 }
 
 // static void tcp_send_skb_display(struct sk_buff* skb)
