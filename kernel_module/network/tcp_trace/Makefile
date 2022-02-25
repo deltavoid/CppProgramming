@@ -14,7 +14,7 @@ MODULE_NAME		:= tcp_trace
 # ifneq ($(KERNELRELEASE),)
 ifneq ($(KBUILD_EXTMOD),)
 obj-m			:= $(MODULE_NAME).o
-$(MODULE_NAME)-m	:= tcp_trace_main.o hook_func_lib.o
+$(MODULE_NAME)-m	:= tcp_trace_main.o tcp_trace_conn.o tcp_trace_data.o tcp_trace_filter.o hook_func_lib.o
 # $(MODULE_NAME)-m	+= kprobe.o trace.o
 # ldflags-y		+= -r -T $(KBUILD_EXTMOD)/kprobe.lds
 # ccflags-y		+= -I$(KBUILD_EXTMOD)/include
@@ -39,6 +39,7 @@ clean:
 
 insmod: rmmod build
 	sudo insmod $(MODULE_NAME).ko local_port=8192 remote_port=0 enable_ipv4=1 enable_ipv6=1
+#	sudo insmod $(MODULE_NAME).ko local_port=8080 remote_port=0 enable_ipv4=1 enable_ipv6=0
 
 rmmod:
 	-sudo rmmod $(MODULE_NAME)
