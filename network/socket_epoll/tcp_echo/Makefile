@@ -174,6 +174,16 @@ server: server.cpp util.h util.cpp
 
 
 
+server_epoll_lt_recvmsg: server_epoll_lt_recvmsg.cpp
+	g++ -o $@ $^ -pthread
+
+
+server_epoll_lt_recv: server_epoll_lt_recv.cpp
+	g++ -o $@ $^ -pthread
+
+
+
+
 clean:
 # 	-rm client client_epoll_bench server server_epoll server_epoll_bench
 	rm `cat .gitignore` -f 
