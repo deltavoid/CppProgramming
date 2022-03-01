@@ -34,4 +34,13 @@ target_include_directories(server_epoll_lt_recvmsg
         .
 )
 
+
+add_executable(server_epoll_et_recvmsg
+    main/server_epoll_et_recvmsg.cpp
+)
+target_include_directories(server_epoll_et_recvmsg
+    PRIVATE
+        .
+)
+
 # message("hello CMakeLists end")
