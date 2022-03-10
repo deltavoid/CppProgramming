@@ -217,11 +217,15 @@ public:
 
     virtual ~Connection()
     {
+        printf("Connection::~Connection\n");
+
         if  (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) < 0)
             perror("epoll_ctl del error");
         
         close(fd);
         printf("fd %d closed\n", fd);
+
+        printf("Connection::~Connection: end\n");
     }
 
 
@@ -239,6 +243,7 @@ public:
 
         printf("Connection::start: 2\n");
         makecontext(&this->ctx_fnew, (void (*)(void)) run, 1, this);
+
 
         printf("Connection::start: 3\n");
         wait_status = WaitStatus::running;
@@ -355,20 +360,24 @@ public:
     {
         int ret = -1;
 
+        printf("connection::await_recv: 1\n");
+
 
         while (true)
         {
             int recv_size = recv(fd, buf, size, 0);
 
-            if  (recv_size <= 0)
+            if  (recv_size < 0)
             {
 
                 if  (errno == EAGAIN || errno == EWOULDBLOCK)
                 {
                     wait_status = WaitStatus::wait_could_recv;
 
+                    printf("connection::await_recv: 2\n");
                     swapcontext(&this->ctx_fnew, &this->ctx_main);
-                
+                    printf("connection::await_recv: 3\n");
+
                     wait_status = WaitStatus::running;
                 }
                 else
@@ -384,6 +393,7 @@ public:
             }
         }
 
+        printf("connection::await_recv: 4, ret: %d\n", ret);
         return ret;
     }
 
@@ -392,6 +402,7 @@ public:
         int ret = 0;
         int have_sent = 0;
 
+        printf("connection::await_send: 1\n");
 
         while (have_sent < size)
         {
@@ -407,8 +418,10 @@ public:
 
                     wait_status = WaitStatus::wait_could_send;
 
+                    printf("connection::await_send: 2\n");
                     swapcontext(&this->ctx_fnew, &this->ctx_main);
-                
+                    printf("connection::await_send: 3\n");
+
                     wait_status = WaitStatus::running;
                 }
                 else
@@ -422,6 +435,7 @@ public:
             }
         }
 
+        printf("connection::await_send: 4, ret: %d\n", ret);
         return ret;
     }
 
@@ -458,7 +472,7 @@ public:
 
     virtual int handle(uint32_t ev)
     {
-        int ret = -1;
+        // int ret = 0;
         printf("Connection::handle: ev: %d\n", ev);
         // return -1;
 
@@ -469,7 +483,10 @@ public:
         {
             if  (wait_status == WaitStatus::wait_could_send)
             {
-                swapcontext(&this->ctx_main, &this->ctx_fnew);
+                int ret = swapcontext(&this->ctx_main, &this->ctx_fnew);
+
+                if  (ret < 0 || this->exited)
+                    return -1;
             }
         }
             
@@ -477,7 +494,10 @@ public:
         {
             if  (wait_status == WaitStatus::wait_could_recv)
             {
-                swapcontext(&this->ctx_main, &this->ctx_fnew);
+                int ret = swapcontext(&this->ctx_main, &this->ctx_fnew);
+                
+                if  (ret < 0 || this->exited)
+                    return -1;
             }
         }
 
