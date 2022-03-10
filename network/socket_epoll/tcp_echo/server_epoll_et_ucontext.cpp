@@ -17,6 +17,7 @@
 #include <pthread.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <ucontext.h>
 
 
 
@@ -176,16 +177,31 @@ public:
     int fd;
     int epfd;
 
-    RingBuffer buf;
+    // RingBuffer buf;
 
-    // bool enable_epollout;
+    enum class WaitStatus {
+        running = 0,
+        wait_could_recv,
+        wait_could_send,
+    }wait_status;
+
+    ucontext_t ctx_main, ctx_fnew;
+
+    bool exited;
+
+    static const int buf_size = 64;
+    char buffer[buf_size];
+
+    static const int stack_size = 4096;
+    char stack[stack_size];
+
 
     Connection(int fd, int epfd)
         : fd(fd), epfd(epfd)
     {
+        int ret = -1;
         printf("Connection::Connection: fd: %d, epfd: %d\n", fd, epfd);
 
-        // enable_epollout = false;
 
         struct epoll_event event;
         event.events = EPOLLIN | EPOLLOUT | EPOLLET;
@@ -193,6 +209,10 @@ public:
         if  (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &event) < 0)
         {   perror("epoll_ctl add error");
         }
+
+
+
+        printf("Connection::Connection: end\n");
     }
 
     virtual ~Connection()
@@ -204,125 +224,70 @@ public:
         printf("fd %d closed\n", fd);
     }
 
-    // void set_epollout(bool flag)
-    // {
-    //     struct epoll_event event;
-    //     event.events = EPOLLIN | (flag? EPOLLOUT : 0);
-    //     event.data.ptr = this;
-    //     if  (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &event) < 0)
-    //         perror("epoll_ctl error");
-    //     enable_epollout = flag;
-    // }
 
-
-    int recv_buf()
+    int start()
     {
-        if  (buf.get_blank_size() <= 0)
-        {
-            printf("error: read buf should not be empty\n");
-            return -1;
+        int ret = -1;
+        printf("Connection::start: 1\n");
+
+
+        ret = getcontext(&this->ctx_fnew);
+        this->ctx_fnew.uc_stack.ss_sp = &this->stack;
+	    this->ctx_fnew.uc_stack.ss_size = this->stack_size;
+        this->ctx_fnew.uc_link = &this->ctx_main;
+        exited = false;
+
+        printf("Connection::start: 2\n");
+        makecontext(&this->ctx_fnew, (void (*)(void)) run, 1, this);
+
+        printf("Connection::start: 3\n");
+        wait_status = WaitStatus::running;
+        ret = swapcontext(&this->ctx_main, &this->ctx_fnew);
+        if  (ret != 0)
+        {   perror("swapcontext error at Connection::Connection");
         }
 
-        // at this stage not support read flow control, just assume the read buf is enough.
 
-        struct iovec iov[2];
-        size_t iov_len = 0;
-        if  (buf.get_blank_iovec(iov, &iov_len) < 0)
-            return 0;
-
-        struct msghdr msg = {
-            .msg_name = NULL,
-            .msg_namelen = 0,
-            .msg_iov = iov,
-            .msg_iovlen = iov_len,
-            .msg_control = NULL,
-            .msg_controllen = 0
-        };
-        int recv_len = recvmsg(fd, &msg, 0);
-        printf("Connection::recv_buf, recv_len: %d\n", recv_len);
-        if  (recv_len <= 0)
-            return -1;
-
-        buf.add_exist(recv_len);
-        printf("Connection::recv_buf, f: %llu, p: %llu\n", buf.f, buf.p);
-        return recv_len;
+        printf("Connection::start: 4, end\n");
+        return 0;
     }
 
-    // int recv_buf_native()
+
+    // int recv_buf()
     // {
     //     if  (buf.get_blank_size() <= 0)
-    //         return 0;
+    //     {
+    //         printf("error: read buf should not be empty\n");
+    //         return -1;
+    //     }
+
+    //     // at this stage not support read flow control, just assume the read buf is enough.
 
     //     struct iovec iov[2];
     //     size_t iov_len = 0;
     //     if  (buf.get_blank_iovec(iov, &iov_len) < 0)
     //         return 0;
 
-    //     int ret = 0;
-    //     for (int i = 0; i < iov_len; i++)
-    //     {
-    //         int recv_len = ::recv(fd, iov[i].iov_base, iov[i].iov_len, 0);
-    //         printf("Connection::recv_buf_native, recv_len: %d, iov[%d].len: %d\n", recv_len, i, iov[i].iov_len);
+    //     struct msghdr msg = {
+    //         .msg_name = NULL,
+    //         .msg_namelen = 0,
+    //         .msg_iov = iov,
+    //         .msg_iovlen = iov_len,
+    //         .msg_control = NULL,
+    //         .msg_controllen = 0
+    //     };
+    //     int recv_len = recvmsg(fd, &msg, 0);
+    //     printf("Connection::recv_buf, recv_len: %d\n", recv_len);
+    //     if  (recv_len <= 0)
+    //         return -1;
 
-    //         if  (recv_len == 0)
-    //             return -1;
-            
-    //         if  (recv_len < 0)
-    //         {   if  (errno == EAGAIN || errno == EWOULDBLOCK)
-    //                 recv_len = 0;
-    //             else
-    //                 return -1;
-    //         }
-
-    //         buf.add_exist(recv_len);
-    //         printf("Connection::recv_buf_native, f: %llu, p: %llu\n", buf.f, buf.p);
-    //         ret += recv_len;
-    //         if  (recv_len < iov[i].iov_len)
-    //             break;
-    //     }
-
-    //     return ret;
+    //     buf.add_exist(recv_len);
+    //     printf("Connection::recv_buf, f: %llu, p: %llu\n", buf.f, buf.p);
+    //     return recv_len;
     // }
 
-    int send_buf()
-    {
-        int to_send = buf.get_exist_size();
-        if  (to_send <= 0)
-            return 0;
-        
-        struct iovec iov[2];
-        size_t iov_len = 0;
-        buf.get_exist_iovec(iov, &iov_len);
 
-        struct msghdr msg = {
-            .msg_name = NULL,
-            .msg_namelen = 0,
-            .msg_iov = iov,
-            .msg_iovlen = iov_len,
-            .msg_control = NULL,
-            .msg_controllen = 0
-        };
-        int send_len = sendmsg(fd, &msg, 0);
-        printf("Connection::send_buf, send_len: %d\n", send_len);
-                
-        if  (send_len < 0)
-        {
-            if  (errno == EAGAIN || errno == EWOULDBLOCK)
-            {   send_len = 0;
-            }
-
-            else
-                return -1;
-        }
-
-        buf.add_blank(send_len);
-
-
-        printf("Connection::send_buf, f: %llu, p: %llu\n", buf.f, buf.p);
-        return send_len;
-    }
-
-    // int send_buf_native()
+    // int send_buf()
     // {
     //     int to_send = buf.get_exist_size();
     //     if  (to_send <= 0)
@@ -332,62 +297,164 @@ public:
     //     size_t iov_len = 0;
     //     buf.get_exist_iovec(iov, &iov_len);
 
-    //     int have_send = 0;
-    //     for (int i = 0; i < iov_len; i++)
+    //     struct msghdr msg = {
+    //         .msg_name = NULL,
+    //         .msg_namelen = 0,
+    //         .msg_iov = iov,
+    //         .msg_iovlen = iov_len,
+    //         .msg_control = NULL,
+    //         .msg_controllen = 0
+    //     };
+    //     int send_len = sendmsg(fd, &msg, 0);
+    //     printf("Connection::send_buf, send_len: %d\n", send_len);
+                
+    //     if  (send_len < 0)
     //     {
-    //         int send_len = send(fd, iov[i].iov_base, iov[i].iov_len, 0);
-    //         printf("Connection::send_buf_native, send_len: %d, iov[%d].len: %d\n", send_len, i, iov[i].iov_len);
-
-    //         if  (send_len < 0)
-    //         {   if  (errno == EAGAIN || errno == EWOULDBLOCK)
-    //                 send_len = 0;
-    //             else
-    //                 return -1;
+    //         if  (errno == EAGAIN || errno == EWOULDBLOCK)
+    //         {   send_len = 0;
     //         }
 
-    //         buf.add_blank(send_len);
-    //         printf("Connection::send_buf_native, f: %llu, p: %llu\n", buf.f, buf.p);
-    //         have_send += send_len;
-
-    //         if  (have_send == to_send)
-    //         {   if  (enable_epollout)
-    //                 set_epollout(false);
-    //         }
-    //         else if  (send_len < iov[i].iov_len)
-    //         {   if  (!enable_epollout)
-    //                 set_epollout(true);
-    //             break;
-    //         }
+    //         else
+    //             return -1;
     //     }
 
-    //     return have_send;
+    //     buf.add_blank(send_len);
+
+
+    //     printf("Connection::send_buf, f: %llu, p: %llu\n", buf.f, buf.p);
+    //     return send_len;
+    // }
+    // int handle_read()
+    // {
+    //     if  (recv_buf() < 0)
+    //         return -1;
+    //     // if  (recv_buf_native() < 0)
+    //     //     return -1;
+
+    //     if  (send_buf() < 0)
+    //         return -1;
+    //     // if  (send_buf_native() < 0)
+    //     //     return -1;
+        
+    //     return 0;
     // }
 
-    int handle_read()
-    {
-        if  (recv_buf() < 0)
-            return -1;
-        // if  (recv_buf_native() < 0)
-        //     return -1;
+    // int handle_write()
+    // {
+    //     if  (send_buf() < 0)
+    //         return -1;
 
-        if  (send_buf() < 0)
-            return -1;
-        // if  (send_buf_native() < 0)
-        //     return -1;
+    //     // if  (send_buf_native() < 0)
+    //     //     return -1;
         
-        return 0;
+    //     return 0;
+    // }
+
+
+    int await_recv(char* buf, int size)
+    {
+        int ret = -1;
+
+
+        while (true)
+        {
+            int recv_size = recv(fd, buf, size, 0);
+
+            if  (recv_size <= 0)
+            {
+
+                if  (errno == EAGAIN || errno == EWOULDBLOCK)
+                {
+                    wait_status = WaitStatus::wait_could_recv;
+
+                    swapcontext(&this->ctx_fnew, &this->ctx_main);
+                
+                    wait_status = WaitStatus::running;
+                }
+                else
+                {
+                    ret = recv_size;
+                    break;
+                }
+            }
+            else
+            {
+                ret = recv_size;
+                break;
+            }
+        }
+
+        return ret;
     }
 
-    int handle_write()
+    int await_send(char* buf, int size)
     {
-        if  (send_buf() < 0)
-            return -1;
+        int ret = 0;
+        int have_sent = 0;
 
-        // if  (send_buf_native() < 0)
-        //     return -1;
-        
-        return 0;
+
+        while (have_sent < size)
+        {
+            char* start = buf + have_sent;
+            int to_send = size - have_sent;
+
+            int send_size = send(fd, start, to_send, 0);
+
+            if  (send_size < 0)
+            {
+                if  (errno == EAGAIN || errno == EWOULDBLOCK)
+                {
+
+                    wait_status = WaitStatus::wait_could_send;
+
+                    swapcontext(&this->ctx_fnew, &this->ctx_main);
+                
+                    wait_status = WaitStatus::running;
+                }
+                else
+                {
+                    ret = send_size;
+                }
+            }
+            else
+            {
+                have_sent += send_size;
+            }
+        }
+
+        return ret;
     }
+
+
+
+
+
+    static void run(Connection* This)
+    {
+        printf("Connection::run: 1\n");
+
+
+        while (true)
+        {
+            printf("Connection::run: 2\n");
+            int recv_size = This->await_recv(This->buffer, This->buf_size);
+            if  (recv_size <= 0)
+                break;
+
+
+            printf("Connection::run: 3\n");
+            int send_size = This->await_send(This->buffer, recv_size);
+            if  (send_size < 0)
+                break;
+        }
+
+
+        printf("Connection::run: 4\n");
+        This->exited = true;
+        swapcontext(&This->ctx_fnew, &This->ctx_main);
+    }
+
+
 
     virtual int handle(uint32_t ev)
     {
@@ -400,21 +467,27 @@ public:
 
         if  (ev & EPOLLOUT)
         {
-            ret = handle_write();
-            if  (ret < 0)
-                return ret;
+            if  (wait_status == WaitStatus::wait_could_send)
+            {
+                swapcontext(&this->ctx_main, &this->ctx_fnew);
+            }
         }
             
         if  (ev & EPOLLIN)
         {
-            ret = handle_read();
-            printf("Connection::handle, handle_read: %d\n", ret);
-            if  (ret < 0)
-                return ret;
+            if  (wait_status == WaitStatus::wait_could_recv)
+            {
+                swapcontext(&this->ctx_main, &this->ctx_fnew);
+            }
         }
+
 
         return 0;
     }
+
+
+
+
 };
 
 class Acceptor : public EpollHandler {
@@ -475,6 +548,10 @@ public:
         }
 
         Connection* conn = new Connection(new_fd, epfd);
+
+        conn->start();
+
+
         return 0;
     }
 };
