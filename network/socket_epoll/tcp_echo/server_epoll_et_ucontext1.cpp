@@ -135,23 +135,21 @@ public:
     int fd;
     int epfd;
 
-    // RingBuffer buf;
+    // enum class WaitStatus {
+    //     running = 0,
+    //     wait_could_recv,
+    //     wait_could_send,
+    // }wait_status;
 
-    enum class WaitStatus {
-        running = 0,
-        wait_could_recv,
-        wait_could_send,
-    }wait_status;
+    // ucontext_t ctx_main, ctx_fnew;
 
-    ucontext_t ctx_main, ctx_fnew;
-
-    bool exited;
+    // bool exited;
 
     static const int buf_size = 64;
     char buffer[buf_size];
 
-    static const int stack_size = 4096;
-    char stack[stack_size];
+    // static const int stack_size = 4096;
+    // char stack[stack_size];
 
     CoroutineContext coroutine_context;
 
