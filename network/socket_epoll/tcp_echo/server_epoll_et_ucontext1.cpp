@@ -88,9 +88,33 @@ public:
 
     CoroutineContext* waiting_context;
     bool waiting;
+
+
+    CoroutineSemaphore() : waiting_context(NULL), waiting(false) {}
     
+    ~CoroutineSemaphore() {}
 
+    int wait(CoroutineContext* ctx)
+    {
+        this->waiting_context = ctx;
+        this->waiting = true;
 
+        swapcontext(&ctx->ctx_fnew, &ctx->ctx_main);
+
+        return 0;
+    }
+
+    int post()
+    {
+        CoroutineContext* ctx = this->waiting_context;
+        this->waiting_context = NULL;
+        this->waiting = false;
+
+        int ret = swapcontext(&ctx->ctx_main, &ctx->ctx_fnew);
+
+        return ret;
+    }
+    
 };
 
 class Connection : public EpollHandler {
@@ -160,7 +184,7 @@ public:
         printf("Connection::start: 1\n");
 
         recv_sem.waiting = false;
-        send_sem.waiting = false;
+        // send_sem.waiting = false;
 
 
         ret = getcontext(&this->coroutine_context.ctx_fnew);
@@ -204,11 +228,13 @@ public:
                 if  (errno == EAGAIN || errno == EWOULDBLOCK)
                 {
                     // wait_status = WaitStatus::wait_could_recv;
-                    this->recv_sem.waiting_context = ctx;
-                    this->recv_sem.waiting = true;
+                    // this->recv_sem.waiting_context = ctx;
+                    // this->recv_sem.waiting = true;
 
                     printf("connection::await_recv: 2\n");
-                    swapcontext(&this->coroutine_context.ctx_fnew, &this->coroutine_context.ctx_main);
+                    // swapcontext(&this->coroutine_context.ctx_fnew, &this->coroutine_context.ctx_main);
+                    
+                    this->recv_sem.wait(ctx);
                     printf("connection::await_recv: 3\n");
 
                     // wait_status = WaitStatus::running;
@@ -330,13 +356,14 @@ public:
             // if  (wait_status == WaitStatus::wait_could_recv)
             if  (this->recv_sem.waiting)
             {
-                CoroutineContext* ctx = this->recv_sem.waiting_context;
-                this->recv_sem.waiting_context = NULL;
-                this->recv_sem.waiting = false;
+                // CoroutineContext* ctx = this->recv_sem.waiting_context;
+                // this->recv_sem.waiting_context = NULL;
+                // this->recv_sem.waiting = false;
 
-                int ret = swapcontext(&ctx->ctx_main, &ctx->ctx_fnew);
+                // int ret = swapcontext(&ctx->ctx_main, &ctx->ctx_fnew);
+                int ret = this->recv_sem.post();
                 
-                if  (ret < 0 || this->exited)
+                if  (ret < 0 || this->coroutine_context.exited)
                     return -1;
             }
         }
