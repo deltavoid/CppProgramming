@@ -91,7 +91,6 @@ public:
         this->ctx_fnew.uc_stack.ss_sp = &this->stack;
 	    this->ctx_fnew.uc_stack.ss_size = this->stack_size;
         this->ctx_fnew.uc_link = &this->ctx_main;
-        // this->exited = false;
     }
 
 };
@@ -135,21 +134,8 @@ public:
     int fd;
     int epfd;
 
-    // enum class WaitStatus {
-    //     running = 0,
-    //     wait_could_recv,
-    //     wait_could_send,
-    // }wait_status;
-
-    // ucontext_t ctx_main, ctx_fnew;
-
-    // bool exited;
-
     static const int buf_size = 64;
     char buffer[buf_size];
-
-    // static const int stack_size = 4096;
-    // char stack[stack_size];
 
     CoroutineContext coroutine_context;
 
