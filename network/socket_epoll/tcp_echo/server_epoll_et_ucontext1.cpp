@@ -173,7 +173,6 @@ public:
         }
 
 
-
         printf("Connection::Connection: end\n");
     }
 
@@ -194,17 +193,8 @@ public:
     int start()
     {
         int ret = -1;
+
         printf("Connection::start: 1\n");
-
-        // recv_sem.waiting = false;
-        // send_sem.waiting = false;
-
-
-        // ret = getcontext(&this->coroutine_context.ctx_fnew);
-        // this->coroutine_context.ctx_fnew.uc_stack.ss_sp = &this->stack;
-	    // this->coroutine_context.ctx_fnew.uc_stack.ss_size = this->stack_size;
-        // this->coroutine_context.ctx_fnew.uc_link = &this->ctx_main;
-        // this->coroutine_context.exited = false;
         this->coroutine_context.init_context();
 
         printf("Connection::start: 2\n");
@@ -212,7 +202,6 @@ public:
 
 
         printf("Connection::start: 3\n");
-        // wait_status = WaitStatus::running;
         ret = swapcontext(&this->coroutine_context.ctx_main, &this->coroutine_context.ctx_fnew);
         if  (ret != 0)
         {   perror("swapcontext error at Connection::Connection");
@@ -231,29 +220,19 @@ public:
 
         printf("connection::await_recv: 1\n");
 
-
         while (true)
         {
             int recv_size = recv(fd, buf, size, 0);
 
             if  (recv_size < 0)
             {
-
                 if  (errno == EAGAIN || errno == EWOULDBLOCK)
                 {
-                    // wait_status = WaitStatus::wait_could_recv;
-                    // this->recv_sem.waiting_context = ctx;
-                    // this->recv_sem.waiting = true;
-
                     printf("connection::await_recv: 2\n");
-                    // swapcontext(&this->coroutine_context.ctx_fnew, &this->coroutine_context.ctx_main);
-                    
-                    this->recv_sem.wait(ctx);
-                    printf("connection::await_recv: 3\n");
 
-                    // wait_status = WaitStatus::running;
-                    // this->recv_sem.waiting_context = NULL;
-                    // this->recv_sem.waiting = false;
+                    this->recv_sem.wait(ctx);
+                    
+                    printf("connection::await_recv: 3\n");
                 }
                 else
                 {
@@ -290,16 +269,11 @@ public:
             {
                 if  (errno == EAGAIN || errno == EWOULDBLOCK)
                 {
-
-                    // wait_status = WaitStatus::wait_could_send;
-
                     printf("connection::await_send: 2\n");
-                    // swapcontext(&this->ctx_fnew, &this->ctx_main);
-                    
+               
                     this->send_sem.wait(ctx);
+            
                     printf("connection::await_send: 3\n");
-
-                    // wait_status = WaitStatus::running;
                 }
                 else
                 {
@@ -351,21 +325,16 @@ public:
 
     virtual int handle(uint32_t ev)
     {
-        // int ret = 0;
         printf("Connection::handle: ev: %d\n", ev);
-        // return -1;
 
         if  (ev & ~(EPOLLIN | EPOLLOUT))
             return -1;
 
         if  (ev & EPOLLOUT)
         {
-            // if  (wait_status == WaitStatus::wait_could_send)
             if  (this->send_sem.waiting)
             {
-                // int ret = swapcontext(&this->ctx_main, &this->ctx_fnew);
                 int ret = this->send_sem.post();
-
 
                 if  (ret < 0 || this->coroutine_context.exited)
                     return -1;
@@ -374,14 +343,8 @@ public:
             
         if  (ev & EPOLLIN)
         {
-            // if  (wait_status == WaitStatus::wait_could_recv)
             if  (this->recv_sem.waiting)
             {
-                // CoroutineContext* ctx = this->recv_sem.waiting_context;
-                // this->recv_sem.waiting_context = NULL;
-                // this->recv_sem.waiting = false;
-
-                // int ret = swapcontext(&ctx->ctx_main, &ctx->ctx_fnew);
                 int ret = this->recv_sem.post();
                 
                 if  (ret < 0 || this->coroutine_context.exited)
