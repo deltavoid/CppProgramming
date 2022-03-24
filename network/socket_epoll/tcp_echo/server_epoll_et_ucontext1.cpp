@@ -81,6 +81,19 @@ public:
 
     bool exited;
 
+    CoroutineContext() : exited(false) {}
+
+    ~CoroutineContext() {}
+
+    void init_context()
+    {
+        int ret = getcontext(&this->ctx_fnew);
+        this->ctx_fnew.uc_stack.ss_sp = &this->stack;
+	    this->ctx_fnew.uc_stack.ss_size = this->stack_size;
+        this->ctx_fnew.uc_link = &this->ctx_main;
+        // this->exited = false;
+    }
+
 };
 
 class CoroutineSemaphore {
@@ -183,22 +196,23 @@ public:
         int ret = -1;
         printf("Connection::start: 1\n");
 
-        recv_sem.waiting = false;
+        // recv_sem.waiting = false;
         // send_sem.waiting = false;
 
 
-        ret = getcontext(&this->coroutine_context.ctx_fnew);
-        this->coroutine_context.ctx_fnew.uc_stack.ss_sp = &this->stack;
-	    this->coroutine_context.ctx_fnew.uc_stack.ss_size = this->stack_size;
-        this->coroutine_context.ctx_fnew.uc_link = &this->ctx_main;
-        this->coroutine_context.exited = false;
+        // ret = getcontext(&this->coroutine_context.ctx_fnew);
+        // this->coroutine_context.ctx_fnew.uc_stack.ss_sp = &this->stack;
+	    // this->coroutine_context.ctx_fnew.uc_stack.ss_size = this->stack_size;
+        // this->coroutine_context.ctx_fnew.uc_link = &this->ctx_main;
+        // this->coroutine_context.exited = false;
+        this->coroutine_context.init_context();
 
         printf("Connection::start: 2\n");
         makecontext(&this->coroutine_context.ctx_fnew, (void (*)(void)) run, 1, this);
 
 
         printf("Connection::start: 3\n");
-        wait_status = WaitStatus::running;
+        // wait_status = WaitStatus::running;
         ret = swapcontext(&this->coroutine_context.ctx_main, &this->coroutine_context.ctx_fnew);
         if  (ret != 0)
         {   perror("swapcontext error at Connection::Connection");
@@ -258,7 +272,7 @@ public:
         return ret;
     }
 
-    int await_send(char* buf, int size)
+    int await_send(CoroutineContext* ctx, char* buf, int size)
     {
         int ret = 0;
         int have_sent = 0;
@@ -277,13 +291,15 @@ public:
                 if  (errno == EAGAIN || errno == EWOULDBLOCK)
                 {
 
-                    wait_status = WaitStatus::wait_could_send;
+                    // wait_status = WaitStatus::wait_could_send;
 
                     printf("connection::await_send: 2\n");
-                    swapcontext(&this->ctx_fnew, &this->ctx_main);
+                    // swapcontext(&this->ctx_fnew, &this->ctx_main);
+                    
+                    this->send_sem.wait(ctx);
                     printf("connection::await_send: 3\n");
 
-                    wait_status = WaitStatus::running;
+                    // wait_status = WaitStatus::running;
                 }
                 else
                 {
@@ -308,25 +324,27 @@ public:
     {
         printf("Connection::run: 1\n");
 
+        CoroutineContext* ctx = &This->coroutine_context;
+        
 
         while (true)
         {
             printf("Connection::run: 2\n");
-            int recv_size = This->await_recv(&This->coroutine_context, This->buffer, This->buf_size);
+            int recv_size = This->await_recv(ctx, This->buffer, This->buf_size);
             if  (recv_size <= 0)
                 break;
 
 
             printf("Connection::run: 3\n");
-            int send_size = This->await_send(This->buffer, recv_size);
+            int send_size = This->await_send(ctx, This->buffer, recv_size);
             if  (send_size < 0)
                 break;
         }
 
 
         printf("Connection::run: 4\n");
-        This->exited = true;
-        swapcontext(&This->ctx_fnew, &This->ctx_main);
+        ctx->exited = true;
+        swapcontext(&ctx->ctx_fnew, &ctx->ctx_main);
     }
 
 
@@ -342,11 +360,14 @@ public:
 
         if  (ev & EPOLLOUT)
         {
-            if  (wait_status == WaitStatus::wait_could_send)
+            // if  (wait_status == WaitStatus::wait_could_send)
+            if  (this->send_sem.waiting)
             {
-                int ret = swapcontext(&this->ctx_main, &this->ctx_fnew);
+                // int ret = swapcontext(&this->ctx_main, &this->ctx_fnew);
+                int ret = this->send_sem.post();
 
-                if  (ret < 0 || this->exited)
+
+                if  (ret < 0 || this->coroutine_context.exited)
                     return -1;
             }
         }
@@ -371,8 +392,6 @@ public:
 
         return 0;
     }
-
-
 
 
 };
