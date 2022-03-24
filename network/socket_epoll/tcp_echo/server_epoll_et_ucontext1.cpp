@@ -71,6 +71,28 @@ int parse_args(int argc, char** argv)
 }
 
 
+class CoroutineContext {
+public:
+
+    ucontext_t ctx_main, ctx_fnew;
+
+    static const int stack_size = 4096;
+    char stack[stack_size];
+
+    bool exited;
+
+};
+
+class CoroutineSemaphore {
+public:
+
+    CoroutineContext* waiting_context;
+    bool waiting;
+    
+
+
+};
+
 class Connection : public EpollHandler {
 public:
     int fd;
@@ -93,6 +115,10 @@ public:
 
     static const int stack_size = 4096;
     char stack[stack_size];
+
+    CoroutineContext coroutine_context;
+
+    CoroutineSemaphore recv_sem, send_sem;
 
 
     Connection(int fd, int epfd)
@@ -133,20 +159,23 @@ public:
         int ret = -1;
         printf("Connection::start: 1\n");
 
+        recv_sem.waiting = false;
+        send_sem.waiting = false;
 
-        ret = getcontext(&this->ctx_fnew);
-        this->ctx_fnew.uc_stack.ss_sp = &this->stack;
-	    this->ctx_fnew.uc_stack.ss_size = this->stack_size;
-        this->ctx_fnew.uc_link = &this->ctx_main;
-        exited = false;
+
+        ret = getcontext(&this->coroutine_context.ctx_fnew);
+        this->coroutine_context.ctx_fnew.uc_stack.ss_sp = &this->stack;
+	    this->coroutine_context.ctx_fnew.uc_stack.ss_size = this->stack_size;
+        this->coroutine_context.ctx_fnew.uc_link = &this->ctx_main;
+        this->coroutine_context.exited = false;
 
         printf("Connection::start: 2\n");
-        makecontext(&this->ctx_fnew, (void (*)(void)) run, 1, this);
+        makecontext(&this->coroutine_context.ctx_fnew, (void (*)(void)) run, 1, this);
 
 
         printf("Connection::start: 3\n");
         wait_status = WaitStatus::running;
-        ret = swapcontext(&this->ctx_main, &this->ctx_fnew);
+        ret = swapcontext(&this->coroutine_context.ctx_main, &this->coroutine_context.ctx_fnew);
         if  (ret != 0)
         {   perror("swapcontext error at Connection::Connection");
         }
@@ -158,7 +187,7 @@ public:
 
 
     
-    int await_recv(char* buf, int size)
+    int await_recv(CoroutineContext* ctx, char* buf, int size)
     {
         int ret = -1;
 
@@ -174,13 +203,17 @@ public:
 
                 if  (errno == EAGAIN || errno == EWOULDBLOCK)
                 {
-                    wait_status = WaitStatus::wait_could_recv;
+                    // wait_status = WaitStatus::wait_could_recv;
+                    this->recv_sem.waiting_context = ctx;
+                    this->recv_sem.waiting = true;
 
                     printf("connection::await_recv: 2\n");
-                    swapcontext(&this->ctx_fnew, &this->ctx_main);
+                    swapcontext(&this->coroutine_context.ctx_fnew, &this->coroutine_context.ctx_main);
                     printf("connection::await_recv: 3\n");
 
-                    wait_status = WaitStatus::running;
+                    // wait_status = WaitStatus::running;
+                    // this->recv_sem.waiting_context = NULL;
+                    // this->recv_sem.waiting = false;
                 }
                 else
                 {
@@ -253,7 +286,7 @@ public:
         while (true)
         {
             printf("Connection::run: 2\n");
-            int recv_size = This->await_recv(This->buffer, This->buf_size);
+            int recv_size = This->await_recv(&This->coroutine_context, This->buffer, This->buf_size);
             if  (recv_size <= 0)
                 break;
 
@@ -294,9 +327,14 @@ public:
             
         if  (ev & EPOLLIN)
         {
-            if  (wait_status == WaitStatus::wait_could_recv)
+            // if  (wait_status == WaitStatus::wait_could_recv)
+            if  (this->recv_sem.waiting)
             {
-                int ret = swapcontext(&this->ctx_main, &this->ctx_fnew);
+                CoroutineContext* ctx = this->recv_sem.waiting_context;
+                this->recv_sem.waiting_context = NULL;
+                this->recv_sem.waiting = false;
+
+                int ret = swapcontext(&ctx->ctx_main, &ctx->ctx_fnew);
                 
                 if  (ret < 0 || this->exited)
                     return -1;
