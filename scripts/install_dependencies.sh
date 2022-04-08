@@ -10,4 +10,6 @@ apt-get install -y build-essential \
     libboost-dev \
     libgoogle-glog-dev 
     
-apt-get install -y libboost-dev
+apt-get install -y libboost-dev \
+    libfmt-dev
+    
