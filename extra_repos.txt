@@ -66,3 +66,23 @@ https://github.com/deltavoid/uoa
 
 https://github.com/deltavoid/multi_hook
 
+
+
+
+
+
+basic reference repos
+
+
+
+build-essential
+pkg-config
+cmake
+
+
+libgoogle-glog-dev 
+libgflags-dev
+libfmt-dev
+
+
+libboost-dev

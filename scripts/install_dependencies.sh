@@ -6,10 +6,13 @@ set -xe
 
 
 apt-get install -y build-essential \
-    cmake \
-    libboost-dev \
-    libgoogle-glog-dev 
-    
-apt-get install -y libboost-dev \
+    pkg-config \
+    cmake 
+     
+
+apt-get install -y libgoogle-glog-dev \
+    libgflags-dev \
     libfmt-dev
     
+
+apt-get install -y libboost-dev 
