@@ -20,10 +20,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 find_package(RapidJSON REQUIRED)
-# no target
+# no target, but header-only library
 
 
 add_executable(main main.cpp)
+
+target_include_directories(main
+    PRIVATE
+        ${RAPIDJSON_INCLUDE_DIRS}
+)
 
 
 # message("hello CMakeLists end")
