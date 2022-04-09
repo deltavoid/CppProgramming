@@ -16,3 +16,5 @@ apt-get install -y libgoogle-glog-dev \
     
 
 apt-get install -y libboost-dev 
+
+# apt-get install -y libboost-all-dev
