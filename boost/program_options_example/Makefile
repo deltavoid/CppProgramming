@@ -18,7 +18,7 @@ clean:
 
 
 run: build
-	$(BUILD_DIR)/main hello world
+	$(BUILD_DIR)/main  --help
 
 ldd: build
 	ldd $(BUILD_DIR)/main

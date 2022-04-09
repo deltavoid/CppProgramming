@@ -46,6 +46,7 @@ int main(int argc, char** argv, char** env)
         _conf_reader(configuration);
     } catch (bpo::error& e) {
         // fmt::print("error: {}\n\nTry --help.\n", e.what());
+        printf("parse error\n");
         return 2;
     }
 
