@@ -18,8 +18,33 @@ message("CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
 
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+
+find_package(Boost 
+    COMPONENTS
+        program_options
+        thread
+        filesystem
+    REQUIRED
+)
+
+
+
 
 add_executable(main main.cpp)
+
+target_link_libraries(main
+    PUBLIC
+        Boost::boost
+        Boost::program_options
+        # Boost::thread
+
+    PRIVATE
+        # Boost::filesystem
+)
+
+
 
 
 # message("hello CMakeLists end")
