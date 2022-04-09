@@ -16,12 +16,15 @@ message("CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
 message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 message("CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+
 
 find_package(Boost 
     COMPONENTS
-        filesystem
         program_options
         thread
+        filesystem
     REQUIRED
 )
 
@@ -29,5 +32,14 @@ find_package(Boost
 
 add_executable(main main.cpp)
 
+target_link_libraries(main
+    PUBLIC
+        Boost::boost
+        Boost::program_options
+        # Boost::thread
+
+    PRIVATE
+        # Boost::filesystem
+)
 
 # message("hello CMakeLists end")
