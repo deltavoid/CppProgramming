@@ -18,7 +18,7 @@ clean:
 
 
 run: build
-	$(BUILD_DIR)/main hello world
+	$(BUILD_DIR)/main --echo_attachment true --timeout_ms 10 --server 127.0.0.1:8000
 
 ldd: build
 	ldd $(BUILD_DIR)/main

@@ -22,15 +22,18 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(GFLAGS_USE_TARGET_NAMESPACE ON)
 find_package(gflags REQUIRED)
 
-
+#debian glog has not cmake config files
 
 
 add_executable(main main.cpp)
 
 target_link_libraries(main
     PRIVATE
-        gflags::gflags_static
+        # gflags::gflags_static
         # gflags_static
+        # libglog.a
+        gflags::gflags_shared
+        libglog.so
 )
 
 
