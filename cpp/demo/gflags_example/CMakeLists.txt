@@ -27,6 +27,7 @@ find_package(gflags REQUIRED)
 
 add_executable(main main.cpp)
 
+# static gflags and glog looks not work
 target_link_libraries(main
     PRIVATE
         # gflags::gflags_static
