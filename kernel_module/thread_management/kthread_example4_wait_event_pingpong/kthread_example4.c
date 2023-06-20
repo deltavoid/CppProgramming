@@ -56,7 +56,7 @@ static inline void wait_for_kthread_stop(void)
 static int example_thread_run(void *arg)
 {
     int i = 0;
-    struct example_thread_ctx* ctx = (struct example_thread_ctx*)arg;
+    struct example_thread_ctx* thread_ctx = (struct example_thread_ctx*)arg;
 
     pr_debug("example_thread: 1\n");
 
@@ -87,8 +87,12 @@ static int example_thread_run(void *arg)
     while (!kthread_should_stop())
     {
         pr_debug("example_thread: 2, i: %d\n", ++i);
+        wait_event(thread_ctx->wq_head, thread_ctx->waked == 1);
+        thread_ctx->waked = 0;
 
-        msleep(1000);
+
+        // pr_debug("example_thread: 3");
+        // msleep(1000);
     }
     
     pr_debug("example_thread: 5\n");
@@ -113,9 +117,9 @@ struct timer_example {
 
 #define timer_example_timeout 5
 
-static void timer_example_expire__(struct timer_example* data, struct timer_list* timer)
+static void timer_example_expire__(struct timer_example* timer_ctx, struct timer_list* timer)
 {
-    pr_debug("timer_example_expire__, cnt: %lld\n", ++data->cnt);
+    pr_debug("timer_example_expire__, cnt: %lld\n", ++timer_ctx->cnt);
     // preempt_count_display();
     // dump_stack();
 
@@ -127,6 +131,10 @@ static void timer_example_expire__(struct timer_example* data, struct timer_list
     // {   pr_debug("jeffies: %ld\n", jiffies);
     //     mod_timer(timer, jiffies + timer_example_timeout * HZ);
     // }
+
+
+    timer_ctx->thread_ctx->waked = 1;
+    wake_up(&timer_ctx->thread_ctx->wq_head);
 
     pr_debug("jeffies: %ld\n", jiffies);
     mod_timer(timer, jiffies + timer_example_timeout * HZ);
