@@ -17,6 +17,7 @@
 struct example_thread_ctx {
     struct task_struct* task;
 
+    int running;
     int waked;
     struct wait_queue_head wq_head;
 
@@ -24,6 +25,7 @@ struct example_thread_ctx {
 
 static int example_thread_ctx_init(struct example_thread_ctx* ctx)
 {
+    ctx->running = 1;
     ctx->waked = 0;
     init_waitqueue_head(&ctx->wq_head);
     return 0;
@@ -84,17 +86,31 @@ static int example_thread_run(void *arg)
     //     msleep(1000);
     // }
 
-    while (!kthread_should_stop())
+    // while (!kthread_should_stop())
+    // {
+    //     pr_debug("example_thread: 2, i: %d\n", ++i);
+    //     wait_event(thread_ctx->wq_head, thread_ctx->waked == 1);
+    //     thread_ctx->waked = 0;
+
+
+    //     // pr_debug("example_thread: 3");
+    //     // msleep(1000);
+    // }
+
+
+    while (thread_ctx->running)
     {
         pr_debug("example_thread: 2, i: %d\n", ++i);
         wait_event(thread_ctx->wq_head, thread_ctx->waked == 1);
         thread_ctx->waked = 0;
 
 
-        // pr_debug("example_thread: 3");
-        // msleep(1000);
+        pr_debug("example_thread: 3");
+        msleep(1000);
     }
-    
+
+
+    wait_for_kthread_stop();
     pr_debug("example_thread: 5\n");
 	return 0;
 }
@@ -223,8 +239,11 @@ static void __exit kthread_example4_exit(void)
 
     timer_example_exit(&example_timer);
 
-    kthread_stop(example_thread);
+    example_thread_ctx.running = 0;
+    example_thread_ctx.waked = 1;
+    wake_up(&example_thread_ctx.wq_head);
 
+    kthread_stop(example_thread);
 
     pr_info("kthread_example4_exit end\n");
     pr_debug("-------------------------------------------------\n");
