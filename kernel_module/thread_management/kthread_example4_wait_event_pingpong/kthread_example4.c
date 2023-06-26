@@ -8,6 +8,7 @@
 #include <linux/version.h>
 
 #include <linux/sched.h>
+#include <uapi/linux/sched/types.h>
 #include <linux/delay.h>
 #include <linux/kthread.h>
 
@@ -236,6 +237,10 @@ struct timer_example example_timer;
 
 static int __init kthread_example4_init(void)
 {
+    struct sched_param thread_param = {
+		.sched_priority = MAX_USER_RT_PRIO/2,
+	};
+
     pr_info("kthread_example4_init begin\n");
 
     example_thread_ctx_init(&example_thread_ctx);
@@ -248,6 +253,9 @@ static int __init kthread_example4_init(void)
 
 
     example_timer.thread_ctx = &example_thread_ctx;
+
+
+    sched_setscheduler_nocheck(example_thread_ctx.task, SCHED_FIFO, &thread_param);    
 
 
     timer_example_init(&example_timer);
