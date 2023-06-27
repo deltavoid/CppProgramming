@@ -21,3 +21,7 @@ run: build
 
 ldd: build
 	ldd $(BUILD_DIR)/main
+
+run_taskset: build
+	taskset -c 4 $(BUILD_DIR)/main
+	
