@@ -83,6 +83,7 @@ static inline void wait_for_kthread_stop(void)
 static int example_thread_run(void *arg)
 {
     int i = 0;
+    int tmp = 0;
     struct example_thread_ctx* thread_ctx = (struct example_thread_ctx*)arg;
 
     pr_debug("example_thread: 1\n");
@@ -134,6 +135,13 @@ static int example_thread_run(void *arg)
                 thread_ctx->t1 -  thread_ctx->t0);
 
 
+        for (i = 0; i < 1000 ; i++)
+        {
+            tmp++;
+        }
+            
+
+
         // pr_debug("example_thread: 3");
         // msleep(1000);
     }
@@ -160,7 +168,7 @@ struct timer_example {
     uint64_t cnt;
 };
 
-#define timer_example_timeout 5
+#define timer_example_timeout 1
 
 static void timer_example_expire__(struct timer_example* timer_ctx, struct timer_list* timer)
 {
