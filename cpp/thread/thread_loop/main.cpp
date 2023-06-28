@@ -22,8 +22,8 @@ int main(int argc, char** argv, char** env)
     {
         a++;
 
-        if  (a % 1000000 == 0)
-            printf("a: %llu\n", a);
+        // if  (a % 1000000 == 0)
+        //     printf("a: %llu\n", a);
     }
 
     return 0;
