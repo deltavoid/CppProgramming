@@ -135,10 +135,10 @@ static int example_thread_run(void *arg)
                 thread_ctx->t1 -  thread_ctx->t0);
 
 
-        for (i = 0; i < 1000 ; i++)
-        {
-            tmp++;
-        }
+        // for (i = 0; i < 1000 ; i++)
+        // {
+        //     tmp++;
+        // }
             
 
 
@@ -191,7 +191,9 @@ static void timer_example_expire__(struct timer_example* timer_ctx, struct timer
     wake_up(&timer_ctx->thread_ctx->wq_head);
 
     // pr_debug("jeffies: %ld\n", jiffies);
-    mod_timer(timer, jiffies + timer_example_timeout * HZ);
+    // mod_timer(timer, jiffies + timer_example_timeout * HZ);
+    mod_timer(timer, jiffies + timer_example_timeout * HZ / 4);
+
     // printk("\n");
 }
 
