@@ -21,6 +21,7 @@
 
 static int example_dev_open(struct inode *inode, struct file *filp)
 {
+    pr_debug("example_dev_open");
     filp->private_data = NULL;
 
     return 0;
@@ -28,28 +29,35 @@ static int example_dev_open(struct inode *inode, struct file *filp)
 
 static int example_dev_release(struct inode *inode, struct file *filp)
 {
-    return 0;
+    pr_debug("example_dev_release");
 
+
+
+    return 0;
 }
 
 static int example_dev_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-    return 0;
+    pr_debug("example_dev_mmap");
 
+    return 0;
 }
 
 static long example_dev_ioctl(struct file *filp, unsigned int cmd,
                               unsigned long arg)
 {
-    return 0;
+    pr_debug("example_dev_ioctl");
 
+    return 0;
 }
 
 
 static unsigned int example_dev_poll(struct file *filp, struct poll_table_struct *wait)
 {
+    pr_debug("example_dev_poll");
     /* Never report ready, so that this device can be added to poll/select
      * without affecting results. */
+
     return 0;
 }
 
