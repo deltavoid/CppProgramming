@@ -5,7 +5,7 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
-#include <linux/version.h>`
+#include <linux/version.h>
 
 #include <linux/miscdevice.h>
 #include <linux/inetdevice.h>
@@ -16,7 +16,7 @@
 
 
 // build a char device for user to mmap, map two areas, one control area, and one queue area
-
+#define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_mmap_char_device"
 
 
 static int example_dev_open(struct inode *inode, struct file *filp)
@@ -56,7 +56,7 @@ static unsigned int example_dev_poll(struct file *filp, struct poll_table_struct
 
 
 
-static struct file_operations example_fops = {
+static struct file_operations example_char_device_fops = {
     .owner          = THIS_MODULE,
     .open           = example_dev_open,
     .release        = example_dev_release,
@@ -68,6 +68,7 @@ static struct file_operations example_fops = {
 
 
 
+static struct miscdevice example_char_device;
 
 
 
@@ -76,7 +77,23 @@ static struct file_operations example_fops = {
 
 static int __init example_module_init(void)
 {
+    int ret;
     pr_info("example_module_init begin\n");
+
+
+
+    /* Create /dev/instanta_socket device */
+    example_char_device.minor = MISC_DYNAMIC_MINOR;
+    example_char_device.name  = EXAMPLE_CHAR_DEVICE_PATH;
+    example_char_device.fops = &example_char_device_fops;
+    example_char_device.mode = S_IFCHR|S_IRUGO|S_IWUGO; // 支持非root账户下运行用户态协议栈
+    ret = misc_register(&example_char_device);
+    if (ret != 0)
+    {
+        pr_err("Failed to register instanta device: %d\n", ret);
+        return -1;
+    }
+
 
 
     pr_info("example_module_init end\n");
@@ -86,6 +103,9 @@ static int __init example_module_init(void)
 static void __exit example_module_exit(void)
 {
     pr_info("example_module_exit begin\n");
+
+    misc_deregister(&example_char_device);
+
 
 
     pr_info("example_module_exit end\n");
