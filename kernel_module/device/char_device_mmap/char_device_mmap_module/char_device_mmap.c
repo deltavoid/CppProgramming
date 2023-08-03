@@ -16,7 +16,7 @@
 
 
 // build a char device for user to mmap, map two areas, one control area, and one queue area
-#define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_mmap_char_device"
+#define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_device"
 
 
 static int example_dev_open(struct inode *inode, struct file *filp)
@@ -92,7 +92,7 @@ static int __init example_module_init(void)
 
     /* Create /dev/instanta_socket device */
     example_char_device.minor = MISC_DYNAMIC_MINOR;
-    example_char_device.name  = EXAMPLE_CHAR_DEVICE_PATH;
+    example_char_device.name  = "example_mmap_char_device";
     example_char_device.fops = &example_char_device_fops;
     example_char_device.mode = S_IFCHR|S_IRUGO|S_IWUGO; // 支持非root账户下运行用户态协议栈
     ret = misc_register(&example_char_device);
