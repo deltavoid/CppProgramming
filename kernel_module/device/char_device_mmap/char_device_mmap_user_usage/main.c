@@ -7,6 +7,11 @@
 #include <pthread.h>
 
 
+#define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_mmap_char_device"
+
+
+
+
 // void* run(void* arg)
 // {
 //     printf("run: 1\n");
@@ -16,6 +21,12 @@
 //     return NULL;
 // }
 
+
+void mmap_char_device_test()
+{
+    printf("mmap_char_device_test\n");
+
+}
 
 
 int main()
@@ -37,8 +48,10 @@ int main()
 
 
     // printf("hello world\n");
+    mmap_char_device_test();
 
-    sleep(10000);
+    // sleep(10000);
+
 
     return 0;
 }
