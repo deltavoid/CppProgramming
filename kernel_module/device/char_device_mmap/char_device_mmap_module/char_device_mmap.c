@@ -21,7 +21,7 @@
 
 static int example_dev_open(struct inode *inode, struct file *filp)
 {
-    pr_debug("example_dev_open");
+    pr_debug("example_dev_open\n");
     filp->private_data = NULL;
 
     return 0;
@@ -29,7 +29,7 @@ static int example_dev_open(struct inode *inode, struct file *filp)
 
 static int example_dev_release(struct inode *inode, struct file *filp)
 {
-    pr_debug("example_dev_release");
+    pr_debug("example_dev_release\n");
 
 
 
@@ -38,7 +38,7 @@ static int example_dev_release(struct inode *inode, struct file *filp)
 
 static int example_dev_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-    pr_debug("example_dev_mmap");
+    pr_debug("example_dev_mmap\n");
 
     return 0;
 }
@@ -46,7 +46,7 @@ static int example_dev_mmap(struct file *filp, struct vm_area_struct *vma)
 static long example_dev_ioctl(struct file *filp, unsigned int cmd,
                               unsigned long arg)
 {
-    pr_debug("example_dev_ioctl");
+    pr_debug("example_dev_ioctl\n");
 
     return 0;
 }
@@ -54,7 +54,7 @@ static long example_dev_ioctl(struct file *filp, unsigned int cmd,
 
 static unsigned int example_dev_poll(struct file *filp, struct poll_table_struct *wait)
 {
-    pr_debug("example_dev_poll");
+    pr_debug("example_dev_poll\n");
     /* Never report ready, so that this device can be added to poll/select
      * without affecting results. */
 
