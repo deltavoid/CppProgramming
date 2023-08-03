@@ -19,6 +19,58 @@
 #define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_device"
 
 
+#define EXAMPLE_CHAR_DEVICE_QUEUE_SIZE (64 * 1024 * 1024)
+// 64MB
+
+
+
+struct example_mmap_char_dev_ctrl_t {
+    // int queue_chunk_size;
+    // int queue_chunk_num_bit;
+    // int queue_size;
+    // int tmp;
+    // uint64_t tx_id;
+    int queue_size;
+};
+
+struct example_mmap_char_dev_meta_t {
+    struct example_mmap_char_dev_ctrl_t* ctrl;
+    void* queue;
+};
+
+struct example_mmap_char_dev_meta_t example_mmap_dev;
+
+int example_mmap_char_dev_meta_init(struct example_mmap_char_dev_meta_t* data)
+{
+    data->ctrl = vmalloc_user(sizeof( *(data->ctrl)));
+    if  (data->ctrl == NULL)
+    {
+        pr_err("malloc ctrl failed\n");
+    }
+
+    data->ctrl->queue_size = EXAMPLE_CHAR_DEVICE_QUEUE_SIZE;
+
+    data->queue = vmalloc_user(EXAMPLE_CHAR_DEVICE_QUEUE_SIZE);
+    if  (data->queue == NULL)
+    {
+        pr_err("malloc ctrl failed\n");
+    }
+
+    return 0;
+}
+
+void example_mmap_char_dev_meta_exit(struct example_mmap_char_dev_meta_t* data)
+{
+
+    vfree(data->queue);
+    vfree(data->ctrl);
+
+}
+
+
+
+
+
 static int example_dev_open(struct inode *inode, struct file *filp)
 {
     pr_debug("example_dev_open\n");
