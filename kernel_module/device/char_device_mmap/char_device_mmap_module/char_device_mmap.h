@@ -3,7 +3,8 @@
 
 
 
-#define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_device"
+#define EXAMPLE_CHAR_DEVICE_NAME "example_mmap_char_device"
+#define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_mmap_char_device"
 
 
 #define EXAMPLE_CHAR_DEVICE_QUEUE_SIZE (64 * 1024 * 1024)

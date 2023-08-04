@@ -9,8 +9,10 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
+#include "../char_device_mmap_module/char_device_mmap.h"
 
-#define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_mmap_char_device"
+
+// #define EXAMPLE_CHAR_DEVICE_PATH "/dev/example_mmap_char_device"
 
 
 
@@ -46,6 +48,8 @@ int mmap_char_device_test()
     printf("ioctl ret %d\n", ret);
 
 
+
+    
 
 
 
