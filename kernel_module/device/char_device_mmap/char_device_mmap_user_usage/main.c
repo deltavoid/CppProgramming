@@ -5,6 +5,7 @@
 
 #include <unistd.h>
 #include <pthread.h>
+#include <sys/mman.h>
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
@@ -27,6 +28,12 @@
 // }
 
 
+struct example_mmap_char_dev_meta_t example_mmap_dev;
+
+
+
+
+
 int mmap_char_device_test()
 {
     int ret;
@@ -47,6 +54,13 @@ int mmap_char_device_test()
     ret = ioctl(dev_fd, /*test arg*/ 1, &test_ioctl_arg);
     printf("ioctl ret %d\n", ret);
 
+    
+    void* ctrl = mmap(NULL, EXAMPLE_CHAR_DEVICE_MMAP_CTRL_SIZE, PROT_READ | PROT_WRITE,
+            MAP_SHARED, dev_fd, EXAMPLE_CHAR_DEVICE_MMAP_CTRL_OFFSET);
+
+    if  (ctrl == NULL)
+        printf("mmap ctrl error");
+    printf("ctrl: %lx\n", ctrl);
 
 
     

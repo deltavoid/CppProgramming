@@ -27,6 +27,7 @@ int example_mmap_char_dev_meta_init(struct example_mmap_char_dev_meta_t* data)
     {
         pr_err("malloc ctrl failed\n");
     }
+    pr_info("data->ctrl: %lx\n", (long)data->ctrl);
 
     data->ctrl->queue_size = EXAMPLE_CHAR_DEVICE_QUEUE_SIZE;
 
@@ -35,6 +36,7 @@ int example_mmap_char_dev_meta_init(struct example_mmap_char_dev_meta_t* data)
     {
         pr_err("malloc ctrl failed\n");
     }
+    pr_info("data->queue: %lx\n", (long)data->queue);
 
     return 0;
 }
@@ -78,12 +80,14 @@ static int example_dev_mmap(struct file *filp, struct vm_area_struct *vma)
     if  (vma->vm_pgoff >= EXAMPLE_CHAR_DEVICE_MMAP_QUEUE_OFFSET / PAGE_SIZE)
     {
         // mmap queue area
+        pr_info("mmap queue\n");
 
         return remap_vmalloc_range(vma, example_mmap_dev.queue, vma->vm_pgoff);
     }
     else
     {
         // mmap ctrl area
+        pr_info("mmap ctrl\n");
 
         return remap_vmalloc_range(vma, example_mmap_dev.ctrl, vma->vm_pgoff);
     }
@@ -136,7 +140,7 @@ static int __init example_module_init(void)
     int ret;
     pr_info("example_module_init begin\n");
 
-
+    example_mmap_char_dev_meta_init(&example_mmap_dev);
 
     /* Create /dev/instanta_socket device */
     example_char_device.minor = MISC_DYNAMIC_MINOR;
@@ -161,6 +165,8 @@ static void __exit example_module_exit(void)
     pr_info("example_module_exit begin\n");
 
     misc_deregister(&example_char_device);
+
+    example_mmap_char_dev_meta_exit(&example_mmap_dev);
 
 
 
