@@ -63,6 +63,10 @@ int mmap_char_device_test()
     printf("ctrl: %lx\n", ctrl);
 
 
+    example_mmap_dev.ctrl = ctrl;
+    printf("ctrl->queue: %d\n", example_mmap_dev.ctrl->queue_size);
+
+
     
 
 
