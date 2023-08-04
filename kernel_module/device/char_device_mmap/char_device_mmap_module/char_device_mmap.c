@@ -102,17 +102,18 @@ static int example_dev_mmap(struct file *filp, struct vm_area_struct *vma)
     pr_debug("example_dev_mmap\n");
 
 
+    if  (vma->vm_pgoff >= EXAMPLE_CHAR_DEVICE_MMAP_QUEUE_OFFSET / PAGE_SIZE)
+    {
+        // mmap queue area
 
+        return remap_vmalloc_range(vma, example_mmap_dev.queue, vma->vm_pgoff);
+    }
+    else
+    {
+        // mmap ctrl area
 
-
-
-
-
-
-
-
-
-
+        return remap_vmalloc_range(vma, example_mmap_dev.ctrl, vma->vm_pgoff);
+    }
 
     return 0;
 }
