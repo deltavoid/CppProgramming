@@ -8,8 +8,31 @@
 #include <linux/version.h>
 
 #include <linux/sched.h>
+#include <uapi/linux/sched/types.h>
 #include <linux/delay.h>
 #include <linux/kthread.h>
+
+
+
+
+
+// for arm
+uint64_t qjl_gettick10ns(void)
+{    
+    uint64_t count_num;    
+    __asm__ __volatile__ (
+        "mrs %0, cntvct_el0" 
+        : "=r" (count_num)
+    );    
+    
+    return count_num;
+}
+
+uint64_t simple_arm_clock(void)
+{
+    return qjl_gettick10ns() * 10;
+}
+
 
 
 
@@ -21,6 +44,8 @@ struct example_thread_ctx {
     int waked;
     struct wait_queue_head wq_head;
 
+    uint64_t t0;
+    uint64_t t1;
 };
 
 static int example_thread_ctx_init(struct example_thread_ctx* ctx)
@@ -58,6 +83,7 @@ static inline void wait_for_kthread_stop(void)
 static int example_thread_run(void *arg)
 {
     int i = 0;
+    int tmp = 0;
     struct example_thread_ctx* thread_ctx = (struct example_thread_ctx*)arg;
 
     pr_debug("example_thread: 1\n");
@@ -100,13 +126,24 @@ static int example_thread_run(void *arg)
 
     while (thread_ctx->running)
     {
-        pr_debug("example_thread: 2, i: %d\n", ++i);
+        // pr_debug("example_thread: 2, i: %d\n", ++i);
         wait_event(thread_ctx->wq_head, thread_ctx->waked == 1);
         thread_ctx->waked = 0;
+        thread_ctx->t1 = simple_arm_clock();
+
+        pr_info("t0: %llu, t1: %llu, duration: %llu",  thread_ctx->t0,  thread_ctx->t1,  
+                thread_ctx->t1 -  thread_ctx->t0);
 
 
-        pr_debug("example_thread: 3");
-        msleep(1000);
+        // for (i = 0; i < 1000 ; i++)
+        // {
+        //     tmp++;
+        // }
+            
+
+
+        // pr_debug("example_thread: 3");
+        // msleep(1000);
     }
 
 
@@ -131,7 +168,7 @@ struct timer_example {
     uint64_t cnt;
 };
 
-#define timer_example_timeout 5
+#define timer_example_timeout 1
 
 static void timer_example_expire__(struct timer_example* timer_ctx, struct timer_list* timer)
 {
@@ -149,11 +186,14 @@ static void timer_example_expire__(struct timer_example* timer_ctx, struct timer
     // }
 
 
+    timer_ctx->thread_ctx->t0 = simple_arm_clock();
     timer_ctx->thread_ctx->waked = 1;
     wake_up(&timer_ctx->thread_ctx->wq_head);
 
-    pr_debug("jeffies: %ld\n", jiffies);
-    mod_timer(timer, jiffies + timer_example_timeout * HZ);
+    // pr_debug("jeffies: %ld\n", jiffies);
+    // mod_timer(timer, jiffies + timer_example_timeout * HZ);
+    mod_timer(timer, jiffies + timer_example_timeout * HZ / 4);
+
     // printk("\n");
 }
 
@@ -207,6 +247,10 @@ struct timer_example example_timer;
 
 static int __init kthread_example4_init(void)
 {
+    struct sched_param thread_param = {
+		.sched_priority = MAX_USER_RT_PRIO/2,
+	};
+
     pr_info("kthread_example4_init begin\n");
 
     example_thread_ctx_init(&example_thread_ctx);
@@ -219,6 +263,9 @@ static int __init kthread_example4_init(void)
 
 
     example_timer.thread_ctx = &example_thread_ctx;
+
+
+    sched_setscheduler_nocheck(example_thread_ctx.task, SCHED_FIFO, &thread_param);    
 
 
     timer_example_init(&example_timer);
