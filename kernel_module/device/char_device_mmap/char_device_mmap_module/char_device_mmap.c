@@ -38,7 +38,14 @@ struct example_mmap_char_dev_meta_t {
     void* queue;
 };
 
-struct example_mmap_char_dev_meta_t example_mmap_dev;
+
+#define EXAMPLE_CHAR_DEVICE_MMAP_CTRL_OFFSET 0x0000
+#define EXAMPLE_CHAR_DEVICE_MMAP_QUEUE_OFFSET 0x1000
+
+#define EXAMPLE_CHAR_DEVICE_MMAP_CTRL_SIZE sizeof(struct example_mmap_char_dev_ctrl_t)
+#define EXAMPLE_CHAR_DEVICE_MMAP_QUEUE_SIZE EXAMPLE_CHAR_DEVICE_QUEUE_SIZE
+
+
 
 int example_mmap_char_dev_meta_init(struct example_mmap_char_dev_meta_t* data)
 {
@@ -67,6 +74,8 @@ void example_mmap_char_dev_meta_exit(struct example_mmap_char_dev_meta_t* data)
 
 }
 
+struct example_mmap_char_dev_meta_t example_mmap_dev;
+
 
 
 
@@ -91,6 +100,19 @@ static int example_dev_release(struct inode *inode, struct file *filp)
 static int example_dev_mmap(struct file *filp, struct vm_area_struct *vma)
 {
     pr_debug("example_dev_mmap\n");
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     return 0;
 }
