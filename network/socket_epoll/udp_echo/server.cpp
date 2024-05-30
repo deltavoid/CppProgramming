@@ -46,22 +46,35 @@ void* udp_echo(void* arg)
 int main(int argc, char** argv)
 {
     if  (!(argc > 1))
-    {   printf("usage: %s <port>\n", argv[0]);
+    {   printf("usage: %s <port> [<addr>]\n", argv[0]);
         return 0;
     }
-
-    int port_;
-    if  (sscanf(argv[1], "%d", &port_) == -1)  perror("bad port");
-    // short port = port_;
-
-    int fd = -1;
-    if  ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)  perror("socket error");
 
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(sockaddr_in));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons((short)port_);
+    
+    int port_;
+    if  (sscanf(argv[1], "%d", &port_) == -1)  perror("bad port");
+    // short port = port_;
+    server_addr.sin_port = htons((short)port_);    
+
+
+    if  (argc > 2)
+    {
+        if  (inet_pton(AF_INET, argv[2], &server_addr.sin_addr.s_addr) < 0)
+            perror("bad addr");
+        
+        char addr[20];
+        printf("addr: %s\n", inet_ntop(AF_INET, &server_addr.sin_addr.s_addr, addr, 20));
+    }
+    else
+    {
+        server_addr.sin_addr.s_addr = INADDR_ANY;
+    }
+
+    int fd = -1;
+    if  ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)  perror("socket error");
 
     if  (bind(fd, (struct sockaddr*)&server_addr, sizeof(struct sockaddr)) == -1)  perror("bind error");
 
