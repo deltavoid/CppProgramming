@@ -20,7 +20,13 @@ int request_num = 100;
 void* client(void* arg)
 {
     int fd = *(int*)arg;
-    char buf[buf_size];
+    // char buf[buf_size];
+    char* buf = (char*)malloc(buf_size + 10);
+    if  (!buf)
+    {
+        return NULL;
+    }
+
 
     struct sockaddr_in recv_server_addr;
     socklen_t socklen = sizeof(struct sockaddr);
@@ -39,6 +45,7 @@ void* client(void* arg)
     }
 
     close(fd);
+    free(buf);
     return NULL;
 }
 
